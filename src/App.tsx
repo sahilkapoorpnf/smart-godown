@@ -7,6 +7,11 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import UserManagement from "./pages/admin/UserManagement";
+import SystemConfiguration from "./pages/admin/SystemConfiguration";
+import TaxUnitCategories from "./pages/admin/TaxUnitCategories";
+import ModuleControl from "./pages/admin/ModuleControl";
+import BackupSecurity from "./pages/admin/BackupSecurity";
 
 const queryClient = new QueryClient();
 
@@ -20,8 +25,12 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/users" element={<UserManagement />} />
+          <Route path="/dashboard/settings" element={<SystemConfiguration />} />
+          <Route path="/dashboard/tax-units" element={<TaxUnitCategories />} />
+          <Route path="/dashboard/modules" element={<ModuleControl />} />
+          <Route path="/dashboard/backup" element={<BackupSecurity />} />
           <Route path="/dashboard/*" element={<Dashboard />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

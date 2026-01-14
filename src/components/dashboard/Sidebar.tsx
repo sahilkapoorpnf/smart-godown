@@ -36,6 +36,7 @@ const menuItems = [
   { icon: FileText, label: "Reports", path: "/dashboard/reports" },
   { icon: Search, label: "Audit & Logs", path: "/dashboard/audit" },
   { icon: Users, label: "User Control", path: "/dashboard/users" },
+  { icon: Settings, label: "Tax & Categories", path: "/dashboard/tax-units" },
 ];
 
 const Sidebar = () => {
