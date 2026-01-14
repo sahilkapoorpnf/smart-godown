@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["DM Sans", "system-ui", "sans-serif"],
+        serif: ["Playfair Display", "Georgia", "serif"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -57,33 +61,52 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        himfed: {
+          green: "hsl(var(--himfed-green))",
+          "green-light": "hsl(var(--himfed-green-light))",
+          amber: "hsl(var(--himfed-amber))",
+          gold: "hsl(var(--himfed-gold))",
+          earth: "hsl(var(--himfed-earth))",
+          cream: "hsl(var(--himfed-cream))",
+          success: "hsl(var(--himfed-success))",
+          warning: "hsl(var(--himfed-warning))",
+          danger: "hsl(var(--himfed-danger))",
+          info: "hsl(var(--himfed-info))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      boxShadow: {
+        'glow': 'var(--shadow-glow)',
+        'card': 'var(--shadow-md)',
+        'card-hover': 'var(--shadow-lg)',
+      },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        "pulse-glow": {
+          "0%, 100%": { boxShadow: "0 0 20px hsl(152 45% 25% / 0.2)" },
+          "50%": { boxShadow: "0 0 40px hsl(152 45% 25% / 0.4)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "float": "float 3s ease-in-out infinite",
+        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
       },
     },
   },
