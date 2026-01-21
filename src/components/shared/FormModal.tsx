@@ -51,8 +51,8 @@ export function FormModal({
               <DialogDescription>{description}</DialogDescription>
             )}
           </DialogHeader>
-          <ScrollArea className="max-h-[60vh] py-4">
-            <div className="space-y-4 px-1">{children}</div>
+          <ScrollArea className="max-h-[60vh] py-4 pr-4">
+            <div className="space-y-4 pr-2">{children}</div>
           </ScrollArea>
           {showFooter && (
             <DialogFooter className="gap-2">
