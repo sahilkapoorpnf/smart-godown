@@ -14,6 +14,7 @@ import ModuleControl from "./pages/admin/ModuleControl";
 import BackupSecurity from "./pages/admin/BackupSecurity";
 import ProductMaster from "./pages/master/ProductMaster";
 import StockManagement from "./pages/master/StockManagement";
+import GodownMaster from "./pages/master/GodownMaster";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/dashboard/backup" element={<BackupSecurity />} />
           <Route path="/dashboard/products" element={<ProductMaster />} />
           <Route path="/dashboard/stock" element={<StockManagement />} />
+          <Route path="/dashboard/godowns" element={<GodownMaster />} />
           <Route path="/dashboard/*" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
