@@ -9,16 +9,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-interface FormModalProps {
+export interface FormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
   description?: string;
   children: React.ReactNode;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit?: (e: React.FormEvent) => void;
   submitLabel?: string;
   isLoading?: boolean;
   size?: "sm" | "md" | "lg" | "xl";
+  showFooter?: boolean;
 }
 
 const sizeClasses = {
@@ -38,6 +39,7 @@ export function FormModal({
   submitLabel = "Save",
   isLoading = false,
   size = "md",
+  showFooter = true,
 }: FormModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -52,19 +54,21 @@ export function FormModal({
           <ScrollArea className="max-h-[60vh] py-4">
             <div className="space-y-4 px-1">{children}</div>
           </ScrollArea>
-          <DialogFooter className="gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isLoading}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Saving..." : submitLabel}
-            </Button>
-          </DialogFooter>
+          {showFooter && (
+            <DialogFooter className="gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={isLoading}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Saving..." : submitLabel}
+              </Button>
+            </DialogFooter>
+          )}
         </form>
       </DialogContent>
     </Dialog>

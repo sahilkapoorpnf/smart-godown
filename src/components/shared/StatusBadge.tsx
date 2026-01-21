@@ -15,7 +15,8 @@ type StatusType =
   | "out_of_stock"
   | "expired"
   | "destructive"
-  | "secondary";
+  | "secondary"
+  | "maintenance";
 
 interface StatusBadgeProps {
   status: StatusType;
@@ -37,6 +38,7 @@ const statusStyles: Record<StatusType, string> = {
   expired: "bg-himfed-danger/10 text-himfed-danger border-himfed-danger/20",
   destructive: "bg-himfed-danger/10 text-himfed-danger border-himfed-danger/20",
   secondary: "bg-muted text-muted-foreground border-muted",
+  maintenance: "bg-himfed-warning/10 text-himfed-warning border-himfed-warning/20",
 };
 
 const defaultLabels: Record<StatusType, string> = {
@@ -54,6 +56,7 @@ const defaultLabels: Record<StatusType, string> = {
   expired: "Expired",
   destructive: "Error",
   secondary: "Secondary",
+  maintenance: "Under Maintenance",
 };
 
 export function StatusBadge({ status, label }: StatusBadgeProps) {
