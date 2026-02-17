@@ -1,5 +1,6 @@
 import Header from "@/components/landing/Header";
 import HeroSection from "@/components/landing/HeroSection";
+import StockChecker from "@/components/landing/StockChecker";
 import ProblemsSection from "@/components/landing/ProblemsSection";
 import ModulesSection from "@/components/landing/ModulesSection";
 import RolesSection from "@/components/landing/RolesSection";
@@ -13,6 +14,7 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
+        <StockChecker />
         <section id="features">
           <ProblemsSection />
         </section>
