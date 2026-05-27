@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { IndianRupee, Pencil, Trash2 } from "lucide-react";
 import { useFertilizerStore, upsertPricing, deletePricing, companyName, productName } from "@/lib/fertilizer/store";
-import { FertilizerPricing } from "@/lib/fertilizer/types";
+import type { FertilizerPricing } from "@/lib/fertilizer/types";
 import { toast } from "sonner";
 
 const empty: FertilizerPricing = {
