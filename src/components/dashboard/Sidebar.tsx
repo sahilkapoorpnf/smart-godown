@@ -27,9 +27,7 @@ import {
   MapPin,
   Activity,
   PlusSquare,
-  Truck,
   Receipt,
-  FileText as FileText2,
 } from "lucide-react";
 
 type Item = { icon: any; label: string; path: string; roles?: Role[] };
@@ -59,7 +57,7 @@ const menuItems: Item[] = [
   { icon: ClipboardList, label: "Stock Listing", path: "/dashboard/stock/listing", roles: ["superadmin", "incharge", "accountant", "warehouse_staff", "joa_it"] },
   { icon: Package, label: "Fertilizer Master", path: "/dashboard/stock/master", roles: ["superadmin"] },
   { icon: Receipt, label: "Generate Invoice", path: "/dashboard/stock/invoice", roles: ["superadmin", "accountant", "warehouse_staff"] },
-  { icon: FileText2, label: "Sales History", path: "/dashboard/stock/sales", roles: ["superadmin", "accountant", "incharge", "warehouse_staff", "joa_it"] },
+  { icon: FileText, label: "Sales History", path: "/dashboard/stock/sales", roles: ["superadmin", "accountant", "incharge", "warehouse_staff", "joa_it"] },
   { icon: BarChart3, label: "Reports & Analytics", path: "/dashboard/stock/reports", roles: ["superadmin", "accountant", "joa_it", "incharge"] },
 
   // Existing modules (superadmin)
