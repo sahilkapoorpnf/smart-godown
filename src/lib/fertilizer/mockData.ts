@@ -8,13 +8,14 @@ import {
 } from "./types";
 
 export const companies: FertilizerCompany[] = [
-  { id: "fc1", code: "NFL", name: "National Fertilizers Ltd.", gst: "06AAACN0917P1Z2", contactPerson: "Rakesh Mehta", mobile: "+91 98100 11111", email: "sales@nfl.co.in", address: "Noida, UP", status: "active" },
-  { id: "fc2", code: "IFFCO", name: "Indian Farmers Fertiliser Cooperative", gst: "07AAAAI0140P1ZE", contactPerson: "Suman Joshi", mobile: "+91 98100 22222", email: "marketing@iffco.in", address: "New Delhi", status: "active" },
-  { id: "fc3", code: "KRIBHCO", name: "Krishak Bharati Cooperative Ltd.", gst: "24AAACK6936P1Z0", contactPerson: "Pravin Patel", mobile: "+91 98100 33333", email: "info@kribhco.net", address: "Surat, Gujarat", status: "active" },
-  { id: "fc4", code: "RCF", name: "Rashtriya Chemicals & Fertilizers", gst: "27AAACR1718Q1ZB", contactPerson: "Asha Naik", mobile: "+91 98100 44444", email: "contact@rcfltd.com", address: "Mumbai", status: "active" },
-  { id: "fc5", code: "CHAMBAL", name: "Chambal Fertilizers & Chemicals", gst: "08AAACC4536R1Z0", contactPerson: "Vikas Saxena", mobile: "+91 98100 55555", email: "info@chambal.in", address: "Kota, Rajasthan", status: "active" },
-  { id: "fc6", code: "COROMANDEL", name: "Coromandel International Ltd.", gst: "37AAACC4659P1ZH", contactPerson: "Rahul Reddy", mobile: "+91 98100 66666", email: "sales@coromandel.biz", address: "Secunderabad", status: "active" },
+  { id: "fc1", code: "NFL", name: "National Fertilizers Ltd.", gst: "06AAACN0917P1Z2", contactPerson: "Rakesh Mehta", mobile: "+91 98100 11111", email: "sales@nfl.co.in", address: "Noida, UP", serviceAreas: ["a1", "a2", "a3", "a4"], status: "active" },
+  { id: "fc2", code: "IFFCO", name: "Indian Farmers Fertiliser Cooperative", gst: "07AAAAI0140P1ZE", contactPerson: "Suman Joshi", mobile: "+91 98100 22222", email: "marketing@iffco.in", address: "New Delhi", serviceAreas: ["a1", "a2", "a3", "a4"], status: "active" },
+  { id: "fc3", code: "KRIBHCO", name: "Krishak Bharati Cooperative Ltd.", gst: "24AAACK6936P1Z0", contactPerson: "Pravin Patel", mobile: "+91 98100 33333", email: "info@kribhco.net", address: "Surat, Gujarat", serviceAreas: ["a2", "a3"], status: "active" },
+  { id: "fc4", code: "RCF", name: "Rashtriya Chemicals & Fertilizers", gst: "27AAACR1718Q1ZB", contactPerson: "Asha Naik", mobile: "+91 98100 44444", email: "contact@rcfltd.com", address: "Mumbai", serviceAreas: ["a1", "a4"], status: "active" },
+  { id: "fc5", code: "CHAMBAL", name: "Chambal Fertilizers & Chemicals", gst: "08AAACC4536R1Z0", contactPerson: "Vikas Saxena", mobile: "+91 98100 55555", email: "info@chambal.in", address: "Kota, Rajasthan", serviceAreas: ["a2", "a4"], status: "active" },
+  { id: "fc6", code: "COROMANDEL", name: "Coromandel International Ltd.", gst: "37AAACC4659P1ZH", contactPerson: "Rahul Reddy", mobile: "+91 98100 66666", email: "sales@coromandel.biz", address: "Secunderabad", serviceAreas: ["a3", "a4"], status: "active" },
 ];
+
 
 export const products: FertilizerProduct[] = [
   { id: "fp1", code: "UREA-50", name: "Urea 50Kg", companyId: "fc1", unit: "Bag", category: "Nitrogenous", status: "active" },
