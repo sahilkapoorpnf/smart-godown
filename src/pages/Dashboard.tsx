@@ -32,6 +32,7 @@ const Dashboard = () => {
   useStore();
   const user = getCurrentUser();
   if (!user) return <Navigate to="/login" replace />;
+  if (user.role === "accountant") return <Navigate to="/dashboard/acc" replace />;
 
   const myEntries = visibleEntries(user);
   const today = myEntries.filter((e) => e.depotDate === todayStr || e.createdAt.slice(0, 10) === todayStr);

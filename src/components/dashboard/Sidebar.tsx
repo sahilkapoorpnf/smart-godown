@@ -9,6 +9,7 @@ import {
   Package,
   Warehouse,
   BarChart3,
+  TrendingUp,
   ShoppingCart,
   ArrowLeftRight,
   Truck,
@@ -28,12 +29,47 @@ import {
   Activity,
   PlusSquare,
   Receipt,
+  BookOpen,
+  Landmark,
+  FileMinus,
+  Undo2,
+  Scale,
+  ClipboardCheck,
+  ShieldCheck,
+  CalendarRange,
+  PiggyBank,
+  Wallet,
+  AlertTriangle,
+  BadgePercent,
 } from "lucide-react";
 
 type Item = { icon: any; label: string; path: string; roles?: Role[] };
 
 const menuItems: Item[] = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+
+  // ===== ACCOUNTANT PANEL =====
+  { icon: LayoutDashboard, label: "Accountant Dashboard", path: "/dashboard/acc", roles: ["accountant", "superadmin"] },
+  { icon: FileText, label: "Sales Ledger", path: "/dashboard/acc/sales", roles: ["accountant", "superadmin"] },
+  { icon: Truck, label: "Purchase Ledger", path: "/dashboard/acc/purchase", roles: ["accountant", "superadmin"] },
+  { icon: BarChart3, label: "Stock Ledger", path: "/dashboard/acc/stock-ledger", roles: ["accountant", "superadmin"] },
+  { icon: BadgePercent, label: "GST Management", path: "/dashboard/acc/gst", roles: ["accountant", "superadmin"] },
+  { icon: Wallet, label: "Subsidy Management", path: "/dashboard/acc/subsidy", roles: ["accountant", "superadmin"] },
+  { icon: AlertTriangle, label: "Outstanding Payments", path: "/dashboard/acc/outstanding", roles: ["accountant", "superadmin"] },
+  { icon: Users, label: "Party Ledger", path: "/dashboard/acc/party-ledger", roles: ["accountant", "superadmin"] },
+  { icon: TrendingUp, label: "Margin Management", path: "/dashboard/acc/margin", roles: ["accountant", "superadmin"] },
+  { icon: Receipt, label: "Expense Management", path: "/dashboard/acc/expenses", roles: ["accountant", "superadmin"] },
+  { icon: BookOpen, label: "Cash Book", path: "/dashboard/acc/cashbook", roles: ["accountant", "superadmin"] },
+  { icon: Landmark, label: "Bank Book", path: "/dashboard/acc/bankbook", roles: ["accountant", "superadmin"] },
+  { icon: FileMinus, label: "Credit / Debit Notes", path: "/dashboard/acc/notes", roles: ["accountant", "superadmin"] },
+  { icon: Undo2, label: "Return Management", path: "/dashboard/acc/returns", roles: ["accountant", "superadmin"] },
+  { icon: Scale, label: "Stock Adjustment", path: "/dashboard/acc/stock-adjustment", roles: ["accountant", "superadmin"] },
+  { icon: ClipboardCheck, label: "Physical Verification", path: "/dashboard/acc/physical-verification", roles: ["accountant", "superadmin"] },
+  { icon: Truck, label: "Transport Expense", path: "/dashboard/acc/transport", roles: ["accountant", "superadmin"] },
+  { icon: FileText, label: "Report Center", path: "/dashboard/acc/reports", roles: ["accountant", "superadmin"] },
+  { icon: ShieldCheck, label: "Audit Log", path: "/dashboard/acc/audit", roles: ["accountant", "superadmin"] },
+  { icon: PiggyBank, label: "Tally Export", path: "/dashboard/acc/tally", roles: ["accountant", "superadmin"] },
+  { icon: CalendarRange, label: "Financial Year", path: "/dashboard/acc/fy", roles: ["accountant", "superadmin"] },
 
   // Warehouse Workflow
   { icon: PlusSquare, label: "New Entry", path: "/dashboard/wh/new-entry", roles: ["warehouse_staff"] },

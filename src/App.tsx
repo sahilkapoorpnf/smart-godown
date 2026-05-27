@@ -33,6 +33,27 @@ import InvoiceGenerate from "./pages/stock/InvoiceGenerate";
 import SalesHistory from "./pages/stock/SalesHistory";
 import StockReports from "./pages/stock/StockReports";
 import SalesLedger from "./pages/sales/SalesLedger";
+import AccountantDashboard from "./pages/accountant/AccountantDashboard";
+import AccSalesLedger from "./pages/accountant/SalesLedger";
+import PurchaseLedger from "./pages/accountant/PurchaseLedger";
+import StockLedger from "./pages/accountant/StockLedger";
+import GstManagement from "./pages/accountant/GstManagement";
+import SubsidyManagement from "./pages/accountant/SubsidyManagement";
+import OutstandingPayments from "./pages/accountant/OutstandingPayments";
+import PartyLedger from "./pages/accountant/PartyLedger";
+import MarginManagement from "./pages/accountant/MarginManagement";
+import ExpenseManagement from "./pages/accountant/ExpenseManagement";
+import CashBook from "./pages/accountant/CashBook";
+import BankBook from "./pages/accountant/BankBook";
+import CreditDebitNotes from "./pages/accountant/CreditDebitNotes";
+import ReturnManagement from "./pages/accountant/ReturnManagement";
+import StockAdjustment from "./pages/accountant/StockAdjustment";
+import PhysicalVerification from "./pages/accountant/PhysicalVerification";
+import TransportExpense from "./pages/accountant/TransportExpense";
+import ReportCenter from "./pages/accountant/ReportCenter";
+import AuditLog from "./pages/accountant/AuditLog";
+import TallyExport from "./pages/accountant/TallyExport";
+import FinancialYear from "./pages/accountant/FinancialYear";
 
 const queryClient = new QueryClient();
 
@@ -73,7 +94,28 @@ const App = () => (
           <Route path="/dashboard/stock/reports" element={<StockReports />} />
           <Route path="/dashboard/sales/ledger" element={<SalesLedger />} />
 
-
+          {/* Accountant Panel */}
+          <Route path="/dashboard/acc" element={<AccountantDashboard />} />
+          <Route path="/dashboard/acc/sales" element={<AccSalesLedger />} />
+          <Route path="/dashboard/acc/purchase" element={<PurchaseLedger />} />
+          <Route path="/dashboard/acc/stock-ledger" element={<StockLedger />} />
+          <Route path="/dashboard/acc/gst" element={<GstManagement />} />
+          <Route path="/dashboard/acc/subsidy" element={<SubsidyManagement />} />
+          <Route path="/dashboard/acc/outstanding" element={<OutstandingPayments />} />
+          <Route path="/dashboard/acc/party-ledger" element={<PartyLedger />} />
+          <Route path="/dashboard/acc/margin" element={<MarginManagement />} />
+          <Route path="/dashboard/acc/expenses" element={<ExpenseManagement />} />
+          <Route path="/dashboard/acc/cashbook" element={<CashBook />} />
+          <Route path="/dashboard/acc/bankbook" element={<BankBook />} />
+          <Route path="/dashboard/acc/notes" element={<CreditDebitNotes />} />
+          <Route path="/dashboard/acc/returns" element={<ReturnManagement />} />
+          <Route path="/dashboard/acc/stock-adjustment" element={<StockAdjustment />} />
+          <Route path="/dashboard/acc/physical-verification" element={<PhysicalVerification />} />
+          <Route path="/dashboard/acc/transport" element={<TransportExpense />} />
+          <Route path="/dashboard/acc/reports" element={<ReportCenter />} />
+          <Route path="/dashboard/acc/audit" element={<AuditLog />} />
+          <Route path="/dashboard/acc/tally" element={<TallyExport />} />
+          <Route path="/dashboard/acc/fy" element={<FinancialYear />} />
 
           {/* Admin */}
           <Route path="/dashboard/users" element={<UserManagement />} />
