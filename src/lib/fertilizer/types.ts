@@ -7,8 +7,10 @@ export interface FertilizerCompany {
   mobile: string;
   email: string;
   address: string;
+  serviceAreas?: string[]; // areaIds this supplier serves
   status: "active" | "inactive";
 }
+
 
 export interface FertilizerProduct {
   id: string;
