@@ -43,6 +43,14 @@ const menuItems: Item[] = [
   { icon: Warehouse, label: "Warehouse Mgmt", path: "/dashboard/wh/warehouses", roles: ["superadmin"] },
   { icon: Activity, label: "Activity Logs", path: "/dashboard/wh/logs", roles: ["superadmin", "joa_it"] },
 
+  // Fertilizer Workflow
+  { icon: ClipboardList, label: "Demand Requests", path: "/dashboard/fert/requests", roles: ["superadmin", "incharge"] },
+  { icon: ShoppingCart, label: "Purchase Orders", path: "/dashboard/fert/purchase-orders", roles: ["superadmin"] },
+  { icon: Package, label: "Fertilizer Products", path: "/dashboard/fert/products", roles: ["superadmin"] },
+  { icon: Warehouse, label: "Fertilizer Companies", path: "/dashboard/fert/companies", roles: ["superadmin"] },
+  { icon: FileText, label: "Pricing Master", path: "/dashboard/fert/pricing", roles: ["superadmin"] },
+  { icon: BarChart3, label: "Fertilizer Inventory", path: "/dashboard/fert/inventory", roles: ["superadmin", "incharge", "accountant", "warehouse_staff"] },
+
   // Existing modules (superadmin)
   { icon: Package, label: "Product Master", path: "/dashboard/products", roles: ["superadmin"] },
   { icon: Warehouse, label: "Godown & Location", path: "/dashboard/godowns", roles: ["superadmin"] },
