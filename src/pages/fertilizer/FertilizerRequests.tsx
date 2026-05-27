@@ -206,8 +206,19 @@ export default function FertilizerRequests() {
               <div><div className="text-muted-foreground text-xs">Product</div><div className="font-medium">{productName(review.productId)}</div></div>
               <div><div className="text-muted-foreground text-xs">Requested</div><div className="font-medium">{review.requestedQty} Bags</div></div>
               <div><div className="text-muted-foreground text-xs">Priority</div><div className="font-medium">{review.priority}</div></div>
+              <div className="col-span-2"><div className="text-muted-foreground text-xs">Supplier Company</div><div className="font-medium text-primary">{review.companyId ? companyName(review.companyId) : "— not specified —"}</div></div>
+              {review.forwardedPONumber && (
+                <div className="col-span-2"><div className="text-muted-foreground text-xs">Forwarded PO</div><div className="font-semibold text-himfed-success">{review.forwardedPONumber}</div></div>
+              )}
               <div className="col-span-2 md:col-span-4"><div className="text-muted-foreground text-xs">Remarks</div><div>{review.remarks || "—"}</div></div>
             </div>
+
+            {user?.role === "superadmin" && review.companyId && (review.status === "pending" || review.status === "under_review") && (
+              <div className="p-3 rounded-lg border border-primary/30 bg-primary/5 text-sm">
+                On approval, a Purchase Order will be automatically generated and sent to <span className="font-semibold">{companyName(review.companyId)}</span>.
+              </div>
+            )}
+
 
             {user?.role === "superadmin" ? (
               <>
