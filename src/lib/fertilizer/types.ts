@@ -7,8 +7,10 @@ export interface FertilizerCompany {
   mobile: string;
   email: string;
   address: string;
+  serviceAreas?: string[]; // areaIds this supplier serves
   status: "active" | "inactive";
 }
+
 
 export interface FertilizerProduct {
   id: string;
@@ -49,6 +51,7 @@ export interface DemandRequest {
   requestCode: string;
   areaId: string;
   productId: string;
+  companyId?: string; // preferred supplier chosen by area officer
   requestedQty: number;
   approvedQty?: number;
   priority: "Low" | "Medium" | "High" | "Urgent";
@@ -61,7 +64,9 @@ export interface DemandRequest {
   reviewedAt?: string;
   reviewRemarks?: string;
   allocations?: WarehouseAllocation[];
+  forwardedPONumber?: string; // PO auto-generated to the supplier on approval
 }
+
 
 export type POStatus = "draft" | "sent" | "in_transit" | "delivered" | "closed";
 

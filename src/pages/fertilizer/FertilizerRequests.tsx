@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ClipboardList, Eye, PlusSquare } from "lucide-react";
-import { useFertilizerStore, createRequest, reviewRequest, productName } from "@/lib/fertilizer/store";
+import { useFertilizerStore, createRequest, reviewRequest, productName, companyName } from "@/lib/fertilizer/store";
 import { areaName, getCurrentUser, store, warehouseName } from "@/lib/warehouse/store";
 import type { DemandRequest, RequestStatus, WarehouseAllocation } from "@/lib/fertilizer/types";
 import { toast } from "sonner";
@@ -30,7 +30,7 @@ const statusLabel: Record<RequestStatus, string> = {
 
 export default function FertilizerRequests() {
   const user = getCurrentUser();
-  const { requests, products } = useFertilizerStore();
+  const { requests, products, companies } = useFertilizerStore();
 
   const [createOpen, setCreateOpen] = useState(false);
   const [review, setReview] = useState<DemandRequest | null>(null);
@@ -41,18 +41,26 @@ export default function FertilizerRequests() {
     return requests;
   }, [user, requests]);
 
+  // Companies that serve the current officer's area
+  const eligibleCompanies = useMemo(() => {
+    if (!user?.areaId) return companies;
+    return companies.filter((c) => c.status === "active" && (!c.serviceAreas || c.serviceAreas.includes(user.areaId!)));
+  }, [companies, user]);
+
   // ---- Create form ----
   const [form, setForm] = useState({
-    productId: "", requestedQty: 0, priority: "Medium" as DemandRequest["priority"],
+    productId: "", companyId: "", requestedQty: 0, priority: "Medium" as DemandRequest["priority"],
     requiredDate: new Date().toISOString().slice(0, 10), remarks: "",
   });
   const submitCreate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user?.areaId) { toast.error("Only Area Officers can raise requests"); return; }
     if (!form.productId || form.requestedQty <= 0) { toast.error("Product and qty required"); return; }
+    if (!form.companyId) { toast.error("Please select a supplier company"); return; }
     createRequest({
       areaId: user.areaId,
       productId: form.productId,
+      companyId: form.companyId,
       requestedQty: form.requestedQty,
       priority: form.priority,
       requiredDate: form.requiredDate,
@@ -61,8 +69,9 @@ export default function FertilizerRequests() {
     });
     toast.success("Request raised");
     setCreateOpen(false);
-    setForm({ productId: "", requestedQty: 0, priority: "Medium", requiredDate: new Date().toISOString().slice(0, 10), remarks: "" });
+    setForm({ productId: "", companyId: "", requestedQty: 0, priority: "Medium", requiredDate: new Date().toISOString().slice(0, 10), remarks: "" });
   };
+
 
   // ---- Review form ----
   const [revStatus, setRevStatus] = useState<RequestStatus>("approved");
@@ -95,12 +104,15 @@ export default function FertilizerRequests() {
     { key: "requestCode", label: "Request ID", sortable: true },
     { key: "areaId", label: "Area", render: (r) => areaName(r.areaId) },
     { key: "productId", label: "Product", render: (r) => productName(r.productId) },
+    { key: "companyId", label: "Supplier", render: (r) => r.companyId ? companyName(r.companyId) : <span className="text-muted-foreground">—</span> },
     { key: "requestedQty", label: "Requested", render: (r) => `${r.requestedQty} Bags` },
     { key: "approvedQty", label: "Approved", render: (r) => r.approvedQty ? `${r.approvedQty} Bags` : "—" },
     { key: "priority", label: "Priority" },
     { key: "requiredDate", label: "Required" },
     { key: "status", label: "Status", render: (r) => <Badge variant="outline" className={statusStyle[r.status]}>{statusLabel[r.status]}</Badge> },
+    { key: "forwardedPONumber", label: "Forwarded PO", render: (r) => r.forwardedPONumber ? <span className="text-primary font-medium">{r.forwardedPONumber}</span> : <span className="text-muted-foreground">—</span> },
   ];
+
 
   const counts = {
     total: visible.length,
@@ -151,6 +163,18 @@ export default function FertilizerRequests() {
               <SelectContent className="bg-popover">{products.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent>
             </Select>
           </div>
+          <div className="space-y-1 col-span-2">
+            <Label>Supplier Company * <span className="text-xs text-muted-foreground font-normal">(serving {user?.areaId ? areaName(user.areaId) : "your area"})</span></Label>
+            <Select value={form.companyId} onValueChange={(v) => setForm({ ...form, companyId: v })}>
+              <SelectTrigger><SelectValue placeholder="Select supplier company" /></SelectTrigger>
+              <SelectContent className="bg-popover">
+                {eligibleCompanies.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>{c.code} — {c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">On approval, a Purchase Order will be auto-generated and forwarded to this company.</p>
+          </div>
           <div className="space-y-1"><Label>Requested Qty (Bags) *</Label><Input type="number" value={form.requestedQty} onChange={(e) => setForm({ ...form, requestedQty: +e.target.value })} /></div>
           <div className="space-y-1">
             <Label>Priority</Label>
@@ -163,6 +187,7 @@ export default function FertilizerRequests() {
           <div className="space-y-1 col-span-2"><Label>Remarks</Label><Textarea value={form.remarks} onChange={(e) => setForm({ ...form, remarks: e.target.value })} maxLength={500} /></div>
         </div>
       </FormModal>
+
 
       {/* Review */}
       <FormModal
@@ -181,8 +206,19 @@ export default function FertilizerRequests() {
               <div><div className="text-muted-foreground text-xs">Product</div><div className="font-medium">{productName(review.productId)}</div></div>
               <div><div className="text-muted-foreground text-xs">Requested</div><div className="font-medium">{review.requestedQty} Bags</div></div>
               <div><div className="text-muted-foreground text-xs">Priority</div><div className="font-medium">{review.priority}</div></div>
+              <div className="col-span-2"><div className="text-muted-foreground text-xs">Supplier Company</div><div className="font-medium text-primary">{review.companyId ? companyName(review.companyId) : "— not specified —"}</div></div>
+              {review.forwardedPONumber && (
+                <div className="col-span-2"><div className="text-muted-foreground text-xs">Forwarded PO</div><div className="font-semibold text-himfed-success">{review.forwardedPONumber}</div></div>
+              )}
               <div className="col-span-2 md:col-span-4"><div className="text-muted-foreground text-xs">Remarks</div><div>{review.remarks || "—"}</div></div>
             </div>
+
+            {user?.role === "superadmin" && review.companyId && (review.status === "pending" || review.status === "under_review") && (
+              <div className="p-3 rounded-lg border border-primary/30 bg-primary/5 text-sm">
+                On approval, a Purchase Order will be automatically generated and sent to <span className="font-semibold">{companyName(review.companyId)}</span>.
+              </div>
+            )}
+
 
             {user?.role === "superadmin" ? (
               <>
