@@ -20,6 +20,12 @@ import EntriesPage from "./pages/warehouse/EntriesPage";
 import AreaManagement from "./pages/warehouse/AreaManagement";
 import WarehouseManagement from "./pages/warehouse/WarehouseManagement";
 import ActivityLogs from "./pages/warehouse/ActivityLogs";
+import FertilizerCompanies from "./pages/fertilizer/FertilizerCompanies";
+import FertilizerProducts from "./pages/fertilizer/FertilizerProducts";
+import FertilizerPricing from "./pages/fertilizer/FertilizerPricing";
+import FertilizerRequests from "./pages/fertilizer/FertilizerRequests";
+import PurchaseOrders from "./pages/fertilizer/PurchaseOrders";
+import FertilizerInventory from "./pages/fertilizer/FertilizerInventory";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +48,14 @@ const App = () => (
           <Route path="/dashboard/wh/areas" element={<AreaManagement />} />
           <Route path="/dashboard/wh/warehouses" element={<WarehouseManagement />} />
           <Route path="/dashboard/wh/logs" element={<ActivityLogs />} />
+
+          {/* Fertilizer */}
+          <Route path="/dashboard/fert/companies" element={<FertilizerCompanies />} />
+          <Route path="/dashboard/fert/products" element={<FertilizerProducts />} />
+          <Route path="/dashboard/fert/pricing" element={<FertilizerPricing />} />
+          <Route path="/dashboard/fert/requests" element={<FertilizerRequests />} />
+          <Route path="/dashboard/fert/purchase-orders" element={<PurchaseOrders />} />
+          <Route path="/dashboard/fert/inventory" element={<FertilizerInventory />} />
 
           {/* Admin */}
           <Route path="/dashboard/users" element={<UserManagement />} />
