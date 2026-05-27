@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ClipboardList, Eye, PlusSquare } from "lucide-react";
-import { useFertilizerStore, createRequest, reviewRequest, productName } from "@/lib/fertilizer/store";
+import { useFertilizerStore, createRequest, reviewRequest, productName, companyName } from "@/lib/fertilizer/store";
 import { areaName, getCurrentUser, store, warehouseName } from "@/lib/warehouse/store";
 import type { DemandRequest, RequestStatus, WarehouseAllocation } from "@/lib/fertilizer/types";
 import { toast } from "sonner";
