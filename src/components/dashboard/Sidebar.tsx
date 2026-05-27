@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { getCurrentUser } from "@/lib/warehouse/store";
+import { Role } from "@/lib/warehouse/types";
 import {
   Leaf,
   LayoutDashboard,
@@ -20,37 +22,58 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  ClipboardList,
+  CheckSquare,
+  MapPin,
+  Activity,
+  PlusSquare,
 } from "lucide-react";
 
-const menuItems = [
+type Item = { icon: any; label: string; path: string; roles?: Role[] };
+
+const menuItems: Item[] = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
-  { icon: Package, label: "Product Master", path: "/dashboard/products" },
-  { icon: Warehouse, label: "Godown & Location", path: "/dashboard/godowns" },
-  { icon: BarChart3, label: "Stock Management", path: "/dashboard/stock" },
-  { icon: ShoppingCart, label: "Procurement", path: "/dashboard/procurement" },
-  { icon: ArrowLeftRight, label: "Transfers", path: "/dashboard/transfers" },
-  { icon: Truck, label: "Distribution", path: "/dashboard/distribution" },
-  { icon: Fuel, label: "Petrol & Diesel", path: "/dashboard/fuel" },
-  { icon: Apple, label: "Apple & Crates", path: "/dashboard/crates" },
+
+  // Warehouse Workflow
+  { icon: PlusSquare, label: "New Entry", path: "/dashboard/wh/new-entry", roles: ["warehouse_staff"] },
+  { icon: ClipboardList, label: "My Entries", path: "/dashboard/wh/my-entries", roles: ["warehouse_staff"] },
+  { icon: CheckSquare, label: "Pending Approvals", path: "/dashboard/wh/approvals", roles: ["incharge", "superadmin"] },
+  { icon: ClipboardList, label: "Entry Monitoring", path: "/dashboard/wh/entries", roles: ["superadmin", "accountant", "joa_it", "incharge"] },
+  { icon: MapPin, label: "Area Management", path: "/dashboard/wh/areas", roles: ["superadmin"] },
+  { icon: Warehouse, label: "Warehouse Mgmt", path: "/dashboard/wh/warehouses", roles: ["superadmin"] },
+  { icon: Activity, label: "Activity Logs", path: "/dashboard/wh/logs", roles: ["superadmin", "joa_it"] },
+
+  // Existing modules (superadmin)
+  { icon: Package, label: "Product Master", path: "/dashboard/products", roles: ["superadmin"] },
+  { icon: Warehouse, label: "Godown & Location", path: "/dashboard/godowns", roles: ["superadmin"] },
+  { icon: BarChart3, label: "Stock Management", path: "/dashboard/stock", roles: ["superadmin", "accountant"] },
+  { icon: ShoppingCart, label: "Procurement", path: "/dashboard/procurement", roles: ["superadmin"] },
+  { icon: ArrowLeftRight, label: "Transfers", path: "/dashboard/transfers", roles: ["superadmin", "incharge"] },
+  { icon: Truck, label: "Distribution", path: "/dashboard/distribution", roles: ["superadmin"] },
+  { icon: Fuel, label: "Petrol & Diesel", path: "/dashboard/fuel", roles: ["superadmin"] },
+  { icon: Apple, label: "Apple & Crates", path: "/dashboard/crates", roles: ["superadmin"] },
   { icon: Bell, label: "Alerts", path: "/dashboard/alerts" },
-  { icon: FileText, label: "Reports", path: "/dashboard/reports" },
-  { icon: Search, label: "Audit & Logs", path: "/dashboard/audit" },
-  { icon: Users, label: "User Control", path: "/dashboard/users" },
-  { icon: Settings, label: "Tax & Categories", path: "/dashboard/tax-units" },
+  { icon: FileText, label: "Reports", path: "/dashboard/reports", roles: ["superadmin", "accountant"] },
+  { icon: Search, label: "Audit & Logs", path: "/dashboard/audit", roles: ["superadmin", "joa_it"] },
+  { icon: Users, label: "User Control", path: "/dashboard/users", roles: ["superadmin"] },
+  { icon: Settings, label: "Tax & Categories", path: "/dashboard/tax-units", roles: ["superadmin"] },
 ];
 
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
+  const user = getCurrentUser();
+  const role = user?.role;
+
+  const visible = menuItems.filter((m) => !m.roles || (role && m.roles.includes(role)));
 
   return (
-    <aside 
+    <aside
       className={cn(
-        "h-screen bg-sidebar flex flex-col border-r border-sidebar-border transition-all duration-300",
+        "h-screen bg-sidebar flex flex-col border-r border-sidebar-border transition-all duration-300 relative",
         isCollapsed ? "w-20" : "w-64"
       )}
     >
-      {/* Logo */}
       <div className="p-4 border-b border-sidebar-border">
         <Link to="/dashboard" className="flex items-center gap-3">
           <div className="p-2 rounded-xl bg-sidebar-primary">
@@ -65,9 +88,8 @@ const Sidebar = () => {
         </Link>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 overflow-y-auto p-3 space-y-1">
-        {menuItems.map((item) => {
+        {visible.map((item) => {
           const isActive = location.pathname === item.path;
           return (
             <Link
@@ -75,8 +97,8 @@ const Sidebar = () => {
               to={item.path}
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
-                isActive 
-                  ? "bg-sidebar-primary text-sidebar-primary-foreground" 
+                isActive
+                  ? "bg-sidebar-primary text-sidebar-primary-foreground"
                   : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               )}
             >
@@ -87,15 +109,7 @@ const Sidebar = () => {
         })}
       </nav>
 
-      {/* Bottom section */}
       <div className="p-3 border-t border-sidebar-border space-y-1">
-        <Link
-          to="/dashboard/settings"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
-        >
-          <Settings className="w-5 h-5" />
-          {!isCollapsed && <span>Settings</span>}
-        </Link>
         <Link
           to="/"
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:bg-destructive/10 hover:text-destructive transition-colors"
@@ -105,10 +119,9 @@ const Sidebar = () => {
         </Link>
       </div>
 
-      {/* Collapse toggle */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute top-20 -right-3 p-1.5 rounded-full bg-sidebar-accent border border-sidebar-border text-sidebar-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground transition-colors"
+        className="absolute top-20 -right-3 p-1.5 rounded-full bg-sidebar-accent border border-sidebar-border text-sidebar-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground transition-colors z-10"
       >
         {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
       </button>
