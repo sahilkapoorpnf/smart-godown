@@ -15,6 +15,11 @@ import BackupSecurity from "./pages/admin/BackupSecurity";
 import ProductMaster from "./pages/master/ProductMaster";
 import StockManagement from "./pages/master/StockManagement";
 import GodownMaster from "./pages/master/GodownMaster";
+import NewEntry from "./pages/warehouse/NewEntry";
+import EntriesPage from "./pages/warehouse/EntriesPage";
+import AreaManagement from "./pages/warehouse/AreaManagement";
+import WarehouseManagement from "./pages/warehouse/WarehouseManagement";
+import ActivityLogs from "./pages/warehouse/ActivityLogs";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +33,17 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
+
+          {/* Warehouse workflow */}
+          <Route path="/dashboard/wh/new-entry" element={<NewEntry />} />
+          <Route path="/dashboard/wh/my-entries" element={<EntriesPage mode="mine" />} />
+          <Route path="/dashboard/wh/approvals" element={<EntriesPage mode="approvals" />} />
+          <Route path="/dashboard/wh/entries" element={<EntriesPage mode="monitor" />} />
+          <Route path="/dashboard/wh/areas" element={<AreaManagement />} />
+          <Route path="/dashboard/wh/warehouses" element={<WarehouseManagement />} />
+          <Route path="/dashboard/wh/logs" element={<ActivityLogs />} />
+
+          {/* Admin */}
           <Route path="/dashboard/users" element={<UserManagement />} />
           <Route path="/dashboard/settings" element={<SystemConfiguration />} />
           <Route path="/dashboard/tax-units" element={<TaxUnitCategories />} />
