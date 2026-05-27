@@ -59,6 +59,7 @@ const menuItems: Item[] = [
   { icon: Receipt, label: "Generate Invoice", path: "/dashboard/stock/invoice", roles: ["superadmin", "accountant", "warehouse_staff"] },
   { icon: FileText, label: "Sales History", path: "/dashboard/stock/sales", roles: ["superadmin", "accountant", "incharge", "warehouse_staff", "joa_it"] },
   { icon: BarChart3, label: "Reports & Analytics", path: "/dashboard/stock/reports", roles: ["superadmin", "accountant", "joa_it", "incharge"] },
+  { icon: FileText, label: "Sales Ledger Report", path: "/dashboard/sales/ledger", roles: ["superadmin", "accountant", "incharge", "warehouse_staff", "joa_it"] },
 
   // Existing modules (superadmin)
   { icon: Package, label: "Product Master", path: "/dashboard/products", roles: ["superadmin"] },
