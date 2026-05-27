@@ -9,6 +9,7 @@ import {
   Package,
   Warehouse,
   BarChart3,
+  TrendingUp,
   ShoppingCart,
   ArrowLeftRight,
   Truck,
