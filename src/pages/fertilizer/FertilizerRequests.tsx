@@ -30,7 +30,7 @@ const statusLabel: Record<RequestStatus, string> = {
 
 export default function FertilizerRequests() {
   const user = getCurrentUser();
-  const { requests, products } = useFertilizerStore();
+  const { requests, products, companies } = useFertilizerStore();
 
   const [createOpen, setCreateOpen] = useState(false);
   const [review, setReview] = useState<DemandRequest | null>(null);
@@ -41,18 +41,26 @@ export default function FertilizerRequests() {
     return requests;
   }, [user, requests]);
 
+  // Companies that serve the current officer's area
+  const eligibleCompanies = useMemo(() => {
+    if (!user?.areaId) return companies;
+    return companies.filter((c) => c.status === "active" && (!c.serviceAreas || c.serviceAreas.includes(user.areaId!)));
+  }, [companies, user]);
+
   // ---- Create form ----
   const [form, setForm] = useState({
-    productId: "", requestedQty: 0, priority: "Medium" as DemandRequest["priority"],
+    productId: "", companyId: "", requestedQty: 0, priority: "Medium" as DemandRequest["priority"],
     requiredDate: new Date().toISOString().slice(0, 10), remarks: "",
   });
   const submitCreate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user?.areaId) { toast.error("Only Area Officers can raise requests"); return; }
     if (!form.productId || form.requestedQty <= 0) { toast.error("Product and qty required"); return; }
+    if (!form.companyId) { toast.error("Please select a supplier company"); return; }
     createRequest({
       areaId: user.areaId,
       productId: form.productId,
+      companyId: form.companyId,
       requestedQty: form.requestedQty,
       priority: form.priority,
       requiredDate: form.requiredDate,
@@ -61,8 +69,9 @@ export default function FertilizerRequests() {
     });
     toast.success("Request raised");
     setCreateOpen(false);
-    setForm({ productId: "", requestedQty: 0, priority: "Medium", requiredDate: new Date().toISOString().slice(0, 10), remarks: "" });
+    setForm({ productId: "", companyId: "", requestedQty: 0, priority: "Medium", requiredDate: new Date().toISOString().slice(0, 10), remarks: "" });
   };
+
 
   // ---- Review form ----
   const [revStatus, setRevStatus] = useState<RequestStatus>("approved");
