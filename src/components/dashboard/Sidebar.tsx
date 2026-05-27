@@ -28,6 +28,18 @@ import {
   Activity,
   PlusSquare,
   Receipt,
+  BookOpen,
+  Landmark,
+  FileMinus,
+  Undo2,
+  Scale,
+  ClipboardCheck,
+  ShieldCheck,
+  CalendarRange,
+  PiggyBank,
+  Wallet,
+  AlertTriangle,
+  BadgePercent,
 } from "lucide-react";
 
 type Item = { icon: any; label: string; path: string; roles?: Role[] };
