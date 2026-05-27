@@ -111,13 +111,39 @@ export function createRequest(input: Omit<DemandRequest, "id" | "requestCode" | 
 }
 
 export function reviewRequest(id: string, status: RequestStatus, approvedQty: number, allocations: WarehouseAllocation[], remarks: string, reviewerId: string) {
+  let forwardedPONumber: string | undefined;
+  const target = _requests.find((x) => x.id === id);
+
+  // Auto-generate PO to the chosen supplier when approved/partially-approved
+  if (target && target.companyId && status !== "rejected" && approvedQty > 0) {
+    forwardedPONumber = nextPONumber();
+    const newPO: PurchaseOrder = {
+      id: `po${Date.now()}`,
+      poNumber: forwardedPONumber,
+      companyId: target.companyId,
+      productId: target.productId,
+      areaId: target.areaId,
+      quantity: approvedQty,
+      allocations,
+      deliveryInstructions: `Auto-generated from request ${target.requestCode}. ${remarks || ""}`.trim(),
+      expectedDelivery: target.requiredDate,
+      status: "sent",
+      requestId: target.id,
+      createdAt: new Date().toISOString(),
+      createdBy: reviewerId,
+    };
+    _pos = [newPO, ..._pos];
+    addLog({ user: "System Administrator", role: "superadmin", action: "Forwarded PO to Supplier", target: `${forwardedPONumber} → ${companyName(target.companyId)}` });
+  }
+
   _requests = _requests.map((r) =>
-    r.id === id ? { ...r, status, approvedQty, allocations, reviewRemarks: remarks, reviewedBy: reviewerId, reviewedAt: new Date().toISOString() } : r
+    r.id === id ? { ...r, status, approvedQty, allocations, reviewRemarks: remarks, reviewedBy: reviewerId, reviewedAt: new Date().toISOString(), forwardedPONumber: forwardedPONumber ?? r.forwardedPONumber } : r
   );
   const r = _requests.find((x) => x.id === id);
   addLog({ user: "System Administrator", role: "superadmin", action: `Request ${status}`, target: r?.requestCode });
   notify();
 }
+
 
 // Purchase Orders
 export function upsertPO(po: PurchaseOrder) {
