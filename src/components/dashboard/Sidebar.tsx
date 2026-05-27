@@ -27,6 +27,7 @@ import {
   MapPin,
   Activity,
   PlusSquare,
+  Receipt,
 } from "lucide-react";
 
 type Item = { icon: any; label: string; path: string; roles?: Role[] };
@@ -50,6 +51,14 @@ const menuItems: Item[] = [
   { icon: Warehouse, label: "Fertilizer Companies", path: "/dashboard/fert/companies", roles: ["superadmin"] },
   { icon: FileText, label: "Pricing Master", path: "/dashboard/fert/pricing", roles: ["superadmin"] },
   { icon: BarChart3, label: "Fertilizer Inventory", path: "/dashboard/fert/inventory", roles: ["superadmin", "incharge", "accountant", "warehouse_staff"] },
+
+  // Stock & Sales Management
+  { icon: Truck, label: "Daily Stock Entry", path: "/dashboard/stock/entry", roles: ["warehouse_staff", "accountant", "incharge", "superadmin"] },
+  { icon: ClipboardList, label: "Stock Listing", path: "/dashboard/stock/listing", roles: ["superadmin", "incharge", "accountant", "warehouse_staff", "joa_it"] },
+  { icon: Package, label: "Fertilizer Master", path: "/dashboard/stock/master", roles: ["superadmin"] },
+  { icon: Receipt, label: "Generate Invoice", path: "/dashboard/stock/invoice", roles: ["superadmin", "accountant", "warehouse_staff"] },
+  { icon: FileText, label: "Sales History", path: "/dashboard/stock/sales", roles: ["superadmin", "accountant", "incharge", "warehouse_staff", "joa_it"] },
+  { icon: BarChart3, label: "Reports & Analytics", path: "/dashboard/stock/reports", roles: ["superadmin", "accountant", "joa_it", "incharge"] },
 
   // Existing modules (superadmin)
   { icon: Package, label: "Product Master", path: "/dashboard/products", roles: ["superadmin"] },

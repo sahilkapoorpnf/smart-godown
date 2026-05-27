@@ -26,6 +26,12 @@ import FertilizerPricing from "./pages/fertilizer/FertilizerPricing";
 import FertilizerRequests from "./pages/fertilizer/FertilizerRequests";
 import PurchaseOrders from "./pages/fertilizer/PurchaseOrders";
 import FertilizerInventory from "./pages/fertilizer/FertilizerInventory";
+import DailyStockEntry from "./pages/stock/DailyStockEntry";
+import StockListing from "./pages/stock/StockListing";
+import FertilizerMaster from "./pages/stock/FertilizerMaster";
+import InvoiceGenerate from "./pages/stock/InvoiceGenerate";
+import SalesHistory from "./pages/stock/SalesHistory";
+import StockReports from "./pages/stock/StockReports";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +62,16 @@ const App = () => (
           <Route path="/dashboard/fert/requests" element={<FertilizerRequests />} />
           <Route path="/dashboard/fert/purchase-orders" element={<PurchaseOrders />} />
           <Route path="/dashboard/fert/inventory" element={<FertilizerInventory />} />
+
+          {/* Stock & Sales */}
+          <Route path="/dashboard/stock/entry" element={<DailyStockEntry />} />
+          <Route path="/dashboard/stock/listing" element={<StockListing />} />
+          <Route path="/dashboard/stock/master" element={<FertilizerMaster />} />
+          <Route path="/dashboard/stock/invoice" element={<InvoiceGenerate />} />
+          <Route path="/dashboard/stock/sales" element={<SalesHistory />} />
+          <Route path="/dashboard/stock/reports" element={<StockReports />} />
+
+
 
           {/* Admin */}
           <Route path="/dashboard/users" element={<UserManagement />} />
