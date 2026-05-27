@@ -163,6 +163,18 @@ export default function FertilizerRequests() {
               <SelectContent className="bg-popover">{products.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent>
             </Select>
           </div>
+          <div className="space-y-1 col-span-2">
+            <Label>Supplier Company * <span className="text-xs text-muted-foreground font-normal">(serving {user?.areaId ? areaName(user.areaId) : "your area"})</span></Label>
+            <Select value={form.companyId} onValueChange={(v) => setForm({ ...form, companyId: v })}>
+              <SelectTrigger><SelectValue placeholder="Select supplier company" /></SelectTrigger>
+              <SelectContent className="bg-popover">
+                {eligibleCompanies.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>{c.code} — {c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">On approval, a Purchase Order will be auto-generated and forwarded to this company.</p>
+          </div>
           <div className="space-y-1"><Label>Requested Qty (Bags) *</Label><Input type="number" value={form.requestedQty} onChange={(e) => setForm({ ...form, requestedQty: +e.target.value })} /></div>
           <div className="space-y-1">
             <Label>Priority</Label>
@@ -175,6 +187,7 @@ export default function FertilizerRequests() {
           <div className="space-y-1 col-span-2"><Label>Remarks</Label><Textarea value={form.remarks} onChange={(e) => setForm({ ...form, remarks: e.target.value })} maxLength={500} /></div>
         </div>
       </FormModal>
+
 
       {/* Review */}
       <FormModal
