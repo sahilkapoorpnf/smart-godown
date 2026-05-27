@@ -104,12 +104,15 @@ export default function FertilizerRequests() {
     { key: "requestCode", label: "Request ID", sortable: true },
     { key: "areaId", label: "Area", render: (r) => areaName(r.areaId) },
     { key: "productId", label: "Product", render: (r) => productName(r.productId) },
+    { key: "companyId", label: "Supplier", render: (r) => r.companyId ? companyName(r.companyId) : <span className="text-muted-foreground">—</span> },
     { key: "requestedQty", label: "Requested", render: (r) => `${r.requestedQty} Bags` },
     { key: "approvedQty", label: "Approved", render: (r) => r.approvedQty ? `${r.approvedQty} Bags` : "—" },
     { key: "priority", label: "Priority" },
     { key: "requiredDate", label: "Required" },
     { key: "status", label: "Status", render: (r) => <Badge variant="outline" className={statusStyle[r.status]}>{statusLabel[r.status]}</Badge> },
+    { key: "forwardedPONumber", label: "Forwarded PO", render: (r) => r.forwardedPONumber ? <span className="text-primary font-medium">{r.forwardedPONumber}</span> : <span className="text-muted-foreground">—</span> },
   ];
+
 
   const counts = {
     total: visible.length,
