@@ -44,32 +44,37 @@ export function FormModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={sizeClasses[size]}>
-        <form onSubmit={onSubmit}>
-          <DialogHeader>
-            <DialogTitle className="text-xl font-serif">{title}</DialogTitle>
-            {description && (
-              <DialogDescription>{description}</DialogDescription>
+        {onSubmit ? (
+          <form onSubmit={onSubmit}>
+            <DialogHeader>
+              <DialogTitle className="text-xl font-serif">{title}</DialogTitle>
+              {description && <DialogDescription>{description}</DialogDescription>}
+            </DialogHeader>
+            <ScrollArea className="max-h-[60vh] py-4 pr-4">
+              <div className="space-y-4 pr-2">{children}</div>
+            </ScrollArea>
+            {showFooter && (
+              <DialogFooter className="gap-2">
+                <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? "Saving..." : submitLabel}
+                </Button>
+              </DialogFooter>
             )}
-          </DialogHeader>
-          <ScrollArea className="max-h-[60vh] py-4 pr-4">
-            <div className="space-y-4 pr-2">{children}</div>
-          </ScrollArea>
-          {showFooter && (
-            <DialogFooter className="gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isLoading}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Saving..." : submitLabel}
-              </Button>
-            </DialogFooter>
-          )}
-        </form>
+          </form>
+        ) : (
+          <div>
+            <DialogHeader>
+              <DialogTitle className="text-xl font-serif">{title}</DialogTitle>
+              {description && <DialogDescription>{description}</DialogDescription>}
+            </DialogHeader>
+            <ScrollArea className="max-h-[60vh] py-4 pr-4">
+              <div className="space-y-4 pr-2">{children}</div>
+            </ScrollArea>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
