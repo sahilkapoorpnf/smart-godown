@@ -32,6 +32,7 @@ import FertilizerMaster from "./pages/stock/FertilizerMaster";
 import InvoiceGenerate from "./pages/stock/InvoiceGenerate";
 import SalesHistory from "./pages/stock/SalesHistory";
 import StockReports from "./pages/stock/StockReports";
+import SalesLedger from "./pages/sales/SalesLedger";
 
 const queryClient = new QueryClient();
 
@@ -70,6 +71,7 @@ const App = () => (
           <Route path="/dashboard/stock/invoice" element={<InvoiceGenerate />} />
           <Route path="/dashboard/stock/sales" element={<SalesHistory />} />
           <Route path="/dashboard/stock/reports" element={<StockReports />} />
+          <Route path="/dashboard/sales/ledger" element={<SalesLedger />} />
 
 
 
