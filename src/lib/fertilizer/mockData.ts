@@ -39,12 +39,13 @@ export const pricing: FertilizerPricing[] = [
 
 export const requests: DemandRequest[] = [
   {
-    id: "dr1", requestCode: "REQ-2025-0001", areaId: "a1", productId: "fp1",
+    id: "dr1", requestCode: "REQ-2025-0001", areaId: "a1", productId: "fp1", companyId: "fc1",
     requestedQty: 1000, approvedQty: 400, priority: "High", requiredDate: "2025-06-05",
     remarks: "Pre-Kharif demand from Shimla apple belt.", status: "partially_approved",
     createdBy: "u2", createdAt: "2025-05-20T09:00:00",
     reviewedBy: "u1", reviewedAt: "2025-05-21T10:30:00",
-    reviewRemarks: "Approved 400 bags as per current allocation.",
+    reviewRemarks: "Approved 400 bags as per current allocation. Order forwarded to NFL.",
+    forwardedPONumber: "PO-2025-0001",
     allocations: [
       { warehouseId: "w1", quantity: 100 },
       { warehouseId: "w2", quantity: 100 },
@@ -53,27 +54,28 @@ export const requests: DemandRequest[] = [
     ],
   },
   {
-    id: "dr2", requestCode: "REQ-2025-0002", areaId: "a2", productId: "fp3",
+    id: "dr2", requestCode: "REQ-2025-0002", areaId: "a2", productId: "fp3", companyId: "fc2",
     requestedQty: 600, priority: "Medium", requiredDate: "2025-06-10",
     remarks: "DAP for Solan sowing.", status: "pending",
     createdBy: "u3", createdAt: "2025-05-22T11:15:00",
   },
   {
-    id: "dr3", requestCode: "REQ-2025-0003", areaId: "a3", productId: "fp4",
+    id: "dr3", requestCode: "REQ-2025-0003", areaId: "a3", productId: "fp4", companyId: "fc3",
     requestedQty: 450, approvedQty: 450, priority: "Urgent", requiredDate: "2025-06-02",
     remarks: "NPK for Mandi paddy nursery.", status: "approved",
     createdBy: "u4", createdAt: "2025-05-18T14:00:00",
-    reviewedBy: "u1", reviewedAt: "2025-05-19T09:00:00", reviewRemarks: "Full quantity approved.",
+    reviewedBy: "u1", reviewedAt: "2025-05-19T09:00:00", reviewRemarks: "Full quantity approved. Order placed with KRIBHCO.",
+    forwardedPONumber: "PO-2025-0002",
     allocations: [{ warehouseId: "w5", quantity: 450 }],
   },
   {
-    id: "dr4", requestCode: "REQ-2025-0004", areaId: "a4", productId: "fp6",
+    id: "dr4", requestCode: "REQ-2025-0004", areaId: "a4", productId: "fp6", companyId: "fc6",
     requestedQty: 300, priority: "Low", requiredDate: "2025-06-15",
     remarks: "Kangra rabi top-up.", status: "under_review",
     createdBy: "u5", createdAt: "2025-05-24T10:20:00",
   },
   {
-    id: "dr5", requestCode: "REQ-2025-0005", areaId: "a2", productId: "fp7",
+    id: "dr5", requestCode: "REQ-2025-0005", areaId: "a2", productId: "fp7", companyId: "fc5",
     requestedQty: 200, priority: "Medium", requiredDate: "2025-05-30",
     remarks: "Stock running low.", status: "rejected",
     createdBy: "u3", createdAt: "2025-05-15T08:00:00",
@@ -81,6 +83,7 @@ export const requests: DemandRequest[] = [
     reviewRemarks: "Pending dues with company — request again next cycle.",
   },
 ];
+
 
 export const purchaseOrders: PurchaseOrder[] = [
   {
