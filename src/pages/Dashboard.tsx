@@ -5,7 +5,7 @@ import RecentActivity from "@/components/dashboard/RecentActivity";
 import StockOverview from "@/components/dashboard/StockOverview";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import {
   Warehouse,
   Package,
@@ -31,7 +31,7 @@ const todayStr = new Date().toISOString().slice(0, 10);
 const Dashboard = () => {
   useStore();
   const user = getCurrentUser();
-  if (!user) return null;
+  if (!user) return <Navigate to="/login" replace />;
 
   const myEntries = visibleEntries(user);
   const today = myEntries.filter((e) => e.depotDate === todayStr || e.createdAt.slice(0, 10) === todayStr);
