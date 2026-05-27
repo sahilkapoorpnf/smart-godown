@@ -46,11 +46,11 @@ export default function AreaManagement() {
     { key: "officerName", label: "Area Officer" },
     { key: "contact", label: "Contact" },
     {
-      key: "id", label: "Warehouses",
+      key: "_wh", label: "Warehouses",
       render: (a) => <span className="font-medium">{store.warehouses.filter((w) => w.areaId === a.id).length}</span>,
     },
     {
-      key: "id", label: "Entries",
+      key: "_ent", label: "Entries",
       render: (a) => <span className="font-medium">{store.entries.filter((e) => e.areaId === a.id).length}</span>,
     },
     { key: "createdDate", label: "Created" },

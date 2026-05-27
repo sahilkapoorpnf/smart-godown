@@ -47,7 +47,7 @@ export default function WarehouseManagement() {
     { key: "inchargeName", label: "Incharge" },
     { key: "contact", label: "Contact" },
     {
-      key: "id", label: "Entries",
+      key: "_ent", label: "Entries",
       render: (w) => <span className="font-medium">{store.entries.filter((e) => e.warehouseId === w.id).length}</span>,
     },
     { key: "status", label: "Status", render: (w) => <StatusBadge status={w.status as any} /> },
