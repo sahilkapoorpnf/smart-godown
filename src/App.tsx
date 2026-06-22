@@ -62,6 +62,7 @@ import {
   VoucherTypeMasterStatic,
 } from "./pages/erp/accountant/StaticTallyPages";
 import BalanceSheetPage from "./pages/erp/accountant/BalanceSheetPage";
+import ProfitLossPage from "./pages/erp/accountant/ProfitLossPage";
 
 const queryClient = new QueryClient();
 
@@ -143,6 +144,7 @@ const App = () => (
           <Route path="/dashboard/erp/acc/documents" element={<DocumentsStatic />} />
           <Route path="/dashboard/erp/acc/audit" element={<AuditLogsStatic />} />
           <Route path="/dashboard/erp/acc/balance-sheet" element={<BalanceSheetPage />} />
+          <Route path="/dashboard/erp/acc/profit-loss" element={<ProfitLossPage />} />
 
           <Route path="/dashboard/erp/admin" element={<TallyDashboardStatic />} />
           <Route path="/dashboard/erp/admin/users" element={<AdminUserManagement />} />
