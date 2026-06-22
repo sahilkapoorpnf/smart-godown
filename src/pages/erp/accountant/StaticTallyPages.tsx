@@ -20,8 +20,34 @@ import {
   FileCheck2, FileText, Landmark, Package, Plus, Printer, Receipt, Search,
   ShieldCheck, Truck, Upload, Wallet,
 } from "lucide-react";
+import { getCurrentUser } from "@/lib/warehouse/store";
 
 const allowed = ["wh_accountant", "admin_accountant", "accountant", "superadmin"] as any;
+
+// ===== Role-based scoping (Warehouse Accountant = UNA only; Accountant/Neha = all areas) =====
+const UNA_GODOWNS = new Set(["UNA Warehouse", "AMB Warehouse", "HAROLI Warehouse", "BANGANA Warehouse"]);
+const UNA_COMPANY_NAMES = new Set(["UNA Area"]);
+const isUnaScoped = () => getCurrentUser()?.role === "wh_accountant";
+const scopeLabel = () => isUnaScoped() ? "Active Company: UNA Area (Warehouse Accountant)" : "All Area Companies — Super Accountant View";
+const scopedVouchers = () => isUnaScoped() ? vouchersStatic.filter((v) => UNA_GODOWNS.has(v.godown)) : vouchersStatic;
+const scopedGodowns = () => isUnaScoped() ? godownMastersStatic.filter((g: any) => String(g.area) === "UNA Area") : godownMastersStatic;
+const scopedCompanies = () => isUnaScoped() ? areaCompaniesStatic.filter((c) => c.code === "UNA") : areaCompaniesStatic;
+const scopedDocuments = () => isUnaScoped() ? documentsStatic.filter((d: any) => UNA_GODOWNS.has(d.warehouse) || UNA_COMPANY_NAMES.has(d.company)) : documentsStatic;
+const scopedAuditLogs = () => isUnaScoped() ? auditLogsStatic.filter((a: any) => UNA_GODOWNS.has(a.warehouse) || UNA_COMPANY_NAMES.has(a.company)) : auditLogsStatic;
+const scopedReportRows = () => {
+  if (!isUnaScoped()) return reportRowsStatic;
+  return reportRowsStatic.filter((r: any) => UNA_GODOWNS.has(r.godown));
+};
+const scopedDashboardStats = () => {
+  if (!isUnaScoped()) return dashboardStats;
+  const v = scopedVouchers();
+  return {
+    ...dashboardStats,
+    totalPurchaseToday: v.filter((x) => x.kind === "purchase").reduce((s, x) => s + x.total, 0),
+    totalSalesToday: v.filter((x) => x.kind === "sales").reduce((s, x) => s + x.total, 0),
+    pendingVouchers: v.filter((x) => x.status === "Pending").length,
+  };
+};
 
 const moduleCards = [
   { label: "Company Information", to: "/dashboard/erp/acc/company-info", icon: Building2 },
