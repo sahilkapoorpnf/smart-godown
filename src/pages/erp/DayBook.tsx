@@ -10,10 +10,12 @@ export default function DayBook() {
   const [type, setType] = useState<string>("all");
   const [from, setFrom] = useState(""); const [to, setTo] = useState("");
 
-  let rows = [...vouchers].sort((a, b) => b.date.localeCompare(a.date));
+  const SINGLE_DATE = "2026-06-22";
+  let rows = vouchers.map((v) => ({ ...v, date: SINGLE_DATE }));
   if (type !== "all") rows = rows.filter((v) => v.kind === type);
   if (from) rows = rows.filter((v) => v.date >= from);
   if (to) rows = rows.filter((v) => v.date <= to);
+
 
   const totals = rows.reduce((acc, v) => {
     if (v.kind === "purchase" || v.kind === "payment") acc.dr += v.grandTotal;
@@ -41,7 +43,7 @@ export default function DayBook() {
           { key: "date", label: "Date", sortable: true },
           { key: "voucherNo", label: "Voucher No.", render: (r) => <span className="font-mono font-semibold">{r.voucherNo}</span> },
           { key: "kind", label: "Type", render: (r) => <Badge tone={r.kind === "purchase" ? "blue" : r.kind === "sales" ? "green" : "amber"}>{r.kind}</Badge> },
-          { key: "partyLedgerId", label: "Particulars", render: (r) => ledgerName(r.partyLedgerId) },
+          { key: "voucherType", label: "Voucher Type", render: (r) => <Badge tone="default">{r.kind.replace("_", " ")}</Badge> },
           { key: "narration", label: "Narration", render: (r) => <span className="text-xs">{r.narration}</span> },
           { key: "dr", label: "Debit", className: "text-right font-mono", render: (r) => (r.kind === "purchase" || r.kind === "payment") ? fmtINR(r.grandTotal) : "" },
           { key: "cr", label: "Credit", className: "text-right font-mono", render: (r) => !(r.kind === "purchase" || r.kind === "payment") ? fmtINR(r.grandTotal) : "" },
