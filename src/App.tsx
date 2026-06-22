@@ -136,6 +136,32 @@ const App = () => (
           <Route path="/dashboard/acc/tally" element={<TallyExport />} />
           <Route path="/dashboard/acc/fy" element={<FinancialYear />} />
 
+          {/* ===== HIMFED Tally ERP (new role-gated) ===== */}
+          <Route path="/dashboard/erp/wh" element={<WhUserDashboard />} />
+          <Route path="/dashboard/erp/wh/new" element={<GoodsArrivalNew />} />
+          <Route path="/dashboard/erp/wh/mine" element={<MyArrivals mode="mine" />} />
+          <Route path="/dashboard/erp/wh/recorrect" element={<MyArrivals mode="recorrect" />} />
+          <Route path="/dashboard/erp/ao/pending" element={<AreaOfficerPage mode="pending" />} />
+          <Route path="/dashboard/erp/ao/approved" element={<AreaOfficerPage mode="approved" />} />
+          <Route path="/dashboard/erp/acc" element={<WhAccountantDashboard />} />
+          <Route path="/dashboard/erp/acc/company" element={<CompanyGstSetup />} />
+          <Route path="/dashboard/erp/acc/masters" element={<AccountingMasters />} />
+          <Route path="/dashboard/erp/acc/inventory" element={<InventoryMasters />} />
+          <Route path="/dashboard/erp/acc/purchase" element={<VoucherEntry kind="purchase" title="Purchase Voucher" description="Auto-drafted from approved goods arrivals · also create manual entries." />} />
+          <Route path="/dashboard/erp/acc/sales" element={<VoucherEntry kind="sales" title="Sales Voucher" description="Record sales, reduce stock and post to GST registers." />} />
+          <Route path="/dashboard/erp/acc/payment" element={<VoucherEntry kind="payment" title="Payment Voucher" description="Supplier payments, expenses, bank & cash payments." />} />
+          <Route path="/dashboard/erp/acc/receipt" element={<VoucherEntry kind="receipt" title="Receipt Voucher" description="Customer receipts, government receipts, other income." />} />
+          <Route path="/dashboard/erp/acc/journal" element={<VoucherEntry kind="journal" title="Journal Voucher" description="Adjustments, ledger corrections, accounting transfers." />} />
+          <Route path="/dashboard/erp/acc/daybook" element={<DayBook />} />
+          <Route path="/dashboard/erp/acc/current-stock" element={<CurrentStock />} />
+          <Route path="/dashboard/erp/acc/stock-transfer" element={<StockTransfer />} />
+          <Route path="/dashboard/erp/acc/reports" element={<AccountingReports />} />
+          <Route path="/dashboard/erp/admin" element={<AdminAccountantDashboard />} />
+          <Route path="/dashboard/erp/admin/users" element={<AdminUserManagement />} />
+          <Route path="/dashboard/erp/admin/audit" element={<AuditTrail />} />
+          <Route path="/dashboard/erp/admin/documents" element={<DocumentManagement />} />
+
+
           {/* Admin */}
           <Route path="/dashboard/users" element={<UserManagement />} />
           <Route path="/dashboard/settings" element={<SystemConfiguration />} />
