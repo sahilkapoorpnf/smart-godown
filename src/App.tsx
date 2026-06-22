@@ -77,6 +77,7 @@ import DocumentManagement from "./pages/erp/DocumentManagement";
 // ===== HIMFED Tally ERP — Accountant V2 (Area Company-aware) =====
 import SelectCompany from "./pages/erp/accountant/SelectCompany";
 import CompanyManager from "./pages/erp/accountant/CompanyManager";
+import CompanyInformation from "./pages/erp/accountant/CompanyInformation";
 import TallyDashboard from "./pages/erp/accountant/TallyDashboard";
 import GroupMasterPage from "./pages/erp/accountant/GroupMasterPage";
 import LedgerMasterPage from "./pages/erp/accountant/LedgerMasterPage";
@@ -162,6 +163,7 @@ const App = () => (
           <Route path="/dashboard/erp/ao/approved" element={<AreaOfficerPage mode="approved" />} />
           <Route path="/dashboard/erp/acc/select-company" element={<SelectCompany />} />
           <Route path="/dashboard/erp/acc/companies" element={<CompanyManager />} />
+          <Route path="/dashboard/erp/acc/company-info" element={<CompanyInformation />} />
           <Route path="/dashboard/erp/acc" element={<TallyDashboard />} />
           <Route path="/dashboard/erp/acc/company-old" element={<CompanyGstSetup />} />
           <Route path="/dashboard/erp/acc/masters" element={<AccountingMasters />} />

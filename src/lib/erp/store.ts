@@ -72,13 +72,12 @@ export function upsertCompany(c: AreaCompany) {
   notify();
 }
 export function deleteCompany(id: string) {
-  const used = _vouchers.some((v) => {
-    const ar = v.lines.find((l) => l.godownToId || l.godownFromId);
-    const gid = ar?.godownToId ?? ar?.godownFromId;
-    const aid = _godowns.find((g) => g.id === gid)?.areaId;
-    return aid && areaToCompany[aid] === id;
-  });
-  if (used) return { ok: false as const, reason: "Vouchers exist — cannot delete this company." };
+  const co = _companies.find((c) => c.id === id);
+  if (!co) return { ok: false as const, reason: "Company not found." };
+  const vouchersUsed = vouchersForCompany(id).length > 0;
+  if (vouchersUsed) return { ok: false as const, reason: "Vouchers exist — cannot delete this company." };
+  const inventoryUsed = _godowns.some((g) => g.areaId === co.areaId);
+  if (inventoryUsed) return { ok: false as const, reason: "Inventory / godowns exist — cannot delete this company." };
   _companies = _companies.filter((x) => x.id !== id);
   notify();
   return { ok: true as const };

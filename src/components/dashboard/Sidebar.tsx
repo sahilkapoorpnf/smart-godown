@@ -63,6 +63,7 @@ const menuItems: Item[] = [
   { icon: LayoutDashboard, label: "Tally Dashboard",   path: "/dashboard/erp/acc",                       roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   { icon: Building2,       label: "Select Company",    path: "/dashboard/erp/acc/select-company",        roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   { icon: Building2,       label: "Area Companies",    path: "/dashboard/erp/acc/companies",             roles: ["admin_accountant", "superadmin"] },
+  { icon: Building2,       label: "Company Information", path: "/dashboard/erp/acc/company-info",        roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   { icon: ShieldCheck,     label: "Company & GST",     path: "/dashboard/erp/acc/company-old",           roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   // Masters
   { icon: BookOpen,        label: "Group Master",      path: "/dashboard/erp/acc/masters/groups",        roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
