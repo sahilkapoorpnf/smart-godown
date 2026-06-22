@@ -139,10 +139,11 @@ const actionColumn = { key: "actions", label: "Actions", render: () => <div clas
 
 export function SelectCompanyStatic() {
   const nav = useNavigate();
+  const companies = scopedCompanies();
   return (
-    <TallyPage title="Select Assigned Area Company" description="Warehouse Accountant login flow: select assigned Area Company, then open the Tally-style dashboard." actions={<Button onClick={() => nav("/dashboard/erp/acc/company-create")}><Plus className="w-4 h-4 mr-2" />New Company Form</Button>}>
+    <TallyPage title={isUnaScoped() ? "Select Assigned Area Company — UNA" : "Select Area Company — All Areas"} description={isUnaScoped() ? "Warehouse Accountant login — UNA Area only." : "Super Accountant — choose from all assigned area companies."} actions={<Button onClick={() => nav("/dashboard/erp/acc/company-create")}><Plus className="w-4 h-4 mr-2" />New Company Form</Button>}>
       <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {areaCompaniesStatic.slice(0, 6).map((c) => (
+        {companies.slice(0, 6).map((c) => (
           <Card key={c.id} className="border-himfed-green/20 hover:shadow-md transition-shadow">
             <CardContent className="p-5 space-y-4">
               <div className="flex items-start gap-3"><div className="p-3 rounded-lg bg-himfed-green/10"><Building2 className="w-6 h-6 text-himfed-green" /></div><div><div className="font-serif font-bold text-lg">{c.name}</div><div className="text-xs text-muted-foreground">{c.id} · GST {c.gstNumber}</div></div></div>
@@ -152,7 +153,7 @@ export function SelectCompanyStatic() {
           </Card>
         ))}
       </div>
-      <FilteredTable rows={areaCompaniesStatic} exportName="area-companies" searchKeys={["id", "name", "gstNumber", "district"]} columns={companyColumns} />
+      <FilteredTable rows={companies} exportName="area-companies" searchKeys={["id", "name", "gstNumber", "district"]} columns={companyColumns} />
     </TallyPage>
   );
 }
