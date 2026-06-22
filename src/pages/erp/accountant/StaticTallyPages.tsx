@@ -210,7 +210,7 @@ function InventoryStaticPage({ type }: { type: "groups" | "items" | "units" | "g
     groups: { title: "Stock Group Master", rows: stockGroupsStatic, fields: ["Stock Group Name", "Under"], keys: ["id", "name", "under", "status"] },
     items: { title: "Stock Item Master", rows: stockItemsStatic, fields: ["Item Name", "Stock Group", "Unit", "HSN/SAC Code", "GST Rate", "Opening Quantity", "Opening Value", "Default Godown"], keys: ["id", "name", "group", "unit", "hsn", "gstRate", "openingQty", "openingValue", "defaultGodown", "status"] },
     units: { title: "Stock Unit Master", rows: stockUnitsStatic, fields: ["Unit Code", "Unit Name", "Decimals"], keys: ["id", "code", "name", "decimals", "status"] },
-    godowns: { title: "Godown / Warehouse Master", rows: godownMastersStatic, fields: ["Warehouse Name", "Warehouse Code", "Address", "Area Officer Assigned", "Warehouse User Assigned", "Status"], keys: ["id", "name", "code", "area", "address", "officer", "user", "utilization", "status"] },
+    godowns: { title: "Godown / Warehouse Master", rows: scopedGodowns(), fields: ["Warehouse Name", "Warehouse Code", "Address", "Area Officer Assigned", "Warehouse User Assigned", "Status"], keys: ["id", "name", "code", "area", "address", "officer", "user", "utilization", "status"] },
   }[type];
   const sample = map.rows[0];
   const columns = map.keys.map((k) => ({ key: k, label: k.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()), render: k === "status" ? (r: any) => <StatusBadge value={r.status} /> : k === "utilization" ? (r: any) => <Badge tone={Number(r.utilization) > 90 ? "red" : "green"}>{r.utilization}%</Badge> : undefined })).concat(actionColumn);
