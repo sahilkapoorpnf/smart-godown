@@ -4,7 +4,7 @@ import CompanySwitcher from "@/components/erp/CompanySwitcher";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/warehouse/store";
-import { useErp, ledgerName, vouchersForCompany, godownsForCompany, activeCompany, voucherCompanyId } from "@/lib/erp/store";
+import { useErp, ledgerName, vouchersForCompany, godownsForCompany, activeCompany } from "@/lib/erp/store";
 import { BookOpen, FileText, Package, Receipt, Wallet, Landmark, Truck, ArrowLeftRight, ScrollText, FileMinus } from "lucide-react";
 
 const today = new Date().toISOString().slice(0, 10);
