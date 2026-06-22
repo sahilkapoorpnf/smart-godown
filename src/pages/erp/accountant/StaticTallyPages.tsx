@@ -219,7 +219,22 @@ export function VoucherStaticPage({ kind }: { kind: VoucherKind }) {
 }
 
 export function DayBookStatic() {
-  return <TallyPage title="Day Book" description="Every purchase, sales, payment, receipt, journal, contra and stock transfer voucher appears here."><FilteredTable rows={vouchersStatic} exportName="day-book" searchKeys={["voucherNo", "party", "ledger", "godown"]} columns={voucherColumns} /></TallyPage>;
+  const SINGLE_DATE = "2026-06-22";
+  const rows = vouchersStatic.map((v) => ({ ...v, date: SINGLE_DATE }));
+  const dayBookColumns = [
+    { key: "date", label: "Date", sortable: true },
+    { key: "voucherNo", label: "Voucher Number" },
+    { key: "party", label: "Party" },
+    { key: "kind", label: "Voucher Type", render: (r: VoucherRow) => <Badge tone="blue">{r.kind.replace("_", " ")}</Badge> },
+    { key: "item", label: "Stock Item" },
+    { key: "godown", label: "Godown" },
+    { key: "debit", label: "Debit", className: "text-right", render: (r: VoucherRow) => fmtStaticINR(r.debit) },
+    { key: "credit", label: "Credit", className: "text-right", render: (r: VoucherRow) => fmtStaticINR(r.credit) },
+    { key: "status", label: "Status", render: (r: VoucherRow) => <StatusBadge value={r.status} /> },
+    { key: "actions", label: "Actions", render: () => <div className="flex gap-1"><Button size="sm" variant="ghost"><Printer className="w-3 h-3" /></Button><Button size="sm" variant="ghost">View</Button></div> },
+  ];
+  return <TallyPage title="Day Book" description="Every purchase, sales, payment, receipt, journal, contra and stock transfer voucher appears here."><FilteredTable rows={rows} exportName="day-book" searchKeys={["voucherNo", "party", "kind", "godown"]} columns={dayBookColumns} /></TallyPage>;
+
 }
 
 export function ReportsLandingStatic() {
