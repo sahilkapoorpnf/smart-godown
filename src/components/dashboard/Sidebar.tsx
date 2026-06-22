@@ -56,8 +56,8 @@ const menuItems: Item[] = [
   { icon: AlertTriangle,   label: "Re-correction",     path: "/dashboard/erp/wh/recorrect",roles: ["wh_user"] },
 
   // ===== HIMFED TALLY ERP — Area Officer =====
-  { icon: CheckSquare,     label: "Pending Requests",  path: "/dashboard/erp/ao/pending", roles: ["area_officer", "admin_accountant", "accountant", "superadmin"] },
-  { icon: ClipboardCheck,  label: "Approved Entries",  path: "/dashboard/erp/ao/approved",roles: ["area_officer", "admin_accountant", "accountant", "superadmin"] },
+  { icon: CheckSquare,     label: "Pending Requests",  path: "/dashboard/erp/ao/pending", roles: ["area_officer"] },
+  { icon: ClipboardCheck,  label: "Approved Entries",  path: "/dashboard/erp/ao/approved",roles: ["area_officer"] },
 
   // ===== REDESIGNED STATIC TALLY ACCOUNTANT ERP =====
   { icon: Building2,       label: "Select Company",       path: "/dashboard/erp/acc/select-company", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
@@ -104,7 +104,7 @@ const menuItems: Item[] = [
   { icon: PlusSquare, label: "New Entry", path: "/dashboard/wh/new-entry", roles: ["warehouse_staff"] },
   { icon: ClipboardList, label: "My Entries", path: "/dashboard/wh/my-entries", roles: ["warehouse_staff"] },
   { icon: CheckSquare, label: "Pending Approvals", path: "/dashboard/wh/approvals", roles: ["incharge", "superadmin"] },
-  { icon: ClipboardList, label: "Entry Monitoring", path: "/dashboard/wh/entries", roles: ["superadmin", "accountant", "joa_it", "incharge"] },
+  { icon: ClipboardList, label: "Entry Monitoring", path: "/dashboard/wh/entries", roles: ["superadmin", "joa_it", "incharge"] },
   { icon: MapPin, label: "Area Management", path: "/dashboard/wh/areas", roles: ["superadmin"] },
   { icon: Warehouse, label: "Warehouse Mgmt", path: "/dashboard/wh/warehouses", roles: ["superadmin"] },
   { icon: Activity, label: "Activity Logs", path: "/dashboard/wh/logs", roles: ["superadmin", "joa_it"] },
@@ -115,28 +115,28 @@ const menuItems: Item[] = [
   { icon: Package, label: "Fertilizer Products", path: "/dashboard/fert/products", roles: ["superadmin"] },
   { icon: Warehouse, label: "Fertilizer Companies", path: "/dashboard/fert/companies", roles: ["superadmin"] },
   { icon: FileText, label: "Pricing Master", path: "/dashboard/fert/pricing", roles: ["superadmin"] },
-  { icon: BarChart3, label: "Fertilizer Inventory", path: "/dashboard/fert/inventory", roles: ["superadmin", "incharge", "accountant", "warehouse_staff"] },
+  { icon: BarChart3, label: "Fertilizer Inventory", path: "/dashboard/fert/inventory", roles: ["superadmin", "incharge", "warehouse_staff"] },
 
   // Stock & Sales Management
-  { icon: Truck, label: "Daily Stock Entry", path: "/dashboard/stock/entry", roles: ["warehouse_staff", "accountant", "incharge", "superadmin"] },
-  { icon: ClipboardList, label: "Stock Listing", path: "/dashboard/stock/listing", roles: ["superadmin", "incharge", "accountant", "warehouse_staff", "joa_it"] },
+  { icon: Truck, label: "Daily Stock Entry", path: "/dashboard/stock/entry", roles: ["warehouse_staff", "incharge", "superadmin"] },
+  { icon: ClipboardList, label: "Stock Listing", path: "/dashboard/stock/listing", roles: ["superadmin", "incharge", "warehouse_staff", "joa_it"] },
   { icon: Package, label: "Fertilizer Master", path: "/dashboard/stock/master", roles: ["superadmin"] },
-  { icon: Receipt, label: "Generate Invoice", path: "/dashboard/stock/invoice", roles: ["superadmin", "accountant", "warehouse_staff"] },
-  { icon: FileText, label: "Sales History", path: "/dashboard/stock/sales", roles: ["superadmin", "accountant", "incharge", "warehouse_staff", "joa_it"] },
-  { icon: BarChart3, label: "Reports & Analytics", path: "/dashboard/stock/reports", roles: ["superadmin", "accountant", "joa_it", "incharge"] },
-  { icon: FileText, label: "Sales Ledger Report", path: "/dashboard/sales/ledger", roles: ["superadmin", "accountant", "incharge", "warehouse_staff", "joa_it"] },
+  { icon: Receipt, label: "Generate Invoice", path: "/dashboard/stock/invoice", roles: ["superadmin", "warehouse_staff"] },
+  { icon: FileText, label: "Sales History", path: "/dashboard/stock/sales", roles: ["superadmin", "incharge", "warehouse_staff", "joa_it"] },
+  { icon: BarChart3, label: "Reports & Analytics", path: "/dashboard/stock/reports", roles: ["superadmin", "joa_it", "incharge"] },
+  { icon: FileText, label: "Sales Ledger Report", path: "/dashboard/sales/ledger", roles: ["superadmin", "incharge", "warehouse_staff", "joa_it"] },
 
   // Existing modules (superadmin)
   { icon: Package, label: "Product Master", path: "/dashboard/products", roles: ["superadmin"] },
   { icon: Warehouse, label: "Godown & Location", path: "/dashboard/godowns", roles: ["superadmin"] },
-  { icon: BarChart3, label: "Stock Management", path: "/dashboard/stock", roles: ["superadmin", "accountant"] },
+  { icon: BarChart3, label: "Stock Management", path: "/dashboard/stock", roles: ["superadmin"] },
   { icon: ShoppingCart, label: "Procurement", path: "/dashboard/procurement", roles: ["superadmin"] },
   { icon: ArrowLeftRight, label: "Transfers", path: "/dashboard/transfers", roles: ["superadmin", "incharge"] },
   { icon: Truck, label: "Distribution", path: "/dashboard/distribution", roles: ["superadmin"] },
   { icon: Fuel, label: "Petrol & Diesel", path: "/dashboard/fuel", roles: ["superadmin"] },
   { icon: Apple, label: "Apple & Crates", path: "/dashboard/crates", roles: ["superadmin"] },
   { icon: Bell, label: "Alerts", path: "/dashboard/alerts" },
-  { icon: FileText, label: "Reports", path: "/dashboard/reports", roles: ["superadmin", "accountant"] },
+  { icon: FileText, label: "Reports", path: "/dashboard/reports", roles: ["superadmin"] },
   { icon: Search, label: "Audit & Logs", path: "/dashboard/audit", roles: ["superadmin", "joa_it"] },
   { icon: Users, label: "User Control", path: "/dashboard/users", roles: ["superadmin"] },
   { icon: Settings, label: "Tax & Categories", path: "/dashboard/tax-units", roles: ["superadmin"] },
