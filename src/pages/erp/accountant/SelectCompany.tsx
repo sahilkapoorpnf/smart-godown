@@ -12,8 +12,9 @@ export default function SelectCompany() {
   const nav = useNavigate();
   const list = companiesForUser(user?.id, user?.role);
 
-  const pick = (id: string) => { setActiveCompany(id); nav("/dashboard/erp/acc"); };
+  const pick = (id: string) => { setActiveCompany(id); nav("/dashboard/erp/acc/company-info"); };
   const openInfo = (id: string) => { setActiveCompany(id); nav("/dashboard/erp/acc/company-info"); };
+  const openWorkspace = (id: string) => { setActiveCompany(id); nav("/dashboard/erp/acc"); };
 
   return (
     <ErpPage
