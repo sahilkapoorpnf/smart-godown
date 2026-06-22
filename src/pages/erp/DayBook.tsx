@@ -43,7 +43,7 @@ export default function DayBook() {
           { key: "date", label: "Date", sortable: true },
           { key: "voucherNo", label: "Voucher No.", render: (r) => <span className="font-mono font-semibold">{r.voucherNo}</span> },
           { key: "kind", label: "Type", render: (r) => <Badge tone={r.kind === "purchase" ? "blue" : r.kind === "sales" ? "green" : "amber"}>{r.kind}</Badge> },
-          { key: "partyLedgerId", label: "Particulars", render: (r) => ledgerName(r.partyLedgerId) },
+          { key: "voucherType", label: "Voucher Type", render: (r) => <Badge tone="slate">{r.kind.replace("_", " ")}</Badge> },
           { key: "narration", label: "Narration", render: (r) => <span className="text-xs">{r.narration}</span> },
           { key: "dr", label: "Debit", className: "text-right font-mono", render: (r) => (r.kind === "purchase" || r.kind === "payment") ? fmtINR(r.grandTotal) : "" },
           { key: "cr", label: "Credit", className: "text-right font-mono", render: (r) => !(r.kind === "purchase" || r.kind === "payment") ? fmtINR(r.grandTotal) : "" },
