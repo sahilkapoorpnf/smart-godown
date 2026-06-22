@@ -220,7 +220,9 @@ export function VoucherStaticPage({ kind }: { kind: VoucherKind }) {
 
 export function DayBookStatic() {
   const SINGLE_DATE = "2026-06-22";
-  const rows = vouchersStatic.map((v) => ({ ...v, date: SINGLE_DATE }));
+  const rows = vouchersStatic
+    .filter((v) => v.kind === "sales" || v.kind === "journal")
+    .map((v) => ({ ...v, date: SINGLE_DATE }));
   const dayBookColumns = [
     { key: "date", label: "Date", sortable: true },
     { key: "voucherNo", label: "Voucher Number" },
@@ -233,7 +235,7 @@ export function DayBookStatic() {
     { key: "status", label: "Status", render: (r: VoucherRow) => <StatusBadge value={r.status} /> },
     { key: "actions", label: "Actions", render: () => <div className="flex gap-1"><Button size="sm" variant="ghost"><Printer className="w-3 h-3" /></Button><Button size="sm" variant="ghost">View</Button></div> },
   ];
-  return <TallyPage title="Day Book" description="Every purchase, sales, payment, receipt, journal, contra and stock transfer voucher appears here."><FilteredTable rows={rows} exportName="day-book" searchKeys={["voucherNo", "party", "kind", "godown"]} columns={dayBookColumns} /></TallyPage>;
+  return <TallyPage title="Day Book" description="Sales and Journal vouchers for the day."><FilteredTable rows={rows} exportName="day-book" searchKeys={["voucherNo", "party", "kind", "godown"]} columns={dayBookColumns} /></TallyPage>;
 
 }
 
