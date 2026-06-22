@@ -32,7 +32,7 @@ const Dashboard = () => {
   useStore();
   const user = getCurrentUser();
   if (!user) return <Navigate to="/login" replace />;
-  if (user.role === "accountant") return <Navigate to="/dashboard/acc" replace />;
+  if (user.role === "accountant") return <Navigate to="/dashboard/erp/acc/select-company" replace />;
   if (user.role === "wh_user") return <Navigate to="/dashboard/erp/wh" replace />;
   if (user.role === "area_officer") return <Navigate to="/dashboard/erp/ao/pending" replace />;
   if (user.role === "wh_accountant") return <Navigate to="/dashboard/erp/acc" replace />;
