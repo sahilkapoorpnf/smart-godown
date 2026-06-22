@@ -80,6 +80,7 @@ const menuItems: Item[] = [
   { icon: ArrowLeftRight,  label: "Stock Transfer Voucher", path: "/dashboard/erp/acc/stock-transfer", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   { icon: BookOpen,        label: "Day Book",             path: "/dashboard/erp/acc/daybook", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   { icon: FileText,        label: "Reports",              path: "/dashboard/erp/acc/reports", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
+  { icon: Scale,           label: "Balance Sheet",        path: "/dashboard/erp/acc/balance-sheet", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
 
   // ===== HIMFED TALLY ERP — Admin Accountant (Super) =====
   { icon: LayoutDashboard, label: "HQ Super Dashboard",path: "/dashboard/erp/admin",          roles: ["admin_accountant"] },
