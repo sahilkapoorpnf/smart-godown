@@ -10,12 +10,12 @@ export default function CurrentStock() {
     stockItems.forEach((it) => {
       const r = map[g.id]?.[it.id];
       if (!r) return;
-      const opening = Math.round((it.openingQty / godowns.length));
-      const closing = opening + r.inQ - r.outQ;
+      const opening = Math.round(it.openingQty / godowns.length);
+      const closing = opening + r.inQty - r.outQty;
       rows.push({
         id: `${g.id}_${it.id}`,
         item: it.name, godown: g.name,
-        opening, inQ: r.inQ, outQ: r.outQ, closing,
+        opening, inQ: r.inQty, outQ: r.outQty, closing,
         rate: it.ratePerUnit, value: closing * it.ratePerUnit,
       });
     });
