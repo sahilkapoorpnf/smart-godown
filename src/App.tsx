@@ -88,6 +88,10 @@ import {
   ProfitLoss, BalanceSheet,
 } from "./pages/erp/accountant/Reports";
 
+const queryClient = new QueryClient();
+
+
+
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
