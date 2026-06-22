@@ -13,15 +13,18 @@ export default function SelectCompany() {
   const list = companiesForUser(user?.id, user?.role);
 
   const pick = (id: string) => { setActiveCompany(id); nav("/dashboard/erp/acc"); };
+  const openInfo = (id: string) => { setActiveCompany(id); nav("/dashboard/erp/acc/company-info"); };
 
   return (
     <ErpPage
       allowed={["wh_accountant", "admin_accountant", "accountant", "superadmin"]}
       title="Select Area Company"
       description="Choose the area company (Tally company) you want to work in. Each area maintains its own books, GST, and inventory."
-      actions={(user?.role === "admin_accountant" || user?.role === "superadmin") && (
-        <Button onClick={() => nav("/dashboard/erp/acc/companies")}><Plus className="w-4 h-4 mr-2" />Manage Companies</Button>
-      )}
+      actions={
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => nav("/dashboard/erp/acc/companies")}><Plus className="w-4 h-4 mr-2" />Create / Manage Companies</Button>
+        </div>
+      }
     >
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {list.map((c) => {
@@ -49,9 +52,10 @@ export default function SelectCompany() {
                   <div className="p-2 rounded bg-muted/50"><div className="text-xs text-muted-foreground">Vouchers</div><div className="font-bold">{vs.length}</div></div>
                   <div className="p-2 rounded bg-muted/50"><div className="text-xs text-muted-foreground">Sales</div><div className="font-bold text-himfed-green text-xs">{fmtINR(totalSales)}</div></div>
                 </div>
-                <Button className="w-full" onClick={() => pick(c.id)}>
-                  Open Company <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button variant="outline" onClick={() => openInfo(c.id)}>View / Edit</Button>
+                  <Button onClick={() => pick(c.id)}>Open <ArrowRight className="w-4 h-4 ml-1" /></Button>
+                </div>
               </CardContent>
             </Card>
           );
