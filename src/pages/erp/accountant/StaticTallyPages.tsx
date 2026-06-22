@@ -1,0 +1,235 @@
+import { ReactNode, useMemo, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import ErpPage, { Badge, StatTile } from "@/components/erp/ErpPage";
+import { DataTable } from "@/components/erp/DataTable";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  areaCompaniesStatic, auditLogsStatic, dashboardStats, documentsStatic, fmtStaticINR,
+  godownMastersStatic, groupMasters, ledgerMasters, reportRowsStatic, stockGroupsStatic,
+  stockItemsStatic, stockUnitsStatic, voucherTypeMasters, vouchersStatic,
+  AreaCompanyStatic, MasterRow, VoucherKind, VoucherRow,
+} from "@/lib/erp/staticTallyData";
+import {
+  ArrowLeftRight, BadgeIndianRupee, Banknote, BookOpen, Building2, Download,
+  FileCheck2, FileText, Landmark, Package, Plus, Printer, Receipt, Search,
+  ShieldCheck, Truck, Upload, Wallet,
+} from "lucide-react";
+
+const allowed = ["wh_accountant", "admin_accountant", "accountant", "superadmin"] as any;
+
+const moduleCards = [
+  { label: "Company Information", to: "/dashboard/erp/acc/company-info", icon: Building2 },
+  { label: "Group Master", to: "/dashboard/erp/acc/masters/groups", icon: BookOpen },
+  { label: "Ledger Master", to: "/dashboard/erp/acc/masters/ledgers", icon: FileText },
+  { label: "Voucher Types", to: "/dashboard/erp/acc/masters/voucher-types", icon: Receipt },
+  { label: "Stock Items", to: "/dashboard/erp/acc/inventory/items", icon: Package },
+  { label: "Godowns", to: "/dashboard/erp/acc/inventory/godowns", icon: Truck },
+  { label: "Purchase", to: "/dashboard/erp/acc/purchase", icon: BadgeIndianRupee },
+  { label: "Sales", to: "/dashboard/erp/acc/sales", icon: Receipt },
+  { label: "Day Book", to: "/dashboard/erp/acc/daybook", icon: BookOpen },
+  { label: "Reports", to: "/dashboard/erp/acc/reports", icon: FileCheck2 },
+];
+
+const voucherTitle: Record<VoucherKind, string> = {
+  purchase: "Purchase Voucher",
+  sales: "Sales Voucher",
+  payment: "Payment Voucher",
+  receipt: "Receipt Voucher",
+  journal: "Journal Voucher",
+  contra: "Contra Voucher",
+  stock_transfer: "Stock Transfer Voucher",
+};
+
+const reportTitle: Record<string, string> = {
+  ledger: "Ledger Report",
+  "trial-balance": "Trial Balance",
+  cashbook: "Cash Book",
+  bankbook: "Bank Book",
+  "purchase-register": "Purchase Register",
+  "sales-register": "Sales Register",
+  "stock-summary": "Stock Summary",
+  "stock-register": "Stock Register",
+  gst: "GST Reports",
+  pl: "Profit & Loss Account",
+  "balance-sheet": "Balance Sheet",
+};
+
+function TallyPage({ title, description, actions, children }: { title: string; description?: string; actions?: ReactNode; children: ReactNode }) {
+  return (
+    <ErpPage allowed={allowed} title={title} description={description} actions={actions}>
+      <div className="rounded-lg border border-himfed-green/20 bg-himfed-green/5 p-3 text-sm flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2 font-medium"><Building2 className="w-4 h-4 text-himfed-green" /> Active Company: UNA Area</div>
+        <div className="flex gap-2">
+          <Button asChild size="sm" variant="outline"><Link to="/dashboard/erp/acc/select-company">Select Company</Link></Button>
+          <Button asChild size="sm" variant="outline"><Link to="/dashboard/erp/acc/company-create">Create Company</Link></Button>
+        </div>
+      </div>
+      {children}
+    </ErpPage>
+  );
+}
+
+function Field({ label, value, type = "text" }: { label: string; value: string | number; type?: string }) {
+  return <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">{label}</Label><Input type={type} value={value} readOnly /></div>;
+}
+
+function SelectField({ label, value, options }: { label: string; value: string; options: string[] }) {
+  return (
+    <div className="space-y-1.5"><Label className="text-xs text-muted-foreground">{label}</Label>
+      <Select value={value}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{options.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent></Select>
+    </div>
+  );
+}
+
+function StaticForm({ title, children }: { title: string; children: ReactNode }) {
+  return <Card><CardHeader><CardTitle className="text-lg font-serif">{title}</CardTitle></CardHeader><CardContent className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">{children}</CardContent></Card>;
+}
+
+function StatusBadge({ value }: { value?: string }) {
+  return <Badge tone={value === "Active" || value === "Approved" ? "green" : value === "Pending" ? "amber" : "red"}>{value ?? "Active"}</Badge>;
+}
+
+function FilteredTable<T extends MasterRow | VoucherRow | AreaCompanyStatic>({ rows, columns, exportName, searchKeys }: { rows: T[]; columns: any[]; exportName: string; searchKeys: (keyof T)[] }) {
+  const [status, setStatus] = useState("all");
+  const filtered = useMemo(() => status === "all" ? rows : rows.filter((r: any) => r.status === status), [rows, status]);
+  return <DataTable rows={filtered as any[]} columns={columns} exportName={exportName} searchKeys={searchKeys as any} filters={<Select value={status} onValueChange={setStatus}><SelectTrigger className="h-9 w-40"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All Status</SelectItem><SelectItem value="Active">Active</SelectItem><SelectItem value="Approved">Approved</SelectItem><SelectItem value="Pending">Pending</SelectItem><SelectItem value="Inactive">Inactive</SelectItem></SelectContent></Select>} />;
+}
+
+const actionColumn = { key: "actions", label: "Actions", render: () => <div className="flex gap-1"><Button size="sm" variant="ghost">View</Button><Button size="sm" variant="ghost">Edit</Button><Button size="sm" variant="ghost">Disable</Button></div> };
+
+export function SelectCompanyStatic() {
+  const nav = useNavigate();
+  return (
+    <TallyPage title="Select Assigned Area Company" description="Warehouse Accountant login flow: select assigned Area Company, then open the Tally-style dashboard." actions={<Button onClick={() => nav("/dashboard/erp/acc/company-create")}><Plus className="w-4 h-4 mr-2" />New Company Form</Button>}>
+      <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {areaCompaniesStatic.slice(0, 6).map((c) => (
+          <Card key={c.id} className="border-himfed-green/20 hover:shadow-md transition-shadow">
+            <CardContent className="p-5 space-y-4">
+              <div className="flex items-start gap-3"><div className="p-3 rounded-lg bg-himfed-green/10"><Building2 className="w-6 h-6 text-himfed-green" /></div><div><div className="font-serif font-bold text-lg">{c.name}</div><div className="text-xs text-muted-foreground">{c.id} · GST {c.gstNumber}</div></div></div>
+              <div className="grid grid-cols-3 gap-2 text-center text-sm"><div className="rounded bg-muted/50 p-2"><div className="text-xs text-muted-foreground">FY</div><b>26-27</b></div><div className="rounded bg-muted/50 p-2"><div className="text-xs text-muted-foreground">Godowns</div><b>{godownMastersStatic.filter((g) => String(g.area).includes(c.code)).length || 2}</b></div><div className="rounded bg-muted/50 p-2"><div className="text-xs text-muted-foreground">Status</div><StatusBadge value={c.status} /></div></div>
+              <div className="grid grid-cols-2 gap-2"><Button variant="outline" onClick={() => nav("/dashboard/erp/acc/company-info")}>View / Edit</Button><Button onClick={() => nav("/dashboard/erp/acc")}>Open Company</Button></div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <FilteredTable rows={areaCompaniesStatic} exportName="area-companies" searchKeys={["id", "name", "gstNumber", "district"]} columns={companyColumns} />
+    </TallyPage>
+  );
+}
+
+const companyColumns = [
+  { key: "id", label: "Company ID", sortable: true },
+  { key: "name", label: "Company Name", sortable: true },
+  { key: "gstNumber", label: "GST Number" },
+  { key: "fyStart", label: "Financial Year", render: (r: AreaCompanyStatic) => `${r.fyStart} to ${r.fyEnd}` },
+  { key: "status", label: "Status", render: (r: AreaCompanyStatic) => <StatusBadge value={r.status} /> },
+  { key: "createdDate", label: "Created Date", sortable: true },
+  actionColumn,
+];
+
+export function CompanyCreationStatic() {
+  const c = areaCompaniesStatic[0];
+  return (
+    <TallyPage title="Area Company Creation" description="Static Tally-style company creation with complete form, list view, filtering, export, and action buttons.">
+      <Tabs defaultValue="form"><TabsList><TabsTrigger value="form">Create Company Form</TabsTrigger><TabsTrigger value="list">Company List View</TabsTrigger></TabsList>
+        <TabsContent value="form" className="space-y-4">
+          <StaticForm title="Basic Information"><Field label="Area Company Name" value={c.name} /><Field label="Area Code" value={c.code} /><Field label="Address" value={c.address} /><Field label="District" value={c.district} /><Field label="State" value={c.state} /><Field label="PIN Code" value={c.pin} /><Field label="Phone Number" value={c.phone} /><Field label="Email" value={c.email} /></StaticForm>
+          <StaticForm title="GST Information"><SelectField label="GST Registration Type" value={c.gstType} options={["Regular", "Composition", "Unregistered"]} /><Field label="GST Number" value={c.gstNumber} /><Field label="PAN Number" value={c.pan} /><Field label="GST Effective Date" type="date" value={c.gstEffectiveDate} /></StaticForm>
+          <StaticForm title="Financial Configuration"><Field label="Financial Year Start Date" type="date" value={c.fyStart} /><Field label="Financial Year End Date" type="date" value={c.fyEnd} /><Field label="Books Beginning Date" type="date" value={c.booksFrom} /><Field label="Currency" value={c.currency} /><SelectField label="Maintain Accounts" value="Yes" options={["Yes", "No"]} /><SelectField label="Maintain Inventory" value="Yes" options={["Yes", "No"]} /></StaticForm>
+          <div className="flex gap-2"><Button>Validate Static Form</Button><Button variant="outline">Preview Company</Button><Button variant="outline">Clear</Button></div>
+        </TabsContent>
+        <TabsContent value="list"><FilteredTable rows={areaCompaniesStatic} exportName="area-company-list" searchKeys={["id", "name", "gstNumber", "district"]} columns={companyColumns} /></TabsContent>
+      </Tabs>
+    </TallyPage>
+  );
+}
+
+export function CompanyInformationStatic() {
+  const c = areaCompaniesStatic[0];
+  return <TallyPage title="Company Information" description="Complete company details, GST configuration, financial year settings and company options."><div className="grid lg:grid-cols-3 gap-4"><Card className="lg:col-span-1"><CardContent className="p-5 space-y-3"><Building2 className="w-10 h-10 text-himfed-green" /><h2 className="font-serif font-bold text-2xl">{c.name}</h2><p className="text-sm text-muted-foreground">{c.address}, {c.district}, {c.state} - {c.pin}</p><StatusBadge value={c.status} /><div className="grid grid-cols-2 gap-2 pt-2"><Button>Edit Info</Button><Button variant="outline">GST Config</Button><Button variant="outline">FY Settings</Button><Button variant="outline">View Settings</Button></div></CardContent></Card><div className="lg:col-span-2 space-y-4"><StaticForm title="Company Details"><Field label="Company ID" value={c.id} /><Field label="GST Number" value={c.gstNumber} /><Field label="PAN" value={c.pan} /><Field label="Phone" value={c.phone} /><Field label="Email" value={c.email} /><Field label="Currency" value={c.currency} /></StaticForm><FilteredTable rows={areaCompaniesStatic} exportName="company-information" searchKeys={["id", "name", "gstNumber"]} columns={companyColumns} /></div></div></TallyPage>;
+}
+
+function MasterStaticPage({ type }: { type: "groups" | "ledgers" | "voucher-types" }) {
+  const map = {
+    groups: { title: "Group Master", rows: groupMasters, fields: ["Group Name", "Under Group", "Nature"], keys: ["id", "name", "under", "nature", "status"] },
+    ledgers: { title: "Ledger Master", rows: ledgerMasters, fields: ["Ledger Name", "Under Group", "Opening Balance", "Debit/Credit", "GST Applicable", "GST Details", "Address", "Contact Information"], keys: ["id", "name", "under", "openingBalance", "drCr", "gstin", "status"] },
+    "voucher-types": { title: "Voucher Type Master", rows: voucherTypeMasters, fields: ["Voucher Type Name", "Prefix", "Category", "Numbering", "Activate / Deactivate"], keys: ["id", "name", "prefix", "category", "numbering", "status"] },
+  }[type];
+  const sample = map.rows[0];
+  const columns = map.keys.map((k) => ({ key: k, label: k.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()), render: k === "status" ? (r: any) => <StatusBadge value={r.status} /> : undefined })).concat(actionColumn);
+  return <TallyPage title={map.title} description="Static master management with add form, list view, filters, pagination and export."><StaticForm title={`Add / Edit ${map.title}`}>{map.fields.map((f, i) => <Field key={f} label={f} value={String(Object.values(sample)[i + 1] ?? f)} />)}<div className="md:col-span-2 lg:col-span-3 flex gap-2"><Button>Save Static Master</Button><Button variant="outline">Reset</Button></div></StaticForm><FilteredTable rows={map.rows} exportName={type} searchKeys={["id", "name"] as any} columns={columns} /></TallyPage>;
+}
+
+export const GroupMasterStatic = () => <MasterStaticPage type="groups" />;
+export const LedgerMasterStatic = () => <MasterStaticPage type="ledgers" />;
+export const VoucherTypeMasterStatic = () => <MasterStaticPage type="voucher-types" />;
+
+function InventoryStaticPage({ type }: { type: "groups" | "items" | "units" | "godowns" }) {
+  const map = {
+    groups: { title: "Stock Group Master", rows: stockGroupsStatic, fields: ["Stock Group Name", "Under"], keys: ["id", "name", "under", "status"] },
+    items: { title: "Stock Item Master", rows: stockItemsStatic, fields: ["Item Name", "Stock Group", "Unit", "HSN/SAC Code", "GST Rate", "Opening Quantity", "Opening Value", "Default Godown"], keys: ["id", "name", "group", "unit", "hsn", "gstRate", "openingQty", "openingValue", "defaultGodown", "status"] },
+    units: { title: "Stock Unit Master", rows: stockUnitsStatic, fields: ["Unit Code", "Unit Name", "Decimals"], keys: ["id", "code", "name", "decimals", "status"] },
+    godowns: { title: "Godown / Warehouse Master", rows: godownMastersStatic, fields: ["Warehouse Name", "Warehouse Code", "Address", "Area Officer Assigned", "Warehouse User Assigned", "Status"], keys: ["id", "name", "code", "area", "address", "officer", "user", "utilization", "status"] },
+  }[type];
+  const sample = map.rows[0];
+  const columns = map.keys.map((k) => ({ key: k, label: k.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()), render: k === "status" ? (r: any) => <StatusBadge value={r.status} /> : k === "utilization" ? (r: any) => <Badge tone={Number(r.utilization) > 90 ? "red" : "green"}>{r.utilization}%</Badge> : undefined })).concat(actionColumn);
+  return <TallyPage title={map.title} description="Static inventory master with HIMFED Area → multiple Godowns hierarchy."><StaticForm title={`Create / Update ${map.title}`}>{map.fields.map((f, i) => <Field key={f} label={f} value={String(Object.values(sample)[i + 1] ?? f)} />)}<div className="md:col-span-2 lg:col-span-3 flex gap-2"><Button>Save Static Inventory</Button><Button variant="outline">Disable</Button></div></StaticForm><FilteredTable rows={map.rows} exportName={type} searchKeys={["id", "name"] as any} columns={columns} /></TallyPage>;
+}
+
+export const StockGroupStatic = () => <InventoryStaticPage type="groups" />;
+export const StockItemStatic = () => <InventoryStaticPage type="items" />;
+export const StockUnitStatic = () => <InventoryStaticPage type="units" />;
+export const GodownMasterStatic = () => <InventoryStaticPage type="godowns" />;
+
+export function TallyDashboardStatic() {
+  return <TallyPage title="Tally Style Dashboard — UNA Area" description="Area Company books with connected warehouses, stock, vouchers, GST and reports."><div className="grid grid-cols-2 lg:grid-cols-4 gap-4"><StatTile label="Total Purchase Today" value={fmtStaticINR(dashboardStats.totalPurchaseToday)} tone="blue" /><StatTile label="Total Sales Today" value={fmtStaticINR(dashboardStats.totalSalesToday)} tone="green" /><StatTile label="Current Stock Value" value={fmtStaticINR(dashboardStats.currentStockValue)} tone="amber" /><StatTile label="Pending Vouchers" value={dashboardStats.pendingVouchers} tone="red" /><StatTile label="Cash Balance" value={fmtStaticINR(dashboardStats.cashBalance)} /><StatTile label="Bank Balance" value={fmtStaticINR(dashboardStats.bankBalance)} /><StatTile label="Receivables" value={fmtStaticINR(dashboardStats.receivables)} tone="green" /><StatTile label="Payables" value={fmtStaticINR(dashboardStats.payables)} tone="red" /></div><div className="grid md:grid-cols-2 lg:grid-cols-5 gap-3">{moduleCards.map((m) => <Button key={m.to} asChild variant="outline" className="h-20 flex-col gap-2"><Link to={m.to}><m.icon className="w-5 h-5" /><span>{m.label}</span></Link></Button>)}</div><FilteredTable rows={vouchersStatic.slice(0, 10)} exportName="recent-vouchers" searchKeys={["voucherNo", "party", "ledger"]} columns={voucherColumns} /></TallyPage>;
+}
+
+const voucherColumns = [
+  { key: "date", label: "Date", sortable: true },
+  { key: "voucherNo", label: "Voucher Number" },
+  { key: "party", label: "Party" },
+  { key: "ledger", label: "Ledger" },
+  { key: "item", label: "Stock Item" },
+  { key: "godown", label: "Godown" },
+  { key: "debit", label: "Debit", className: "text-right", render: (r: VoucherRow) => fmtStaticINR(r.debit) },
+  { key: "credit", label: "Credit", className: "text-right", render: (r: VoucherRow) => fmtStaticINR(r.credit) },
+  { key: "status", label: "Status", render: (r: VoucherRow) => <StatusBadge value={r.status} /> },
+  { key: "actions", label: "Actions", render: () => <div className="flex gap-1"><Button size="sm" variant="ghost"><Printer className="w-3 h-3" /></Button><Button size="sm" variant="ghost">View</Button></div> },
+];
+
+export function VoucherStaticPage({ kind }: { kind: VoucherKind }) {
+  const rows = vouchersStatic.filter((v) => v.kind === kind);
+  const first = rows[0];
+  return <TallyPage title={voucherTitle[kind]} description="Static Tally-style voucher entry screen with form, validations preview, list view, filters and export."><StaticForm title={`New ${voucherTitle[kind]}`}><Field label="Voucher Number" value={first.voucherNo} /><Field label="Date" type="date" value={first.date} /><Field label={kind === "sales" ? "Customer Name" : kind === "purchase" ? "Supplier" : "Party / Ledger"} value={first.party} /><Field label="Ledger" value={first.ledger} /><Field label="Invoice Number" value={first.invoiceNo} /><Field label="Stock Item" value={first.item} /><Field label="Godown / Warehouse" value={first.godown} /><Field label="Quantity" value={first.qty} /><Field label="Rate" value={first.rate} /><Field label="GST Details" value={fmtStaticINR(first.gst)} /><Field label="Total Amount" value={fmtStaticINR(first.total)} /><div className="space-y-1.5 md:col-span-2"><Label className="text-xs text-muted-foreground">Narration</Label><Textarea value={first.narration} readOnly /></div><div className="md:col-span-2 lg:col-span-3 flex gap-2"><Button>Save Static Voucher</Button><Button variant="outline"><Upload className="w-4 h-4 mr-2" />Document Upload</Button><Button variant="outline">Preview Accounting Impact</Button></div></StaticForm><FilteredTable rows={rows} exportName={`${kind}-vouchers`} searchKeys={["voucherNo", "party", "ledger", "item"]} columns={voucherColumns} /></TallyPage>;
+}
+
+export function DayBookStatic() {
+  return <TallyPage title="Day Book" description="Every purchase, sales, payment, receipt, journal, contra and stock transfer voucher appears here."><FilteredTable rows={vouchersStatic} exportName="day-book" searchKeys={["voucherNo", "party", "ledger", "godown"]} columns={voucherColumns} /></TallyPage>;
+}
+
+export function ReportsLandingStatic() {
+  const reports = Object.entries(reportTitle);
+  return <TallyPage title="Reports" description="Accounting, inventory, GST and financial statement reports."><div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">{reports.map(([key, label]) => <Button key={key} asChild variant="outline" className="h-16 justify-start"><Link to={`/dashboard/erp/acc/reports/${key}`}><FileText className="w-5 h-5 mr-2" />{label}</Link></Button>)}</div><FilteredTable rows={reportRowsStatic} exportName="reports-summary" searchKeys={["id", "particular", "ledger", "godown"] as any} columns={reportColumns} /></TallyPage>;
+}
+
+const reportColumns = ["particular", "ledger", "godown", "opening", "debit", "credit", "closing", "gst", "status"].map((k) => ({ key: k, label: k.replace(/^./, (s) => s.toUpperCase()), render: ["opening", "debit", "credit", "closing", "gst"].includes(k) ? (r: any) => fmtStaticINR(Number(r[k])) : k === "status" ? (r: any) => <StatusBadge value={r.status} /> : undefined }));
+
+export function ReportStaticPage() {
+  const { report = "ledger" } = useParams();
+  return <TallyPage title={reportTitle[report] ?? "Report"} description="Static filtered report with 10 relevant entries, export and print actions." actions={<><Button variant="outline"><Printer className="w-4 h-4 mr-2" />Print</Button><Button><Download className="w-4 h-4 mr-2" />Export</Button></>}><FilteredTable rows={reportRowsStatic} exportName={report} searchKeys={["id", "particular", "ledger", "godown"] as any} columns={reportColumns} /></TallyPage>;
+}
+
+export function DocumentsStatic() {
+  return <TallyPage title="Documents" description="Purchase bills, sales bills, GST documents, challans and stock transfer documents."><StaticForm title="Upload / Tag Document"><Field label="Document Type" value="Purchase Bills" /><Field label="Reference Number" value="REF-8600" /><Field label="Company" value="UNA Area" /><Field label="Warehouse" value="UNA Warehouse" /><Field label="Upload File" value="purchase_bill_2100.pdf" /><div className="md:col-span-2 lg:col-span-3"><Button><Upload className="w-4 h-4 mr-2" />Upload Static Document</Button></div></StaticForm><FilteredTable rows={documentsStatic} exportName="documents" searchKeys={["id", "name", "refNo", "warehouse"] as any} columns={["id", "name", "type", "refNo", "company", "warehouse", "uploadedBy", "uploadedAt", "status"].map((k) => ({ key: k, label: k.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()), render: k === "status" ? (r: any) => <StatusBadge value={r.status} /> : undefined })).concat(actionColumn)} /></TallyPage>;
+}
+
+export function AuditLogsStatic() {
+  return <TallyPage title="Audit Logs" description="Tracks user, role, company, warehouse, action, old value, new value and date-time."><FilteredTable rows={auditLogsStatic} exportName="audit-logs" searchKeys={["id", "userName", "role", "company", "warehouse", "action"] as any} columns={["id", "userName", "role", "company", "warehouse", "action", "oldValue", "newValue", "dateTime"].map((k) => ({ key: k, label: k.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()) }))} /></TallyPage>;
+}
