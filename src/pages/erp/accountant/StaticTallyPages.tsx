@@ -243,7 +243,7 @@ const voucherColumns = [
 ];
 
 export function VoucherStaticPage({ kind }: { kind: VoucherKind }) {
-  const rows = vouchersStatic.filter((v) => v.kind === kind);
+  const rows = scopedVouchers().filter((v) => v.kind === kind);
   const first = rows[0];
   return <TallyPage title={voucherTitle[kind]} description="Static Tally-style voucher entry screen with form, validations preview, list view, filters and export."><StaticForm title={`New ${voucherTitle[kind]}`}><Field label="Voucher Number" value={first.voucherNo} /><Field label="Date" type="date" value={first.date} /><Field label={kind === "sales" ? "Customer Name" : kind === "purchase" ? "Supplier" : "Party / Ledger"} value={first.party} /><Field label="Ledger" value={first.ledger} /><Field label="Invoice Number" value={first.invoiceNo} /><Field label="Stock Item" value={first.item} /><Field label="Godown / Warehouse" value={first.godown} /><Field label="Quantity" value={first.qty} /><Field label="Rate" value={first.rate} /><Field label="GST Details" value={fmtStaticINR(first.gst)} /><Field label="Total Amount" value={fmtStaticINR(first.total)} /><div className="space-y-1.5 md:col-span-2"><Label className="text-xs text-muted-foreground">Narration</Label><Textarea value={first.narration} readOnly /></div><div className="md:col-span-2 lg:col-span-3 flex gap-2"><Button>Save Static Voucher</Button><Button variant="outline"><Upload className="w-4 h-4 mr-2" />Document Upload</Button><Button variant="outline">Preview Accounting Impact</Button></div></StaticForm><FilteredTable rows={rows} exportName={`${kind}-vouchers`} searchKeys={["voucherNo", "party", "ledger", "item"]} columns={voucherColumns} /></TallyPage>;
 }
