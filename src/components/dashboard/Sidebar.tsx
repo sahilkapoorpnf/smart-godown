@@ -48,6 +48,38 @@ type Item = { icon: any; label: string; path: string; roles?: Role[] };
 const menuItems: Item[] = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
 
+  // ===== HIMFED TALLY ERP — Warehouse User =====
+  { icon: LayoutDashboard, label: "WH User Dashboard", path: "/dashboard/erp/wh",         roles: ["wh_user"] },
+  { icon: PlusSquare,      label: "New Goods Arrival", path: "/dashboard/erp/wh/new",     roles: ["wh_user"] },
+  { icon: ClipboardList,   label: "My Entries",        path: "/dashboard/erp/wh/mine",    roles: ["wh_user"] },
+  { icon: AlertTriangle,   label: "Re-correction",     path: "/dashboard/erp/wh/recorrect",roles: ["wh_user"] },
+
+  // ===== HIMFED TALLY ERP — Area Officer =====
+  { icon: CheckSquare,     label: "Pending Requests",  path: "/dashboard/erp/ao/pending", roles: ["area_officer", "admin_accountant"] },
+  { icon: ClipboardCheck,  label: "Approved Entries",  path: "/dashboard/erp/ao/approved",roles: ["area_officer", "admin_accountant"] },
+
+  // ===== HIMFED TALLY ERP — Warehouse Accountant (Tally) =====
+  { icon: LayoutDashboard, label: "Tally Dashboard",   path: "/dashboard/erp/acc",            roles: ["wh_accountant", "admin_accountant"] },
+  { icon: ShieldCheck,     label: "Company & GST",     path: "/dashboard/erp/acc/company",    roles: ["wh_accountant", "admin_accountant"] },
+  { icon: BookOpen,        label: "Accounting Masters",path: "/dashboard/erp/acc/masters",    roles: ["wh_accountant", "admin_accountant"] },
+  { icon: Package,         label: "Inventory Masters", path: "/dashboard/erp/acc/inventory",  roles: ["wh_accountant", "admin_accountant"] },
+  { icon: Truck,           label: "Purchase Voucher",  path: "/dashboard/erp/acc/purchase",   roles: ["wh_accountant", "admin_accountant"] },
+  { icon: Receipt,         label: "Sales Voucher",     path: "/dashboard/erp/acc/sales",      roles: ["wh_accountant", "admin_accountant"] },
+  { icon: Wallet,          label: "Payment Voucher",   path: "/dashboard/erp/acc/payment",    roles: ["wh_accountant", "admin_accountant"] },
+  { icon: Landmark,        label: "Receipt Voucher",   path: "/dashboard/erp/acc/receipt",    roles: ["wh_accountant", "admin_accountant"] },
+  { icon: FileMinus,       label: "Journal Voucher",   path: "/dashboard/erp/acc/journal",    roles: ["wh_accountant", "admin_accountant"] },
+  { icon: BookOpen,        label: "Day Book",          path: "/dashboard/erp/acc/daybook",    roles: ["wh_accountant", "admin_accountant"] },
+  { icon: BarChart3,       label: "Current Stock",     path: "/dashboard/erp/acc/current-stock", roles: ["wh_accountant", "admin_accountant"] },
+  { icon: ArrowLeftRight,  label: "Stock Transfer",    path: "/dashboard/erp/acc/stock-transfer",roles: ["wh_accountant", "admin_accountant"] },
+  { icon: FileText,        label: "Accounting Reports",path: "/dashboard/erp/acc/reports",    roles: ["wh_accountant", "admin_accountant"] },
+
+  // ===== HIMFED TALLY ERP — Admin Accountant (Super) =====
+  { icon: LayoutDashboard, label: "HQ Super Dashboard",path: "/dashboard/erp/admin",          roles: ["admin_accountant"] },
+  { icon: Users,           label: "ERP User Management", path: "/dashboard/erp/admin/users",  roles: ["admin_accountant"] },
+  { icon: ShieldCheck,     label: "Audit Trail",       path: "/dashboard/erp/admin/audit",    roles: ["admin_accountant", "wh_accountant"] },
+  { icon: FileText,        label: "Document Mgmt",     path: "/dashboard/erp/admin/documents",roles: ["admin_accountant", "wh_accountant", "area_officer"] },
+
+
   // ===== ACCOUNTANT PANEL =====
   { icon: LayoutDashboard, label: "Accountant Dashboard", path: "/dashboard/acc", roles: ["accountant", "superadmin"] },
   { icon: FileText, label: "Sales Ledger", path: "/dashboard/acc/sales", roles: ["accountant", "superadmin"] },
