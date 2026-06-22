@@ -74,7 +74,20 @@ import AdminUserManagement from "./pages/erp/AdminUserManagement";
 import AuditTrail from "./pages/erp/AuditTrail";
 import DocumentManagement from "./pages/erp/DocumentManagement";
 
-const queryClient = new QueryClient();
+// ===== HIMFED Tally ERP — Accountant V2 (Area Company-aware) =====
+import SelectCompany from "./pages/erp/accountant/SelectCompany";
+import CompanyManager from "./pages/erp/accountant/CompanyManager";
+import TallyDashboard from "./pages/erp/accountant/TallyDashboard";
+import GroupMasterPage from "./pages/erp/accountant/GroupMasterPage";
+import LedgerMasterPage from "./pages/erp/accountant/LedgerMasterPage";
+import VoucherTypeMasterPage from "./pages/erp/accountant/VoucherTypeMasterPage";
+import { StockGroupPage, StockItemPage, StockUnitPage, GodownMasterPage as GodownMasterCrud } from "./pages/erp/accountant/InventoryMasterPages";
+import {
+  DayBookTally, LedgerReport, TrialBalance, CashBookReport, BankBookReport,
+  PurchaseRegister, SalesRegister, StockSummary, GodownStockReport, GstReportsPage,
+  ProfitLoss, BalanceSheet,
+} from "./pages/erp/accountant/Reports";
+
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
