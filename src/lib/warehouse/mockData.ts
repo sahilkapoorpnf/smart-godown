@@ -5,6 +5,7 @@ export const areas: Area[] = [
   { id: "a2", code: "ARE-SOL", name: "Solan", officerName: "Anita Sharma", officerUserId: "u3", contact: "+91 98050 22222", status: "active", createdDate: "2024-01-12" },
   { id: "a3", code: "ARE-MND", name: "Mandi", officerName: "Vikram Thakur", officerUserId: "u4", contact: "+91 98050 33333", status: "active", createdDate: "2024-01-15" },
   { id: "a4", code: "ARE-KNG", name: "Kangra", officerName: "Sunita Devi", officerUserId: "u5", contact: "+91 98050 44444", status: "active", createdDate: "2024-01-18" },
+  { id: "a_una", code: "ARE-UNA", name: "Una", officerName: "Bhuvnesh Sood", officerUserId: "ao_una", contact: "+91 98050 55555", status: "active", createdDate: "2024-02-01" },
 ];
 
 export const warehouses: Warehouse[] = [
