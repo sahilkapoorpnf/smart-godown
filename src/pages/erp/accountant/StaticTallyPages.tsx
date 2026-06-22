@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import {
   areaCompaniesStatic, auditLogsStatic, dashboardStats, documentsStatic, fmtStaticINR,
   godownMastersStatic, groupMasters, ledgerMasters, reportRowsStatic, stockGroupsStatic,
@@ -187,7 +189,110 @@ export function CompanyCreationStatic() {
 
 export function CompanyInformationStatic() {
   const c = scopedCompanies()[0] ?? areaCompaniesStatic[0];
-  return <TallyPage title="Company Information" description="Complete company details, GST configuration, financial year settings and company options."><div className="grid lg:grid-cols-3 gap-4"><Card className="lg:col-span-1"><CardContent className="p-5 space-y-3"><Building2 className="w-10 h-10 text-himfed-green" /><h2 className="font-serif font-bold text-2xl">{c.name}</h2><p className="text-sm text-muted-foreground">{c.address}, {c.district}, {c.state} - {c.pin}</p><StatusBadge value={c.status} /><div className="grid grid-cols-2 gap-2 pt-2"><Button>Edit Info</Button><Button variant="outline">GST Config</Button><Button variant="outline">FY Settings</Button><Button variant="outline">View Settings</Button></div></CardContent></Card><div className="lg:col-span-2 space-y-4"><StaticForm title="Company Details"><Field label="Company ID" value={c.id} /><Field label="GST Number" value={c.gstNumber} /><Field label="PAN" value={c.pan} /><Field label="Phone" value={c.phone} /><Field label="Email" value={c.email} /><Field label="Currency" value={c.currency} /></StaticForm><FilteredTable rows={scopedCompanies()} exportName="company-information" searchKeys={["id", "name", "gstNumber"]} columns={companyColumns} /></div></div></TallyPage>;
+  const [openDlg, setOpenDlg] = useState<null | "gst" | "fy" | "view">(null);
+  return (
+    <TallyPage title="Company Information" description="Complete company details, GST configuration, financial year settings and company options.">
+      <div className="grid lg:grid-cols-3 gap-4">
+        <Card className="lg:col-span-1">
+          <CardContent className="p-5 space-y-3">
+            <Building2 className="w-10 h-10 text-himfed-green" />
+            <h2 className="font-serif font-bold text-2xl">{c.name}</h2>
+            <p className="text-sm text-muted-foreground">{c.address}, {c.district}, {c.state} - {c.pin}</p>
+            <StatusBadge value={c.status} />
+            <div className="grid grid-cols-2 gap-2 pt-2">
+              <Button>Edit Info</Button>
+              <Button variant="outline" onClick={() => setOpenDlg("gst")}>GST Config</Button>
+              <Button variant="outline" onClick={() => setOpenDlg("fy")}>FY Settings</Button>
+              <Button variant="outline" onClick={() => setOpenDlg("view")}>View Settings</Button>
+            </div>
+          </CardContent>
+        </Card>
+        <div className="lg:col-span-2 space-y-4">
+          <StaticForm title="Company Details">
+            <Field label="Company ID" value={c.id} />
+            <Field label="GST Number" value={c.gstNumber} />
+            <Field label="PAN" value={c.pan} />
+            <Field label="Phone" value={c.phone} />
+            <Field label="Email" value={c.email} />
+            <Field label="Currency" value={c.currency} />
+          </StaticForm>
+          <FilteredTable rows={scopedCompanies()} exportName="company-information" searchKeys={["id", "name", "gstNumber"]} columns={companyColumns} />
+        </div>
+      </div>
+
+      <Dialog open={openDlg === "gst"} onOpenChange={(o) => !o && setOpenDlg(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>GST Configuration — {c.name}</DialogTitle>
+            <DialogDescription>GST registration, tax rates and e-invoicing setup.</DialogDescription>
+          </DialogHeader>
+          <div className="grid md:grid-cols-2 gap-3">
+            <Field label="GSTIN" value={c.gstNumber} />
+            <Field label="Legal Name" value={c.name} />
+            <Field label="PAN" value={c.pan} />
+            <SelectField label="Registration Type" value={c.gstType} options={["Regular", "Composition", "Unregistered"]} />
+            <Field label="GST Effective Date" type="date" value={c.gstEffectiveDate} />
+            <SelectField label="Place of Supply" value={c.state} options={["Himachal Pradesh", "Punjab", "Haryana", "Delhi"]} />
+            <SelectField label="GST Frequency" value="Monthly" options={["Monthly", "Quarterly"]} />
+            <Field label="Default CGST %" value="9" />
+            <Field label="Default SGST %" value="9" />
+            <Field label="Default IGST %" value="18" />
+            <SelectField label="E-Invoicing" value="Enabled" options={["Enabled", "Disabled"]} />
+            <SelectField label="E-Way Bill" value="Enabled" options={["Enabled", "Disabled"]} />
+          </div>
+          <DialogFooter><Button variant="outline" onClick={() => setOpenDlg(null)}>Close</Button><Button onClick={() => setOpenDlg(null)}>Save GST Config</Button></DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openDlg === "fy"} onOpenChange={(o) => !o && setOpenDlg(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Financial Year Settings — {c.name}</DialogTitle>
+            <DialogDescription>Books period, opening balances and year-end policies.</DialogDescription>
+          </DialogHeader>
+          <div className="grid md:grid-cols-2 gap-3">
+            <Field label="Current FY" value="2026-2027" />
+            <Field label="FY Start Date" type="date" value={c.fyStart} />
+            <Field label="FY End Date" type="date" value={c.fyEnd} />
+            <Field label="Books Beginning From" type="date" value={c.booksFrom} />
+            <SelectField label="Maintain Accounts" value={c.maintainAccounts ? "Yes" : "No"} options={["Yes", "No"]} />
+            <SelectField label="Maintain Inventory" value={c.maintainInventory ? "Yes" : "No"} options={["Yes", "No"]} />
+            <SelectField label="Stock Valuation Method" value="Weighted Average" options={["FIFO", "LIFO", "Weighted Average"]} />
+            <SelectField label="Books Locked Till" value="2026-03-31" options={["2025-03-31", "2026-03-31", "Not Locked"]} />
+            <SelectField label="Auto Close on FY End" value="Yes" options={["Yes", "No"]} />
+            <Field label="Opening Cash" value={fmtStaticINR(250000)} />
+            <Field label="Opening Bank" value={fmtStaticINR(1850000)} />
+            <Field label="Opening Stock Value" value={fmtStaticINR(18250000)} />
+          </div>
+          <DialogFooter><Button variant="outline" onClick={() => setOpenDlg(null)}>Close</Button><Button onClick={() => setOpenDlg(null)}>Save FY Settings</Button></DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openDlg === "view"} onOpenChange={(o) => !o && setOpenDlg(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>View Settings — {c.name}</DialogTitle>
+            <DialogDescription>Display preferences for vouchers, reports and dashboards.</DialogDescription>
+          </DialogHeader>
+          <div className="grid md:grid-cols-2 gap-3">
+            <SelectField label="Default View" value="Tally Classic" options={["Tally Classic", "Modern", "Compact"]} />
+            <SelectField label="Date Format" value="DD-MM-YYYY" options={["DD-MM-YYYY", "YYYY-MM-DD", "MM/DD/YYYY"]} />
+            <SelectField label="Number Format" value="Indian (1,00,000)" options={["Indian (1,00,000)", "International (100,000)"]} />
+            <SelectField label="Default Voucher Mode" value="Item Invoice" options={["Item Invoice", "Accounting Invoice", "As Voucher"]} />
+            <SelectField label="Show Inventory in Vouchers" value="Yes" options={["Yes", "No"]} />
+            <SelectField label="Show Narration by Default" value="Yes" options={["Yes", "No"]} />
+            <SelectField label="Theme" value="Forest Green" options={["Forest Green", "Amber", "System"]} />
+            <SelectField label="Rows per Page" value="25" options={["10", "25", "50", "100"]} />
+            <div className="flex items-center justify-between rounded border p-3"><span className="text-sm">Enable Print Preview</span><Switch defaultChecked /></div>
+            <div className="flex items-center justify-between rounded border p-3"><span className="text-sm">Show Closing Stock on Dashboard</span><Switch defaultChecked /></div>
+            <div className="flex items-center justify-between rounded border p-3"><span className="text-sm">Enable Quick Add Shortcuts</span><Switch defaultChecked /></div>
+            <div className="flex items-center justify-between rounded border p-3"><span className="text-sm">Compact Sidebar</span><Switch /></div>
+          </div>
+          <DialogFooter><Button variant="outline" onClick={() => setOpenDlg(null)}>Close</Button><Button onClick={() => setOpenDlg(null)}>Save View Settings</Button></DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </TallyPage>
+  );
 }
 
 function MasterStaticPage({ type }: { type: "groups" | "ledgers" | "voucher-types" }) {
@@ -220,7 +325,82 @@ function InventoryStaticPage({ type }: { type: "groups" | "items" | "units" | "g
 export const StockGroupStatic = () => <InventoryStaticPage type="groups" />;
 export const StockItemStatic = () => <InventoryStaticPage type="items" />;
 export const StockUnitStatic = () => <InventoryStaticPage type="units" />;
-export const GodownMasterStatic = () => <InventoryStaticPage type="godowns" />;
+export function GodownMasterStatic() {
+  const rows = scopedGodowns();
+  const una = isUnaScoped();
+  const areaOptions = una ? ["UNA Area"] : areaCompaniesStatic.map((c) => c.name);
+  const cols = ["id", "name", "code", "area", "address", "officer", "user", "capacity", "utilization", "status"].map((k) => ({
+    key: k,
+    label: k.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()),
+    render: k === "status" ? (r: any) => <StatusBadge value={r.status} />
+      : k === "utilization" ? (r: any) => <Badge tone={Number(r.utilization) > 90 ? "red" : "green"}>{r.utilization}%</Badge>
+      : k === "capacity" ? (r: any) => `${r.capacity} MT` : undefined,
+  })).concat(actionColumn);
+
+  return (
+    <TallyPage title="Godown / Warehouse Master" description="Create a new godown under any area with full company-style configuration (basic info, GST, financial year and operations).">
+      <Tabs defaultValue="create">
+        <TabsList>
+          <TabsTrigger value="create"><Plus className="w-3 h-3 mr-1" />Add New Godown</TabsTrigger>
+          <TabsTrigger value="list">Godown List View</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="create" className="space-y-4">
+          <StaticForm title="Basic Information">
+            <Field label="Warehouse Name" value="New Pekhubela Warehouse" />
+            <Field label="Warehouse Code" value="PEK-WH" />
+            <SelectField label="Under Area Company" value={areaOptions[0]} options={areaOptions} />
+            <Field label="Address Line" value="Pekhubela, Tehsil Haroli" />
+            <Field label="District" value={una ? "Una" : "Una"} />
+            <SelectField label="State" value="Himachal Pradesh" options={["Himachal Pradesh", "Punjab", "Haryana"]} />
+            <Field label="PIN Code" value="174306" />
+            <Field label="Phone Number" value="+91 1975 220990" />
+            <Field label="Email" value="pekhubela@himfed.in" />
+          </StaticForm>
+
+          <StaticForm title="GST Information">
+            <SelectField label="GST Registration Type" value="Regular" options={["Regular", "Composition", "Unregistered"]} />
+            <Field label="GSTIN" value="02AAACH1234R2Z5" />
+            <Field label="PAN Number" value="AAACH1234R" />
+            <Field label="GST Effective Date" type="date" value="2017-07-01" />
+            <SelectField label="Place of Supply" value="Himachal Pradesh" options={["Himachal Pradesh", "Punjab", "Haryana"]} />
+            <SelectField label="E-Way Bill" value="Enabled" options={["Enabled", "Disabled"]} />
+          </StaticForm>
+
+          <StaticForm title="Financial Year Settings">
+            <Field label="FY Start Date" type="date" value="2026-04-01" />
+            <Field label="FY End Date" type="date" value="2027-03-31" />
+            <Field label="Books Beginning From" type="date" value="2026-04-01" />
+            <Field label="Currency" value="INR" />
+            <SelectField label="Maintain Accounts" value="Yes" options={["Yes", "No"]} />
+            <SelectField label="Maintain Inventory" value="Yes" options={["Yes", "No"]} />
+            <SelectField label="Stock Valuation" value="Weighted Average" options={["FIFO", "LIFO", "Weighted Average"]} />
+            <Field label="Opening Stock Value" value={fmtStaticINR(1250000)} />
+          </StaticForm>
+
+          <StaticForm title="Operations & Capacity">
+            <Field label="Storage Capacity (MT)" value="3200" />
+            <Field label="Current Utilization (%)" value="0" />
+            <SelectField label="Area Officer Assigned" value={una ? "Bhuvnesh Sood" : "Bhuvnesh Sood"} options={["Bhuvnesh Sood", "Rajeev Bansal", "Anita Sharma", "Vikram Thakur"]} />
+            <SelectField label="Warehouse User Assigned" value="Sanjay Kumar" options={["Sanjay Kumar", "Anil Chauhan", "Pooja Devi", "Rohit Kashyap"]} />
+            <SelectField label="Default Voucher Mode" value="Item Invoice" options={["Item Invoice", "Accounting Invoice", "As Voucher"]} />
+            <SelectField label="Status" value="Active" options={["Active", "Inactive"]} />
+          </StaticForm>
+
+          <div className="flex gap-2">
+            <Button><Plus className="w-4 h-4 mr-2" />Save New Godown</Button>
+            <Button variant="outline">Preview Godown</Button>
+            <Button variant="outline">Clear</Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="list">
+          <FilteredTable rows={rows} exportName="godowns" searchKeys={["id", "name", "code", "area"] as any} columns={cols} />
+        </TabsContent>
+      </Tabs>
+    </TallyPage>
+  );
+}
 
 export function TallyDashboardStatic() {
   const stats = scopedDashboardStats();
