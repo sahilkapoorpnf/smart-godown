@@ -204,6 +204,7 @@ export function CompanyInformationStatic() {
               <Button variant="outline" onClick={() => setOpenDlg("gst")}>GST Config</Button>
               <Button variant="outline" onClick={() => setOpenDlg("fy")}>FY Settings</Button>
               <Button variant="outline" onClick={() => setOpenDlg("view")}>View Settings</Button>
+              <Button asChild variant="outline"><Link to="/dashboard/erp/acc/inventory/godowns">Add New Godown</Link></Button>
             </div>
           </CardContent>
         </Card>
