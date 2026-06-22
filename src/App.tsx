@@ -61,6 +61,7 @@ import {
   VoucherStaticPage,
   VoucherTypeMasterStatic,
 } from "./pages/erp/accountant/StaticTallyPages";
+import BalanceSheetPage from "./pages/erp/accountant/BalanceSheetPage";
 
 const queryClient = new QueryClient();
 
