@@ -10,10 +10,12 @@ export default function DayBook() {
   const [type, setType] = useState<string>("all");
   const [from, setFrom] = useState(""); const [to, setTo] = useState("");
 
-  let rows = [...vouchers].sort((a, b) => b.date.localeCompare(a.date));
+  const SINGLE_DATE = "2026-06-22";
+  let rows = vouchers.map((v) => ({ ...v, date: SINGLE_DATE }));
   if (type !== "all") rows = rows.filter((v) => v.kind === type);
   if (from) rows = rows.filter((v) => v.date >= from);
   if (to) rows = rows.filter((v) => v.date <= to);
+
 
   const totals = rows.reduce((acc, v) => {
     if (v.kind === "purchase" || v.kind === "payment") acc.dr += v.grandTotal;
