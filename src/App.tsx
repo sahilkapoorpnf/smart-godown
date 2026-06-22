@@ -55,6 +55,25 @@ import AuditLog from "./pages/accountant/AuditLog";
 import TallyExport from "./pages/accountant/TallyExport";
 import FinancialYear from "./pages/accountant/FinancialYear";
 
+// ===== HIMFED Tally ERP (new) =====
+import WhUserDashboard from "./pages/erp/WhUserDashboard";
+import GoodsArrivalNew from "./pages/erp/GoodsArrivalNew";
+import MyArrivals from "./pages/erp/MyArrivals";
+import AreaOfficerPage from "./pages/erp/AreaOfficerPage";
+import WhAccountantDashboard from "./pages/erp/WhAccountantDashboard";
+import CompanyGstSetup from "./pages/erp/CompanyGstSetup";
+import AccountingMasters from "./pages/erp/AccountingMasters";
+import InventoryMasters from "./pages/erp/InventoryMasters";
+import VoucherEntry from "./pages/erp/VoucherEntry";
+import DayBook from "./pages/erp/DayBook";
+import CurrentStock from "./pages/erp/CurrentStock";
+import StockTransfer from "./pages/erp/StockTransfer";
+import AccountingReports from "./pages/erp/AccountingReports";
+import AdminAccountantDashboard from "./pages/erp/AdminAccountantDashboard";
+import AdminUserManagement from "./pages/erp/AdminUserManagement";
+import AuditTrail from "./pages/erp/AuditTrail";
+import DocumentManagement from "./pages/erp/DocumentManagement";
+
 const queryClient = new QueryClient();
 
 const App = () => (
