@@ -325,7 +325,82 @@ function InventoryStaticPage({ type }: { type: "groups" | "items" | "units" | "g
 export const StockGroupStatic = () => <InventoryStaticPage type="groups" />;
 export const StockItemStatic = () => <InventoryStaticPage type="items" />;
 export const StockUnitStatic = () => <InventoryStaticPage type="units" />;
-export const GodownMasterStatic = () => <InventoryStaticPage type="godowns" />;
+export function GodownMasterStatic() {
+  const rows = scopedGodowns();
+  const una = isUnaScoped();
+  const areaOptions = una ? ["UNA Area"] : areaCompaniesStatic.map((c) => c.name);
+  const cols = ["id", "name", "code", "area", "address", "officer", "user", "capacity", "utilization", "status"].map((k) => ({
+    key: k,
+    label: k.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()),
+    render: k === "status" ? (r: any) => <StatusBadge value={r.status} />
+      : k === "utilization" ? (r: any) => <Badge tone={Number(r.utilization) > 90 ? "red" : "green"}>{r.utilization}%</Badge>
+      : k === "capacity" ? (r: any) => `${r.capacity} MT` : undefined,
+  })).concat(actionColumn);
+
+  return (
+    <TallyPage title="Godown / Warehouse Master" description="Create a new godown under any area with full company-style configuration (basic info, GST, financial year and operations).">
+      <Tabs defaultValue="create">
+        <TabsList>
+          <TabsTrigger value="create"><Plus className="w-3 h-3 mr-1" />Add New Godown</TabsTrigger>
+          <TabsTrigger value="list">Godown List View</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="create" className="space-y-4">
+          <StaticForm title="Basic Information">
+            <Field label="Warehouse Name" value="New Pekhubela Warehouse" />
+            <Field label="Warehouse Code" value="PEK-WH" />
+            <SelectField label="Under Area Company" value={areaOptions[0]} options={areaOptions} />
+            <Field label="Address Line" value="Pekhubela, Tehsil Haroli" />
+            <Field label="District" value={una ? "Una" : "Una"} />
+            <SelectField label="State" value="Himachal Pradesh" options={["Himachal Pradesh", "Punjab", "Haryana"]} />
+            <Field label="PIN Code" value="174306" />
+            <Field label="Phone Number" value="+91 1975 220990" />
+            <Field label="Email" value="pekhubela@himfed.in" />
+          </StaticForm>
+
+          <StaticForm title="GST Information">
+            <SelectField label="GST Registration Type" value="Regular" options={["Regular", "Composition", "Unregistered"]} />
+            <Field label="GSTIN" value="02AAACH1234R2Z5" />
+            <Field label="PAN Number" value="AAACH1234R" />
+            <Field label="GST Effective Date" type="date" value="2017-07-01" />
+            <SelectField label="Place of Supply" value="Himachal Pradesh" options={["Himachal Pradesh", "Punjab", "Haryana"]} />
+            <SelectField label="E-Way Bill" value="Enabled" options={["Enabled", "Disabled"]} />
+          </StaticForm>
+
+          <StaticForm title="Financial Year Settings">
+            <Field label="FY Start Date" type="date" value="2026-04-01" />
+            <Field label="FY End Date" type="date" value="2027-03-31" />
+            <Field label="Books Beginning From" type="date" value="2026-04-01" />
+            <Field label="Currency" value="INR" />
+            <SelectField label="Maintain Accounts" value="Yes" options={["Yes", "No"]} />
+            <SelectField label="Maintain Inventory" value="Yes" options={["Yes", "No"]} />
+            <SelectField label="Stock Valuation" value="Weighted Average" options={["FIFO", "LIFO", "Weighted Average"]} />
+            <Field label="Opening Stock Value" value={fmtStaticINR(1250000)} />
+          </StaticForm>
+
+          <StaticForm title="Operations & Capacity">
+            <Field label="Storage Capacity (MT)" value="3200" />
+            <Field label="Current Utilization (%)" value="0" />
+            <SelectField label="Area Officer Assigned" value={una ? "Bhuvnesh Sood" : "Bhuvnesh Sood"} options={["Bhuvnesh Sood", "Rajeev Bansal", "Anita Sharma", "Vikram Thakur"]} />
+            <SelectField label="Warehouse User Assigned" value="Sanjay Kumar" options={["Sanjay Kumar", "Anil Chauhan", "Pooja Devi", "Rohit Kashyap"]} />
+            <SelectField label="Default Voucher Mode" value="Item Invoice" options={["Item Invoice", "Accounting Invoice", "As Voucher"]} />
+            <SelectField label="Status" value="Active" options={["Active", "Inactive"]} />
+          </StaticForm>
+
+          <div className="flex gap-2">
+            <Button><Plus className="w-4 h-4 mr-2" />Save New Godown</Button>
+            <Button variant="outline">Preview Godown</Button>
+            <Button variant="outline">Clear</Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="list">
+          <FilteredTable rows={rows} exportName="godowns" searchKeys={["id", "name", "code", "area"] as any} columns={cols} />
+        </TabsContent>
+      </Tabs>
+    </TallyPage>
+  );
+}
 
 export function TallyDashboardStatic() {
   const stats = scopedDashboardStats();
