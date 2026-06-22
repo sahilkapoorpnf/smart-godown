@@ -1,7 +1,62 @@
 import {
-  AccountGroup, AuditEntry, DocFile, Godown, GoodsArrival, Ledger,
+  AccountGroup, AreaCompany, AuditEntry, DocFile, Godown, GoodsArrival, Ledger,
   StockGroup, StockItem, StockUnit, Voucher, VoucherType,
 } from "./types";
+
+// ---------- Area Companies (Tally Companies for HIMFED Areas) ----------
+export const areaCompanies: AreaCompany[] = [
+  {
+    id: "co_una", name: "HIMFED — UNA Area", code: "UNA", areaId: "a_una",
+    address: "MC Road, Una", district: "Una", state: "Himachal Pradesh", pin: "174303",
+    phone: "+91 1975 223344", email: "una@himfed.in",
+    gstType: "Regular", gstNumber: "02AAACH1234R1Z9", pan: "AAACH1234R",
+    gstEffectiveDate: "2017-07-01", fyStart: "2026-04-01", fyEnd: "2027-03-31",
+    booksFrom: "2026-04-01", currency: "INR", maintainAccounts: true, maintainInventory: true,
+    status: "active", assignedAccountants: ["wa_una"], createdAt: "2026-04-01T09:00:00",
+  },
+  {
+    id: "co_shm", name: "HIMFED — Shimla Area", code: "SHM", areaId: "a1",
+    address: "Sector 4, New Shimla", district: "Shimla", state: "Himachal Pradesh", pin: "171009",
+    phone: "+91 177 2622345", email: "shimla@himfed.in",
+    gstType: "Regular", gstNumber: "02AAACH5678X1Z3", pan: "AAACH5678X",
+    gstEffectiveDate: "2017-07-01", fyStart: "2026-04-01", fyEnd: "2027-03-31",
+    booksFrom: "2026-04-01", currency: "INR", maintainAccounts: true, maintainInventory: true,
+    status: "active", assignedAccountants: ["wa_una"], createdAt: "2026-04-01T09:00:00",
+  },
+  {
+    id: "co_sol", name: "HIMFED — Solan Area", code: "SOL", areaId: "a2",
+    address: "Old Bus Stand, Solan", district: "Solan", state: "Himachal Pradesh", pin: "173212",
+    phone: "+91 1792 223655", email: "solan@himfed.in",
+    gstType: "Regular", gstNumber: "02AAACH9090S1Z1", pan: "AAACH9090S",
+    gstEffectiveDate: "2017-07-01", fyStart: "2026-04-01", fyEnd: "2027-03-31",
+    booksFrom: "2026-04-01", currency: "INR", maintainAccounts: true, maintainInventory: true,
+    status: "active", createdAt: "2026-04-01T09:00:00",
+  },
+  {
+    id: "co_mnd", name: "HIMFED — Mandi Area", code: "MND", areaId: "a3",
+    address: "Sundernagar, Mandi", district: "Mandi", state: "Himachal Pradesh", pin: "175019",
+    phone: "+91 1907 266102", email: "mandi@himfed.in",
+    gstType: "Regular", gstNumber: "02AAACH3030M1ZA", pan: "AAACH3030M",
+    gstEffectiveDate: "2017-07-01", fyStart: "2026-04-01", fyEnd: "2027-03-31",
+    booksFrom: "2026-04-01", currency: "INR", maintainAccounts: true, maintainInventory: true,
+    status: "active", createdAt: "2026-04-01T09:00:00",
+  },
+  {
+    id: "co_kng", name: "HIMFED — Kangra Area", code: "KNG", areaId: "a4",
+    address: "Dharamshala Road, Kangra", district: "Kangra", state: "Himachal Pradesh", pin: "176001",
+    phone: "+91 1892 223400", email: "kangra@himfed.in",
+    gstType: "Regular", gstNumber: "02AAACH4040K1Z7", pan: "AAACH4040K",
+    gstEffectiveDate: "2017-07-01", fyStart: "2026-04-01", fyEnd: "2027-03-31",
+    booksFrom: "2026-04-01", currency: "INR", maintainAccounts: true, maintainInventory: true,
+    status: "active", createdAt: "2026-04-01T09:00:00",
+  },
+];
+
+// Map an areaId → companyId
+export const areaToCompany: Record<string, string> = areaCompanies.reduce(
+  (m, c) => { m[c.areaId] = c.id; return m; }, {} as Record<string, string>,
+);
+
 
 // ---------- Areas / Godowns (Una included) ----------
 // Reuse warehouse store areas where possible; ERP adds its own godown master.

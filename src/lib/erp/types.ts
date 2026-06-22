@@ -13,6 +13,32 @@ export const ERP_ROLE_LABEL: Record<ErpRole, string> = {
   admin_accountant: "Admin Accountant",
 };
 
+export interface AreaCompany {
+  id: string;
+  name: string;
+  code: string;
+  areaId: string;          // links to existing warehouse area
+  address: string;
+  district: string;
+  state: string;
+  pin: string;
+  phone: string;
+  email: string;
+  gstType: "Regular" | "Composition" | "Unregistered";
+  gstNumber: string;
+  pan: string;
+  gstEffectiveDate: string;
+  fyStart: string;
+  fyEnd: string;
+  booksFrom: string;
+  currency: string;
+  maintainAccounts: boolean;
+  maintainInventory: boolean;
+  status: "active" | "inactive";
+  assignedAccountants?: string[]; // user ids
+  createdAt: string;
+}
+
 export type GoodsStatus = "pending" | "approved" | "re_edit";
 
 export interface GoodsArrival {

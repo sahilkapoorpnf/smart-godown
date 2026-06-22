@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import {
-  accountGroups, auditEntries, docFiles, erpGodowns, goodsArrivals,
+  accountGroups, areaCompanies, areaToCompany, auditEntries, docFiles, erpGodowns, goodsArrivals,
   ledgers, stockGroups, stockItems, stockUnits, vouchers, voucherTypes,
 } from "./mock";
 import {
-  AccountGroup, AuditEntry, DocFile, Godown, GoodsArrival, GoodsStatus,
+  AccountGroup, AreaCompany, AuditEntry, DocFile, Godown, GoodsArrival, GoodsStatus,
   Ledger, StockGroup, StockItem, StockUnit, Voucher, VoucherType,
 } from "./types";
 import { store as whStore, addLog } from "@/lib/warehouse/store";
+
+let _companies = [...areaCompanies];
+let _activeCompanyId: string = (typeof localStorage !== "undefined" && localStorage.getItem("himfed_active_company")) || "co_una";
 
 let _arrivals = [...goodsArrivals];
 let _vouchers = [...vouchers];
@@ -36,6 +39,7 @@ export function useErp() {
     groups: _groups, voucherTypes: _vtypes, stockGroups: _sgroups,
     stockItems: _sitems, stockUnits: _sunits, godowns: _godowns,
     audit: _audit, docs: _docs,
+    companies: _companies, activeCompanyId: _activeCompanyId,
   };
 }
 
@@ -51,7 +55,70 @@ export const erp = {
   get godowns() { return _godowns; },
   get audit() { return _audit; },
   get docs() { return _docs; },
+  get companies() { return _companies; },
+  get activeCompanyId() { return _activeCompanyId; },
 };
+
+// ---------- Company management ----------
+export const companyName = (id?: string) => _companies.find((c) => c.id === id)?.name ?? "—";
+export const activeCompany = () => _companies.find((c) => c.id === _activeCompanyId);
+export function setActiveCompany(id: string) {
+  _activeCompanyId = id;
+  try { localStorage.setItem("himfed_active_company", id); } catch {}
+  notify();
+}
+export function upsertCompany(c: AreaCompany) {
+  _companies = _companies.some((x) => x.id === c.id) ? _companies.map((x) => x.id === c.id ? c : x) : [..._companies, c];
+  notify();
+}
+export function deleteCompany(id: string) {
+  const used = _vouchers.some((v) => {
+    const ar = v.lines.find((l) => l.godownToId || l.godownFromId);
+    const gid = ar?.godownToId ?? ar?.godownFromId;
+    const aid = _godowns.find((g) => g.id === gid)?.areaId;
+    return aid && areaToCompany[aid] === id;
+  });
+  if (used) return { ok: false as const, reason: "Vouchers exist — cannot delete this company." };
+  _companies = _companies.filter((x) => x.id !== id);
+  notify();
+  return { ok: true as const };
+}
+export function companiesForUser(userId?: string, role?: string): AreaCompany[] {
+  if (!userId) return [];
+  if (role === "admin_accountant" || role === "superadmin") return _companies;
+  return _companies.filter((c) => !c.assignedAccountants?.length || c.assignedAccountants.includes(userId));
+}
+export function voucherCompanyId(v: Voucher): string | undefined {
+  const ln = v.lines.find((l) => l.godownToId || l.godownFromId);
+  const gid = ln?.godownToId ?? ln?.godownFromId;
+  const aid = _godowns.find((g) => g.id === gid)?.areaId;
+  if (aid) return areaToCompany[aid];
+  return undefined;
+}
+export function vouchersForCompany(companyId: string): Voucher[] {
+  return _vouchers.filter((v) => {
+    const cid = voucherCompanyId(v);
+    if (cid) return cid === companyId;
+    return companyId === "co_una"; // unscoped → default UNA
+  });
+}
+export function godownsForCompany(companyId: string): Godown[] {
+  const co = _companies.find((c) => c.id === companyId);
+  if (!co) return [];
+  return _godowns.filter((g) => g.areaId === co.areaId);
+}
+export function deleteEntity(kind: "ledger"|"group"|"voucherType"|"stockGroup"|"stockItem"|"stockUnit"|"godown", id: string) {
+  switch (kind) {
+    case "ledger": _ledgers = _ledgers.filter((x) => x.id !== id); break;
+    case "group": _groups = _groups.filter((x) => x.id !== id); break;
+    case "voucherType": _vtypes = _vtypes.filter((x) => x.id !== id); break;
+    case "stockGroup": _sgroups = _sgroups.filter((x) => x.id !== id); break;
+    case "stockItem": _sitems = _sitems.filter((x) => x.id !== id); break;
+    case "stockUnit": _sunits = _sunits.filter((x) => x.id !== id); break;
+    case "godown": _godowns = _godowns.filter((x) => x.id !== id); break;
+  }
+  notify();
+}
 
 // ---------- Helpers ----------
 export const godownName = (id?: string) => _godowns.find((g) => g.id === id)?.name ?? "—";
