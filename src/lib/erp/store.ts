@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import {
-  accountGroups, auditEntries, docFiles, erpGodowns, goodsArrivals,
+  accountGroups, areaCompanies, areaToCompany, auditEntries, docFiles, erpGodowns, goodsArrivals,
   ledgers, stockGroups, stockItems, stockUnits, vouchers, voucherTypes,
 } from "./mock";
 import {
-  AccountGroup, AuditEntry, DocFile, Godown, GoodsArrival, GoodsStatus,
+  AccountGroup, AreaCompany, AuditEntry, DocFile, Godown, GoodsArrival, GoodsStatus,
   Ledger, StockGroup, StockItem, StockUnit, Voucher, VoucherType,
 } from "./types";
 import { store as whStore, addLog } from "@/lib/warehouse/store";
+
+let _companies = [...areaCompanies];
+let _activeCompanyId: string = (typeof localStorage !== "undefined" && localStorage.getItem("himfed_active_company")) || "co_una";
 
 let _arrivals = [...goodsArrivals];
 let _vouchers = [...vouchers];
