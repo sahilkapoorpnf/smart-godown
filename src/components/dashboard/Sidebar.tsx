@@ -41,6 +41,7 @@ import {
   Wallet,
   AlertTriangle,
   BadgePercent,
+  Building2,
 } from "lucide-react";
 
 type Item = { icon: any; label: string; path: string; roles?: Role[] };
