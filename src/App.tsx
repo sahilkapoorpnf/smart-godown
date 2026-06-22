@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -33,61 +33,34 @@ import InvoiceGenerate from "./pages/stock/InvoiceGenerate";
 import SalesHistory from "./pages/stock/SalesHistory";
 import StockReports from "./pages/stock/StockReports";
 import SalesLedger from "./pages/sales/SalesLedger";
-import AccountantDashboard from "./pages/accountant/AccountantDashboard";
-import AccSalesLedger from "./pages/accountant/SalesLedger";
-import PurchaseLedger from "./pages/accountant/PurchaseLedger";
-import StockLedger from "./pages/accountant/StockLedger";
-import GstManagement from "./pages/accountant/GstManagement";
-import SubsidyManagement from "./pages/accountant/SubsidyManagement";
-import OutstandingPayments from "./pages/accountant/OutstandingPayments";
-import PartyLedger from "./pages/accountant/PartyLedger";
-import MarginManagement from "./pages/accountant/MarginManagement";
-import ExpenseManagement from "./pages/accountant/ExpenseManagement";
-import CashBook from "./pages/accountant/CashBook";
-import BankBook from "./pages/accountant/BankBook";
-import CreditDebitNotes from "./pages/accountant/CreditDebitNotes";
-import ReturnManagement from "./pages/accountant/ReturnManagement";
-import StockAdjustment from "./pages/accountant/StockAdjustment";
-import PhysicalVerification from "./pages/accountant/PhysicalVerification";
-import TransportExpense from "./pages/accountant/TransportExpense";
-import ReportCenter from "./pages/accountant/ReportCenter";
-import AuditLog from "./pages/accountant/AuditLog";
-import TallyExport from "./pages/accountant/TallyExport";
-import FinancialYear from "./pages/accountant/FinancialYear";
 
 // ===== HIMFED Tally ERP (new) =====
 import WhUserDashboard from "./pages/erp/WhUserDashboard";
 import GoodsArrivalNew from "./pages/erp/GoodsArrivalNew";
 import MyArrivals from "./pages/erp/MyArrivals";
 import AreaOfficerPage from "./pages/erp/AreaOfficerPage";
-import WhAccountantDashboard from "./pages/erp/WhAccountantDashboard";
-import CompanyGstSetup from "./pages/erp/CompanyGstSetup";
-import AccountingMasters from "./pages/erp/AccountingMasters";
-import InventoryMasters from "./pages/erp/InventoryMasters";
-import VoucherEntry from "./pages/erp/VoucherEntry";
-import DayBook from "./pages/erp/DayBook";
-import CurrentStock from "./pages/erp/CurrentStock";
-import StockTransfer from "./pages/erp/StockTransfer";
-import AccountingReports from "./pages/erp/AccountingReports";
-import AdminAccountantDashboard from "./pages/erp/AdminAccountantDashboard";
 import AdminUserManagement from "./pages/erp/AdminUserManagement";
-import AuditTrail from "./pages/erp/AuditTrail";
-import DocumentManagement from "./pages/erp/DocumentManagement";
 
-// ===== HIMFED Tally ERP — Accountant V2 (Area Company-aware) =====
-import SelectCompany from "./pages/erp/accountant/SelectCompany";
-import CompanyManager from "./pages/erp/accountant/CompanyManager";
-import CompanyInformation from "./pages/erp/accountant/CompanyInformation";
-import TallyDashboard from "./pages/erp/accountant/TallyDashboard";
-import GroupMasterPage from "./pages/erp/accountant/GroupMasterPage";
-import LedgerMasterPage from "./pages/erp/accountant/LedgerMasterPage";
-import VoucherTypeMasterPage from "./pages/erp/accountant/VoucherTypeMasterPage";
-import { StockGroupPage, StockItemPage, StockUnitPage, GodownMasterPage as GodownMasterCrud } from "./pages/erp/accountant/InventoryMasterPages";
+// ===== HIMFED Tally ERP — Static Accountant Redesign =====
 import {
-  DayBookTally, LedgerReport, TrialBalance, CashBookReport, BankBookReport,
-  PurchaseRegister, SalesRegister, StockSummary, GodownStockReport, GstReportsPage,
-  ProfitLoss, BalanceSheet,
-} from "./pages/erp/accountant/Reports";
+  AuditLogsStatic,
+  CompanyCreationStatic,
+  CompanyInformationStatic,
+  DayBookStatic,
+  DocumentsStatic,
+  GodownMasterStatic,
+  GroupMasterStatic,
+  LedgerMasterStatic,
+  ReportStaticPage,
+  ReportsLandingStatic,
+  SelectCompanyStatic,
+  StockGroupStatic,
+  StockItemStatic,
+  StockUnitStatic,
+  TallyDashboardStatic,
+  VoucherStaticPage,
+  VoucherTypeMasterStatic,
+} from "./pages/erp/accountant/StaticTallyPages";
 
 const queryClient = new QueryClient();
 
