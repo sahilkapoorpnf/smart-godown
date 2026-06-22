@@ -12,8 +12,9 @@ export default function SelectCompany() {
   const nav = useNavigate();
   const list = companiesForUser(user?.id, user?.role);
 
-  const pick = (id: string) => { setActiveCompany(id); nav("/dashboard/erp/acc"); };
+  const pick = (id: string) => { setActiveCompany(id); nav("/dashboard/erp/acc/company-info"); };
   const openInfo = (id: string) => { setActiveCompany(id); nav("/dashboard/erp/acc/company-info"); };
+  const openWorkspace = (id: string) => { setActiveCompany(id); nav("/dashboard/erp/acc"); };
 
   return (
     <ErpPage
@@ -53,8 +54,8 @@ export default function SelectCompany() {
                   <div className="p-2 rounded bg-muted/50"><div className="text-xs text-muted-foreground">Sales</div><div className="font-bold text-himfed-green text-xs">{fmtINR(totalSales)}</div></div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  <Button variant="outline" onClick={() => openInfo(c.id)}>View / Edit</Button>
-                  <Button onClick={() => pick(c.id)}>Open <ArrowRight className="w-4 h-4 ml-1" /></Button>
+                  <Button variant="outline" onClick={() => openWorkspace(c.id)}>Workspace</Button>
+                  <Button onClick={() => pick(c.id)}>Open Company <ArrowRight className="w-4 h-4 ml-1" /></Button>
                 </div>
               </CardContent>
             </Card>
