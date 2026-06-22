@@ -20,8 +20,34 @@ import {
   FileCheck2, FileText, Landmark, Package, Plus, Printer, Receipt, Search,
   ShieldCheck, Truck, Upload, Wallet,
 } from "lucide-react";
+import { getCurrentUser } from "@/lib/warehouse/store";
 
 const allowed = ["wh_accountant", "admin_accountant", "accountant", "superadmin"] as any;
+
+// ===== Role-based scoping (Warehouse Accountant = UNA only; Accountant/Neha = all areas) =====
+const UNA_GODOWNS = new Set(["UNA Warehouse", "AMB Warehouse", "HAROLI Warehouse", "BANGANA Warehouse"]);
+const UNA_COMPANY_NAMES = new Set(["UNA Area"]);
+const isUnaScoped = () => getCurrentUser()?.role === "wh_accountant";
+const scopeLabel = () => isUnaScoped() ? "Active Company: UNA Area (Warehouse Accountant)" : "All Area Companies — Super Accountant View";
+const scopedVouchers = () => isUnaScoped() ? vouchersStatic.filter((v) => UNA_GODOWNS.has(v.godown)) : vouchersStatic;
+const scopedGodowns = () => isUnaScoped() ? godownMastersStatic.filter((g: any) => String(g.area) === "UNA Area") : godownMastersStatic;
+const scopedCompanies = () => isUnaScoped() ? areaCompaniesStatic.filter((c) => c.code === "UNA") : areaCompaniesStatic;
+const scopedDocuments = () => isUnaScoped() ? documentsStatic.filter((d: any) => UNA_GODOWNS.has(d.warehouse) || UNA_COMPANY_NAMES.has(d.company)) : documentsStatic;
+const scopedAuditLogs = () => isUnaScoped() ? auditLogsStatic.filter((a: any) => UNA_GODOWNS.has(a.warehouse) || UNA_COMPANY_NAMES.has(a.company)) : auditLogsStatic;
+const scopedReportRows = () => {
+  if (!isUnaScoped()) return reportRowsStatic;
+  return reportRowsStatic.filter((r: any) => UNA_GODOWNS.has(r.godown));
+};
+const scopedDashboardStats = () => {
+  if (!isUnaScoped()) return dashboardStats;
+  const v = scopedVouchers();
+  return {
+    ...dashboardStats,
+    totalPurchaseToday: v.filter((x) => x.kind === "purchase").reduce((s, x) => s + x.total, 0),
+    totalSalesToday: v.filter((x) => x.kind === "sales").reduce((s, x) => s + x.total, 0),
+    pendingVouchers: v.filter((x) => x.status === "Pending").length,
+  };
+};
 
 const moduleCards = [
   { label: "Company Information", to: "/dashboard/erp/acc/company-info", icon: Building2 },
@@ -72,7 +98,7 @@ function TallyPage({ title, description, actions, children }: { title: string; d
   return (
     <ErpPage allowed={allowed} title={title} description={description} actions={actions}>
       <div className="rounded-lg border border-himfed-green/20 bg-himfed-green/5 p-3 text-sm flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2 font-medium"><Building2 className="w-4 h-4 text-himfed-green" /> Active Company: UNA Area</div>
+        <div className="flex items-center gap-2 font-medium"><Building2 className="w-4 h-4 text-himfed-green" /> {scopeLabel()}</div>
         <div className="flex gap-2">
           <Button asChild size="sm" variant="outline"><Link to="/dashboard/erp/acc/select-company">Select Company</Link></Button>
           <Button asChild size="sm" variant="outline"><Link to="/dashboard/erp/acc/company-create">Create Company</Link></Button>
@@ -113,10 +139,11 @@ const actionColumn = { key: "actions", label: "Actions", render: () => <div clas
 
 export function SelectCompanyStatic() {
   const nav = useNavigate();
+  const companies = scopedCompanies();
   return (
-    <TallyPage title="Select Assigned Area Company" description="Warehouse Accountant login flow: select assigned Area Company, then open the Tally-style dashboard." actions={<Button onClick={() => nav("/dashboard/erp/acc/company-create")}><Plus className="w-4 h-4 mr-2" />New Company Form</Button>}>
+    <TallyPage title={isUnaScoped() ? "Select Assigned Area Company — UNA" : "Select Area Company — All Areas"} description={isUnaScoped() ? "Warehouse Accountant login — UNA Area only." : "Super Accountant — choose from all assigned area companies."} actions={<Button onClick={() => nav("/dashboard/erp/acc/company-create")}><Plus className="w-4 h-4 mr-2" />New Company Form</Button>}>
       <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {areaCompaniesStatic.slice(0, 6).map((c) => (
+        {companies.slice(0, 6).map((c) => (
           <Card key={c.id} className="border-himfed-green/20 hover:shadow-md transition-shadow">
             <CardContent className="p-5 space-y-4">
               <div className="flex items-start gap-3"><div className="p-3 rounded-lg bg-himfed-green/10"><Building2 className="w-6 h-6 text-himfed-green" /></div><div><div className="font-serif font-bold text-lg">{c.name}</div><div className="text-xs text-muted-foreground">{c.id} · GST {c.gstNumber}</div></div></div>
@@ -126,7 +153,7 @@ export function SelectCompanyStatic() {
           </Card>
         ))}
       </div>
-      <FilteredTable rows={areaCompaniesStatic} exportName="area-companies" searchKeys={["id", "name", "gstNumber", "district"]} columns={companyColumns} />
+      <FilteredTable rows={companies} exportName="area-companies" searchKeys={["id", "name", "gstNumber", "district"]} columns={companyColumns} />
     </TallyPage>
   );
 }
@@ -159,8 +186,8 @@ export function CompanyCreationStatic() {
 }
 
 export function CompanyInformationStatic() {
-  const c = areaCompaniesStatic[0];
-  return <TallyPage title="Company Information" description="Complete company details, GST configuration, financial year settings and company options."><div className="grid lg:grid-cols-3 gap-4"><Card className="lg:col-span-1"><CardContent className="p-5 space-y-3"><Building2 className="w-10 h-10 text-himfed-green" /><h2 className="font-serif font-bold text-2xl">{c.name}</h2><p className="text-sm text-muted-foreground">{c.address}, {c.district}, {c.state} - {c.pin}</p><StatusBadge value={c.status} /><div className="grid grid-cols-2 gap-2 pt-2"><Button>Edit Info</Button><Button variant="outline">GST Config</Button><Button variant="outline">FY Settings</Button><Button variant="outline">View Settings</Button></div></CardContent></Card><div className="lg:col-span-2 space-y-4"><StaticForm title="Company Details"><Field label="Company ID" value={c.id} /><Field label="GST Number" value={c.gstNumber} /><Field label="PAN" value={c.pan} /><Field label="Phone" value={c.phone} /><Field label="Email" value={c.email} /><Field label="Currency" value={c.currency} /></StaticForm><FilteredTable rows={areaCompaniesStatic} exportName="company-information" searchKeys={["id", "name", "gstNumber"]} columns={companyColumns} /></div></div></TallyPage>;
+  const c = scopedCompanies()[0] ?? areaCompaniesStatic[0];
+  return <TallyPage title="Company Information" description="Complete company details, GST configuration, financial year settings and company options."><div className="grid lg:grid-cols-3 gap-4"><Card className="lg:col-span-1"><CardContent className="p-5 space-y-3"><Building2 className="w-10 h-10 text-himfed-green" /><h2 className="font-serif font-bold text-2xl">{c.name}</h2><p className="text-sm text-muted-foreground">{c.address}, {c.district}, {c.state} - {c.pin}</p><StatusBadge value={c.status} /><div className="grid grid-cols-2 gap-2 pt-2"><Button>Edit Info</Button><Button variant="outline">GST Config</Button><Button variant="outline">FY Settings</Button><Button variant="outline">View Settings</Button></div></CardContent></Card><div className="lg:col-span-2 space-y-4"><StaticForm title="Company Details"><Field label="Company ID" value={c.id} /><Field label="GST Number" value={c.gstNumber} /><Field label="PAN" value={c.pan} /><Field label="Phone" value={c.phone} /><Field label="Email" value={c.email} /><Field label="Currency" value={c.currency} /></StaticForm><FilteredTable rows={scopedCompanies()} exportName="company-information" searchKeys={["id", "name", "gstNumber"]} columns={companyColumns} /></div></div></TallyPage>;
 }
 
 function MasterStaticPage({ type }: { type: "groups" | "ledgers" | "voucher-types" }) {
@@ -183,7 +210,7 @@ function InventoryStaticPage({ type }: { type: "groups" | "items" | "units" | "g
     groups: { title: "Stock Group Master", rows: stockGroupsStatic, fields: ["Stock Group Name", "Under"], keys: ["id", "name", "under", "status"] },
     items: { title: "Stock Item Master", rows: stockItemsStatic, fields: ["Item Name", "Stock Group", "Unit", "HSN/SAC Code", "GST Rate", "Opening Quantity", "Opening Value", "Default Godown"], keys: ["id", "name", "group", "unit", "hsn", "gstRate", "openingQty", "openingValue", "defaultGodown", "status"] },
     units: { title: "Stock Unit Master", rows: stockUnitsStatic, fields: ["Unit Code", "Unit Name", "Decimals"], keys: ["id", "code", "name", "decimals", "status"] },
-    godowns: { title: "Godown / Warehouse Master", rows: godownMastersStatic, fields: ["Warehouse Name", "Warehouse Code", "Address", "Area Officer Assigned", "Warehouse User Assigned", "Status"], keys: ["id", "name", "code", "area", "address", "officer", "user", "utilization", "status"] },
+    godowns: { title: "Godown / Warehouse Master", rows: scopedGodowns(), fields: ["Warehouse Name", "Warehouse Code", "Address", "Area Officer Assigned", "Warehouse User Assigned", "Status"], keys: ["id", "name", "code", "area", "address", "officer", "user", "utilization", "status"] },
   }[type];
   const sample = map.rows[0];
   const columns = map.keys.map((k) => ({ key: k, label: k.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()), render: k === "status" ? (r: any) => <StatusBadge value={r.status} /> : k === "utilization" ? (r: any) => <Badge tone={Number(r.utilization) > 90 ? "red" : "green"}>{r.utilization}%</Badge> : undefined })).concat(actionColumn);
@@ -196,7 +223,10 @@ export const StockUnitStatic = () => <InventoryStaticPage type="units" />;
 export const GodownMasterStatic = () => <InventoryStaticPage type="godowns" />;
 
 export function TallyDashboardStatic() {
-  return <TallyPage title="Tally Style Dashboard — UNA Area" description="Area Company books with connected warehouses, stock, vouchers, GST and reports."><div className="grid grid-cols-2 lg:grid-cols-4 gap-4"><StatTile label="Total Purchase Today" value={fmtStaticINR(dashboardStats.totalPurchaseToday)} tone="blue" /><StatTile label="Total Sales Today" value={fmtStaticINR(dashboardStats.totalSalesToday)} tone="green" /><StatTile label="Current Stock Value" value={fmtStaticINR(dashboardStats.currentStockValue)} tone="amber" /><StatTile label="Pending Vouchers" value={dashboardStats.pendingVouchers} tone="red" /><StatTile label="Cash Balance" value={fmtStaticINR(dashboardStats.cashBalance)} /><StatTile label="Bank Balance" value={fmtStaticINR(dashboardStats.bankBalance)} /><StatTile label="Receivables" value={fmtStaticINR(dashboardStats.receivables)} tone="green" /><StatTile label="Payables" value={fmtStaticINR(dashboardStats.payables)} tone="red" /></div><div className="grid md:grid-cols-2 lg:grid-cols-5 gap-3">{moduleCards.map((m) => <Button key={m.to} asChild variant="outline" className="h-20 flex-col gap-2"><Link to={m.to}><m.icon className="w-5 h-5" /><span>{m.label}</span></Link></Button>)}</div><FilteredTable rows={vouchersStatic.slice(0, 10)} exportName="recent-vouchers" searchKeys={["voucherNo", "party", "ledger"]} columns={voucherColumns} /></TallyPage>;
+  const stats = scopedDashboardStats();
+  const recent = scopedVouchers().slice(0, 10);
+  const title = isUnaScoped() ? "Tally Style Dashboard — UNA Area" : "Tally Style Dashboard — All Areas (Super Accountant)";
+  return <TallyPage title={title} description="Area Company books with connected warehouses, stock, vouchers, GST and reports."><div className="grid grid-cols-2 lg:grid-cols-4 gap-4"><StatTile label="Total Purchase Today" value={fmtStaticINR(stats.totalPurchaseToday)} tone="blue" /><StatTile label="Total Sales Today" value={fmtStaticINR(stats.totalSalesToday)} tone="green" /><StatTile label="Current Stock Value" value={fmtStaticINR(stats.currentStockValue)} tone="amber" /><StatTile label="Pending Vouchers" value={stats.pendingVouchers} tone="red" /><StatTile label="Cash Balance" value={fmtStaticINR(stats.cashBalance)} /><StatTile label="Bank Balance" value={fmtStaticINR(stats.bankBalance)} /><StatTile label="Receivables" value={fmtStaticINR(stats.receivables)} tone="green" /><StatTile label="Payables" value={fmtStaticINR(stats.payables)} tone="red" /></div><div className="grid md:grid-cols-2 lg:grid-cols-5 gap-3">{moduleCards.map((m) => <Button key={m.to} asChild variant="outline" className="h-20 flex-col gap-2"><Link to={m.to}><m.icon className="w-5 h-5" /><span>{m.label}</span></Link></Button>)}</div><FilteredTable rows={recent} exportName="recent-vouchers" searchKeys={["voucherNo", "party", "ledger"]} columns={voucherColumns} /></TallyPage>;
 }
 
 const voucherColumns = [
@@ -213,14 +243,14 @@ const voucherColumns = [
 ];
 
 export function VoucherStaticPage({ kind }: { kind: VoucherKind }) {
-  const rows = vouchersStatic.filter((v) => v.kind === kind);
+  const rows = scopedVouchers().filter((v) => v.kind === kind);
   const first = rows[0];
   return <TallyPage title={voucherTitle[kind]} description="Static Tally-style voucher entry screen with form, validations preview, list view, filters and export."><StaticForm title={`New ${voucherTitle[kind]}`}><Field label="Voucher Number" value={first.voucherNo} /><Field label="Date" type="date" value={first.date} /><Field label={kind === "sales" ? "Customer Name" : kind === "purchase" ? "Supplier" : "Party / Ledger"} value={first.party} /><Field label="Ledger" value={first.ledger} /><Field label="Invoice Number" value={first.invoiceNo} /><Field label="Stock Item" value={first.item} /><Field label="Godown / Warehouse" value={first.godown} /><Field label="Quantity" value={first.qty} /><Field label="Rate" value={first.rate} /><Field label="GST Details" value={fmtStaticINR(first.gst)} /><Field label="Total Amount" value={fmtStaticINR(first.total)} /><div className="space-y-1.5 md:col-span-2"><Label className="text-xs text-muted-foreground">Narration</Label><Textarea value={first.narration} readOnly /></div><div className="md:col-span-2 lg:col-span-3 flex gap-2"><Button>Save Static Voucher</Button><Button variant="outline"><Upload className="w-4 h-4 mr-2" />Document Upload</Button><Button variant="outline">Preview Accounting Impact</Button></div></StaticForm><FilteredTable rows={rows} exportName={`${kind}-vouchers`} searchKeys={["voucherNo", "party", "ledger", "item"]} columns={voucherColumns} /></TallyPage>;
 }
 
 export function DayBookStatic() {
   const SINGLE_DATE = "2026-06-22";
-  const rows = vouchersStatic
+  const rows = scopedVouchers()
     .filter((v) => v.kind === "sales" || v.kind === "journal" || v.kind === "purchase")
     .map((v) => ({ ...v, date: SINGLE_DATE }));
   const dayBookColumns = [
@@ -241,20 +271,20 @@ export function DayBookStatic() {
 
 export function ReportsLandingStatic() {
   const reports = Object.entries(reportTitle);
-  return <TallyPage title="Reports" description="Accounting, inventory, GST and financial statement reports."><div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">{reports.map(([key, label]) => <Button key={key} asChild variant="outline" className="h-16 justify-start"><Link to={`/dashboard/erp/acc/reports/${key}`}><FileText className="w-5 h-5 mr-2" />{label}</Link></Button>)}</div><FilteredTable rows={reportRowsStatic} exportName="reports-summary" searchKeys={["id", "particular", "ledger", "godown"] as any} columns={reportColumns} /></TallyPage>;
+  return <TallyPage title="Reports" description="Accounting, inventory, GST and financial statement reports."><div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">{reports.map(([key, label]) => <Button key={key} asChild variant="outline" className="h-16 justify-start"><Link to={`/dashboard/erp/acc/reports/${key}`}><FileText className="w-5 h-5 mr-2" />{label}</Link></Button>)}</div><FilteredTable rows={scopedReportRows()} exportName="reports-summary" searchKeys={["id", "particular", "ledger", "godown"] as any} columns={reportColumns} /></TallyPage>;
 }
 
 const reportColumns = ["particular", "ledger", "godown", "opening", "debit", "credit", "closing", "gst", "status"].map((k) => ({ key: k, label: k.replace(/^./, (s) => s.toUpperCase()), render: ["opening", "debit", "credit", "closing", "gst"].includes(k) ? (r: any) => fmtStaticINR(Number(r[k])) : k === "status" ? (r: any) => <StatusBadge value={r.status} /> : undefined }));
 
 export function ReportStaticPage() {
   const { report = "ledger" } = useParams();
-  return <TallyPage title={reportTitle[report] ?? "Report"} description="Static filtered report with 10 relevant entries, export and print actions." actions={<><Button variant="outline"><Printer className="w-4 h-4 mr-2" />Print</Button><Button><Download className="w-4 h-4 mr-2" />Export</Button></>}><FilteredTable rows={reportRowsStatic} exportName={report} searchKeys={["id", "particular", "ledger", "godown"] as any} columns={reportColumns} /></TallyPage>;
+  return <TallyPage title={reportTitle[report] ?? "Report"} description="Static filtered report with 10 relevant entries, export and print actions." actions={<><Button variant="outline"><Printer className="w-4 h-4 mr-2" />Print</Button><Button><Download className="w-4 h-4 mr-2" />Export</Button></>}><FilteredTable rows={scopedReportRows()} exportName={report} searchKeys={["id", "particular", "ledger", "godown"] as any} columns={reportColumns} /></TallyPage>;
 }
 
 export function DocumentsStatic() {
-  return <TallyPage title="Documents" description="Purchase bills, sales bills, GST documents, challans and stock transfer documents."><StaticForm title="Upload / Tag Document"><Field label="Document Type" value="Purchase Bills" /><Field label="Reference Number" value="REF-8600" /><Field label="Company" value="UNA Area" /><Field label="Warehouse" value="UNA Warehouse" /><Field label="Upload File" value="purchase_bill_2100.pdf" /><div className="md:col-span-2 lg:col-span-3"><Button><Upload className="w-4 h-4 mr-2" />Upload Static Document</Button></div></StaticForm><FilteredTable rows={documentsStatic} exportName="documents" searchKeys={["id", "name", "refNo", "warehouse"] as any} columns={["id", "name", "type", "refNo", "company", "warehouse", "uploadedBy", "uploadedAt", "status"].map((k) => ({ key: k, label: k.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()), render: k === "status" ? (r: any) => <StatusBadge value={r.status} /> : undefined })).concat(actionColumn)} /></TallyPage>;
+  return <TallyPage title="Documents" description="Purchase bills, sales bills, GST documents, challans and stock transfer documents."><StaticForm title="Upload / Tag Document"><Field label="Document Type" value="Purchase Bills" /><Field label="Reference Number" value="REF-8600" /><Field label="Company" value={isUnaScoped() ? "UNA Area" : "All Areas"} /><Field label="Warehouse" value={isUnaScoped() ? "UNA Warehouse" : "Multi-Warehouse"} /><Field label="Upload File" value="purchase_bill_2100.pdf" /><div className="md:col-span-2 lg:col-span-3"><Button><Upload className="w-4 h-4 mr-2" />Upload Static Document</Button></div></StaticForm><FilteredTable rows={scopedDocuments()} exportName="documents" searchKeys={["id", "name", "refNo", "warehouse"] as any} columns={["id", "name", "type", "refNo", "company", "warehouse", "uploadedBy", "uploadedAt", "status"].map((k) => ({ key: k, label: k.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()), render: k === "status" ? (r: any) => <StatusBadge value={r.status} /> : undefined })).concat(actionColumn)} /></TallyPage>;
 }
 
 export function AuditLogsStatic() {
-  return <TallyPage title="Audit Logs" description="Tracks user, role, company, warehouse, action, old value, new value and date-time."><FilteredTable rows={auditLogsStatic} exportName="audit-logs" searchKeys={["id", "userName", "role", "company", "warehouse", "action"] as any} columns={["id", "userName", "role", "company", "warehouse", "action", "oldValue", "newValue", "dateTime"].map((k) => ({ key: k, label: k.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()) }))} /></TallyPage>;
+  return <TallyPage title="Audit Logs" description="Tracks user, role, company, warehouse, action, old value, new value and date-time."><FilteredTable rows={scopedAuditLogs()} exportName="audit-logs" searchKeys={["id", "userName", "role", "company", "warehouse", "action"] as any} columns={["id", "userName", "role", "company", "warehouse", "action", "oldValue", "newValue", "dateTime"].map((k) => ({ key: k, label: k.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()) }))} /></TallyPage>;
 }
