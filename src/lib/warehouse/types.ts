@@ -3,7 +3,12 @@ export type Role =
   | "incharge"
   | "accountant"
   | "joa_it"
-  | "warehouse_staff";
+  | "warehouse_staff"
+  // ===== HIMFED Tally ERP roles (additive) =====
+  | "wh_user"
+  | "area_officer"
+  | "wh_accountant"
+  | "admin_accountant";
 
 export const ROLE_LABEL: Record<Role, string> = {
   superadmin: "Superadmin",
@@ -11,6 +16,10 @@ export const ROLE_LABEL: Record<Role, string> = {
   accountant: "Accountant",
   joa_it: "JOA IT",
   warehouse_staff: "Warehouse Staff",
+  wh_user: "HIMFED Warehouse User",
+  area_officer: "HIMFED Area Officer",
+  wh_accountant: "HIMFED Warehouse Accountant",
+  admin_accountant: "HIMFED Admin Accountant",
 };
 
 export interface Area {

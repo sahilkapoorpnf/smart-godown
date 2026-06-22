@@ -5,6 +5,7 @@ export const areas: Area[] = [
   { id: "a2", code: "ARE-SOL", name: "Solan", officerName: "Anita Sharma", officerUserId: "u3", contact: "+91 98050 22222", status: "active", createdDate: "2024-01-12" },
   { id: "a3", code: "ARE-MND", name: "Mandi", officerName: "Vikram Thakur", officerUserId: "u4", contact: "+91 98050 33333", status: "active", createdDate: "2024-01-15" },
   { id: "a4", code: "ARE-KNG", name: "Kangra", officerName: "Sunita Devi", officerUserId: "u5", contact: "+91 98050 44444", status: "active", createdDate: "2024-01-18" },
+  { id: "a_una", code: "ARE-UNA", name: "Una", officerName: "Bhuvnesh Sood", officerUserId: "ao_una", contact: "+91 98050 55555", status: "active", createdDate: "2024-02-01" },
 ];
 
 export const warehouses: Warehouse[] = [
@@ -29,6 +30,21 @@ export const users: User[] = [
   { id: "u10", name: "Kiran Chand", email: "kiran.kng01@himfed.in", phone: "+91 90000 44001", username: "staff.kng01", password: "staff123", role: "warehouse_staff", areaId: "a4", warehouseId: "w6", status: "active" },
   { id: "u11", name: "Neha Gupta", email: "neha.acc@himfed.in", phone: "+91 88880 00001", username: "accountant", password: "acct123", role: "accountant", status: "active" },
   { id: "u12", name: "Arjun Patel", email: "arjun.it@himfed.in", phone: "+91 88880 00002", username: "joa.it", password: "joait123", role: "joa_it", status: "active" },
+
+  // ===== HIMFED Tally ERP — 4 NEW user types =====
+  { id: "wu_una1", name: "Anil Chauhan",   email: "anil.una1@himfed.in",  phone: "+91 94180 11001", username: "whuser.una1",  password: "user123",    role: "wh_user",         areaId: "a_una", warehouseId: "g_una1", status: "active" },
+  { id: "wu_una2", name: "Pooja Devi",     email: "pooja.una2@himfed.in", phone: "+91 94180 11002", username: "whuser.una2",  password: "user123",    role: "wh_user",         areaId: "a_una", warehouseId: "g_una2", status: "active" },
+  { id: "wu_una3", name: "Rohit Kashyap",  email: "rohit.una3@himfed.in", phone: "+91 94180 11003", username: "whuser.una3",  password: "user123",    role: "wh_user",         areaId: "a_una", warehouseId: "g_una3", status: "active" },
+  { id: "wu_shm1", name: "Manoj Kumar",    email: "manoj.shm@himfed.in",  phone: "+91 94180 12001", username: "whuser.shm1",  password: "user123",    role: "wh_user",         areaId: "a1",    warehouseId: "g_shm1", status: "active" },
+  { id: "wu_sol1", name: "Deepak Rana",    email: "deepak.sol@himfed.in", phone: "+91 94180 13001", username: "whuser.sol1",  password: "user123",    role: "wh_user",         areaId: "a2",    warehouseId: "g_sol1", status: "active" },
+  { id: "wu_mnd1", name: "Ramesh Sharma",  email: "ramesh.mnd@himfed.in", phone: "+91 94180 14001", username: "whuser.mnd1",  password: "user123",    role: "wh_user",         areaId: "a3",    warehouseId: "g_mnd1", status: "active" },
+  { id: "wu_kng1", name: "Kiran Chand",    email: "kiran.kng@himfed.in",  phone: "+91 94180 15001", username: "whuser.kng1",  password: "user123",    role: "wh_user",         areaId: "a4",    warehouseId: "g_kng1", status: "active" },
+
+  { id: "ao_una",  name: "Bhuvnesh Sood",  email: "bs.una@himfed.in",     phone: "+91 94180 20001", username: "officer.una",  password: "officer123", role: "area_officer",    areaId: "a_una", status: "active" },
+  { id: "ao_default", name: "Rajeev Bansal", email: "rb.officer@himfed.in", phone: "+91 94180 20002", username: "officer.shm", password: "officer123", role: "area_officer", areaId: "a1", status: "active" },
+
+  { id: "wa_una",  name: "Sneha Kapoor",   email: "sneha.acc@himfed.in",  phone: "+91 94180 30001", username: "whacc.una",    password: "wacc123",    role: "wh_accountant",   areaId: "a_una", warehouseId: "g_una1", status: "active" },
+  { id: "aa_hq",   name: "Mahesh Verma",   email: "mahesh.hq@himfed.in",  phone: "+91 94180 40001", username: "adminacc",     password: "adminacc123",role: "admin_accountant", status: "active" },
 ];
 
 export const entries: WarehouseEntry[] = [

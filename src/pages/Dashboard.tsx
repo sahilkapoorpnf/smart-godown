@@ -33,6 +33,10 @@ const Dashboard = () => {
   const user = getCurrentUser();
   if (!user) return <Navigate to="/login" replace />;
   if (user.role === "accountant") return <Navigate to="/dashboard/acc" replace />;
+  if (user.role === "wh_user") return <Navigate to="/dashboard/erp/wh" replace />;
+  if (user.role === "area_officer") return <Navigate to="/dashboard/erp/ao/pending" replace />;
+  if (user.role === "wh_accountant") return <Navigate to="/dashboard/erp/acc" replace />;
+  if (user.role === "admin_accountant") return <Navigate to="/dashboard/erp/admin" replace />;
 
   const myEntries = visibleEntries(user);
   const today = myEntries.filter((e) => e.depotDate === todayStr || e.createdAt.slice(0, 10) === todayStr);

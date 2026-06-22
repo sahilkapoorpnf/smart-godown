@@ -55,6 +55,25 @@ import AuditLog from "./pages/accountant/AuditLog";
 import TallyExport from "./pages/accountant/TallyExport";
 import FinancialYear from "./pages/accountant/FinancialYear";
 
+// ===== HIMFED Tally ERP (new) =====
+import WhUserDashboard from "./pages/erp/WhUserDashboard";
+import GoodsArrivalNew from "./pages/erp/GoodsArrivalNew";
+import MyArrivals from "./pages/erp/MyArrivals";
+import AreaOfficerPage from "./pages/erp/AreaOfficerPage";
+import WhAccountantDashboard from "./pages/erp/WhAccountantDashboard";
+import CompanyGstSetup from "./pages/erp/CompanyGstSetup";
+import AccountingMasters from "./pages/erp/AccountingMasters";
+import InventoryMasters from "./pages/erp/InventoryMasters";
+import VoucherEntry from "./pages/erp/VoucherEntry";
+import DayBook from "./pages/erp/DayBook";
+import CurrentStock from "./pages/erp/CurrentStock";
+import StockTransfer from "./pages/erp/StockTransfer";
+import AccountingReports from "./pages/erp/AccountingReports";
+import AdminAccountantDashboard from "./pages/erp/AdminAccountantDashboard";
+import AdminUserManagement from "./pages/erp/AdminUserManagement";
+import AuditTrail from "./pages/erp/AuditTrail";
+import DocumentManagement from "./pages/erp/DocumentManagement";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -116,6 +135,32 @@ const App = () => (
           <Route path="/dashboard/acc/audit" element={<AuditLog />} />
           <Route path="/dashboard/acc/tally" element={<TallyExport />} />
           <Route path="/dashboard/acc/fy" element={<FinancialYear />} />
+
+          {/* ===== HIMFED Tally ERP (new role-gated) ===== */}
+          <Route path="/dashboard/erp/wh" element={<WhUserDashboard />} />
+          <Route path="/dashboard/erp/wh/new" element={<GoodsArrivalNew />} />
+          <Route path="/dashboard/erp/wh/mine" element={<MyArrivals mode="mine" />} />
+          <Route path="/dashboard/erp/wh/recorrect" element={<MyArrivals mode="recorrect" />} />
+          <Route path="/dashboard/erp/ao/pending" element={<AreaOfficerPage mode="pending" />} />
+          <Route path="/dashboard/erp/ao/approved" element={<AreaOfficerPage mode="approved" />} />
+          <Route path="/dashboard/erp/acc" element={<WhAccountantDashboard />} />
+          <Route path="/dashboard/erp/acc/company" element={<CompanyGstSetup />} />
+          <Route path="/dashboard/erp/acc/masters" element={<AccountingMasters />} />
+          <Route path="/dashboard/erp/acc/inventory" element={<InventoryMasters />} />
+          <Route path="/dashboard/erp/acc/purchase" element={<VoucherEntry kind="purchase" title="Purchase Voucher" description="Auto-drafted from approved goods arrivals · also create manual entries." />} />
+          <Route path="/dashboard/erp/acc/sales" element={<VoucherEntry kind="sales" title="Sales Voucher" description="Record sales, reduce stock and post to GST registers." />} />
+          <Route path="/dashboard/erp/acc/payment" element={<VoucherEntry kind="payment" title="Payment Voucher" description="Supplier payments, expenses, bank & cash payments." />} />
+          <Route path="/dashboard/erp/acc/receipt" element={<VoucherEntry kind="receipt" title="Receipt Voucher" description="Customer receipts, government receipts, other income." />} />
+          <Route path="/dashboard/erp/acc/journal" element={<VoucherEntry kind="journal" title="Journal Voucher" description="Adjustments, ledger corrections, accounting transfers." />} />
+          <Route path="/dashboard/erp/acc/daybook" element={<DayBook />} />
+          <Route path="/dashboard/erp/acc/current-stock" element={<CurrentStock />} />
+          <Route path="/dashboard/erp/acc/stock-transfer" element={<StockTransfer />} />
+          <Route path="/dashboard/erp/acc/reports" element={<AccountingReports />} />
+          <Route path="/dashboard/erp/admin" element={<AdminAccountantDashboard />} />
+          <Route path="/dashboard/erp/admin/users" element={<AdminUserManagement />} />
+          <Route path="/dashboard/erp/admin/audit" element={<AuditTrail />} />
+          <Route path="/dashboard/erp/admin/documents" element={<DocumentManagement />} />
+
 
           {/* Admin */}
           <Route path="/dashboard/users" element={<UserManagement />} />
