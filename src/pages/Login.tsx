@@ -28,7 +28,7 @@ const Login = () => {
     if (role === "incharge") return "/dashboard/wh/approvals";
     if (role === "wh_user") return "/dashboard/erp/wh";
     if (role === "area_officer") return "/dashboard/erp/ao/pending";
-    if (role === "wh_accountant") return "/dashboard/erp/acc";
+    if (role === "wh_accountant" || role === "accountant") return "/dashboard/erp/acc/select-company";
     if (role === "admin_accountant") return "/dashboard/erp/admin";
     return "/dashboard";
   };
