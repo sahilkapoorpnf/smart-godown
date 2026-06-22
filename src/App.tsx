@@ -160,19 +160,41 @@ const App = () => (
           <Route path="/dashboard/erp/wh/recorrect" element={<MyArrivals mode="recorrect" />} />
           <Route path="/dashboard/erp/ao/pending" element={<AreaOfficerPage mode="pending" />} />
           <Route path="/dashboard/erp/ao/approved" element={<AreaOfficerPage mode="approved" />} />
-          <Route path="/dashboard/erp/acc" element={<WhAccountantDashboard />} />
-          <Route path="/dashboard/erp/acc/company" element={<CompanyGstSetup />} />
+          <Route path="/dashboard/erp/acc/select-company" element={<SelectCompany />} />
+          <Route path="/dashboard/erp/acc/companies" element={<CompanyManager />} />
+          <Route path="/dashboard/erp/acc" element={<TallyDashboard />} />
+          <Route path="/dashboard/erp/acc/company-old" element={<CompanyGstSetup />} />
           <Route path="/dashboard/erp/acc/masters" element={<AccountingMasters />} />
+          <Route path="/dashboard/erp/acc/masters/groups" element={<GroupMasterPage />} />
+          <Route path="/dashboard/erp/acc/masters/ledgers" element={<LedgerMasterPage />} />
+          <Route path="/dashboard/erp/acc/masters/voucher-types" element={<VoucherTypeMasterPage />} />
           <Route path="/dashboard/erp/acc/inventory" element={<InventoryMasters />} />
+          <Route path="/dashboard/erp/acc/inventory/groups" element={<StockGroupPage />} />
+          <Route path="/dashboard/erp/acc/inventory/items" element={<StockItemPage />} />
+          <Route path="/dashboard/erp/acc/inventory/units" element={<StockUnitPage />} />
+          <Route path="/dashboard/erp/acc/inventory/godowns" element={<GodownMasterCrud />} />
           <Route path="/dashboard/erp/acc/purchase" element={<VoucherEntry kind="purchase" title="Purchase Voucher" description="Auto-drafted from approved goods arrivals · also create manual entries." />} />
           <Route path="/dashboard/erp/acc/sales" element={<VoucherEntry kind="sales" title="Sales Voucher" description="Record sales, reduce stock and post to GST registers." />} />
           <Route path="/dashboard/erp/acc/payment" element={<VoucherEntry kind="payment" title="Payment Voucher" description="Supplier payments, expenses, bank & cash payments." />} />
           <Route path="/dashboard/erp/acc/receipt" element={<VoucherEntry kind="receipt" title="Receipt Voucher" description="Customer receipts, government receipts, other income." />} />
           <Route path="/dashboard/erp/acc/journal" element={<VoucherEntry kind="journal" title="Journal Voucher" description="Adjustments, ledger corrections, accounting transfers." />} />
-          <Route path="/dashboard/erp/acc/daybook" element={<DayBook />} />
+          <Route path="/dashboard/erp/acc/contra" element={<VoucherEntry kind="contra" title="Contra Voucher" description="Cash ⇄ Bank · Bank ⇄ Bank transfers." />} />
+          <Route path="/dashboard/erp/acc/daybook" element={<DayBookTally />} />
           <Route path="/dashboard/erp/acc/current-stock" element={<CurrentStock />} />
           <Route path="/dashboard/erp/acc/stock-transfer" element={<StockTransfer />} />
           <Route path="/dashboard/erp/acc/reports" element={<AccountingReports />} />
+          <Route path="/dashboard/erp/acc/reports/ledger" element={<LedgerReport />} />
+          <Route path="/dashboard/erp/acc/reports/trial-balance" element={<TrialBalance />} />
+          <Route path="/dashboard/erp/acc/reports/cashbook" element={<CashBookReport />} />
+          <Route path="/dashboard/erp/acc/reports/bankbook" element={<BankBookReport />} />
+          <Route path="/dashboard/erp/acc/reports/purchase-register" element={<PurchaseRegister />} />
+          <Route path="/dashboard/erp/acc/reports/sales-register" element={<SalesRegister />} />
+          <Route path="/dashboard/erp/acc/reports/stock-summary" element={<StockSummary />} />
+          <Route path="/dashboard/erp/acc/reports/godown-stock" element={<GodownStockReport />} />
+          <Route path="/dashboard/erp/acc/reports/gst" element={<GstReportsPage />} />
+          <Route path="/dashboard/erp/acc/reports/pl" element={<ProfitLoss />} />
+          <Route path="/dashboard/erp/acc/reports/balance-sheet" element={<BalanceSheet />} />
+
           <Route path="/dashboard/erp/admin" element={<AdminAccountantDashboard />} />
           <Route path="/dashboard/erp/admin/users" element={<AdminUserManagement />} />
           <Route path="/dashboard/erp/admin/audit" element={<AuditTrail />} />
