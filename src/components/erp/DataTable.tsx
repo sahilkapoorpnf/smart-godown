@@ -24,7 +24,7 @@ interface Props<T> {
   exportName?: string;
 }
 
-export function DataTable<T extends { id?: string }>({
+export function DataTable<T extends Record<string, any>>({
   rows, columns, searchKeys, initialSort, pageSize = 10, filters, toolbar, empty, exportName,
 }: Props<T>) {
   const [q, setQ] = useState("");
