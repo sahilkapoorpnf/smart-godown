@@ -9,11 +9,12 @@ import { ROLE_LABEL } from "@/lib/warehouse/types";
 import { toast } from "sonner";
 
 const quickAccounts = [
-  { id: "u1", label: "Superadmin", color: "bg-himfed-green text-white" },
-  { id: "u2", label: "Incharge — Shimla", color: "bg-himfed-info/90 text-white" },
-  { id: "u6", label: "Staff — Shimla Central", color: "bg-himfed-amber text-foreground" },
-  { id: "u11", label: "Accountant", color: "bg-secondary text-secondary-foreground" },
-  { id: "u12", label: "JOA IT", color: "bg-muted text-foreground" },
+  { id: "wu_una1", label: "WH User — Una",            color: "bg-himfed-green text-white" },
+  { id: "ao_una",  label: "Area Officer — Una",       color: "bg-himfed-amber text-foreground" },
+  { id: "wa_una",  label: "Warehouse Accountant",     color: "bg-himfed-info/90 text-white" },
+  { id: "aa_hq",   label: "Admin Accountant (HQ)",    color: "bg-destructive text-white" },
+  { id: "u1",      label: "Superadmin",               color: "bg-primary text-primary-foreground" },
+  { id: "u11",     label: "Accountant (legacy)",      color: "bg-secondary text-secondary-foreground" },
 ];
 
 const Login = () => {
