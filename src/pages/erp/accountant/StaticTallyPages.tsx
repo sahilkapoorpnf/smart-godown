@@ -98,7 +98,7 @@ function TallyPage({ title, description, actions, children }: { title: string; d
   return (
     <ErpPage allowed={allowed} title={title} description={description} actions={actions}>
       <div className="rounded-lg border border-himfed-green/20 bg-himfed-green/5 p-3 text-sm flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2 font-medium"><Building2 className="w-4 h-4 text-himfed-green" /> Active Company: UNA Area</div>
+        <div className="flex items-center gap-2 font-medium"><Building2 className="w-4 h-4 text-himfed-green" /> {scopeLabel()}</div>
         <div className="flex gap-2">
           <Button asChild size="sm" variant="outline"><Link to="/dashboard/erp/acc/select-company">Select Company</Link></Button>
           <Button asChild size="sm" variant="outline"><Link to="/dashboard/erp/acc/company-create">Create Company</Link></Button>
