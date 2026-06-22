@@ -221,7 +221,7 @@ export function VoucherStaticPage({ kind }: { kind: VoucherKind }) {
 export function DayBookStatic() {
   const SINGLE_DATE = "2026-06-22";
   const rows = vouchersStatic
-    .filter((v) => v.kind === "sales" || v.kind === "journal")
+    .filter((v) => v.kind === "sales" || v.kind === "journal" || v.kind === "purchase")
     .map((v) => ({ ...v, date: SINGLE_DATE }));
   const dayBookColumns = [
     { key: "date", label: "Date", sortable: true },
