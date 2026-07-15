@@ -271,3 +271,106 @@ export const dashboardStats = {
 };
 
 export const fmtStaticINR = (n: number) => "₹" + n.toLocaleString("en-IN", { maximumFractionDigits: 0 });
+
+// ===== Department Master — Himachal Pradesh Govt Departments (Sundry Debtors) =====
+export interface DepartmentRow {
+  id: string;
+  code: string;
+  name: string;
+  alias: string;
+  under: string;                     // Ledger group (e.g. Sundry Debtors)
+  billByBill: "Yes" | "No";
+  creditPeriod: string;              // days
+  address: string;
+  district: string;
+  state: string;
+  pincode: string;
+  contactPerson: string;
+  phone: string;
+  email: string;
+  provideBankDetails: "Yes" | "No";
+  bankName: string;
+  bankAccountNo: string;
+  ifsc: string;
+  panNo: string;
+  registrationType: "Regular" | "Composition" | "Unregistered" | "Government";
+  gstin: string;
+  setAlterGst: "Yes" | "No";
+  openingBalance: number;
+  drCr: "Dr" | "Cr";
+  status: "Active" | "Inactive";
+  [key: string]: string | number;
+}
+
+export const departmentsStatic: DepartmentRow[] = [
+  { id: "DPT-001", code: "1380275", name: "Director General of Police", alias: "DGP HP",
+    under: "Sundry Debtors", billByBill: "Yes", creditPeriod: "30",
+    address: "Police Headquarters, Chotta Shimla", district: "Shimla", state: "Himachal Pradesh", pincode: "171002",
+    contactPerson: "Sr. Accounts Officer", phone: "+91 177 2621904", email: "dgp-hp@nic.in",
+    provideBankDetails: "Yes", bankName: "State Bank of India", bankAccountNo: "35201118842", ifsc: "SBIN0000469",
+    panNo: "AAAGD0451K", registrationType: "Government", gstin: "02AAAGD0451K1ZR", setAlterGst: "No",
+    openingBalance: 1250000, drCr: "Dr", status: "Active" },
+  { id: "DPT-002", code: "1380276", name: "Under Secretary to GAD", alias: "US-GAD",
+    under: "Sundry Debtors", billByBill: "Yes", creditPeriod: "45",
+    address: "Armsdale Building, HP Secretariat", district: "Shimla", state: "Himachal Pradesh", pincode: "171002",
+    contactPerson: "Section Officer (Accounts)", phone: "+91 177 2621127", email: "us-gad-hp@nic.in",
+    provideBankDetails: "No", bankName: "", bankAccountNo: "", ifsc: "",
+    panNo: "AAAGH0102G", registrationType: "Government", gstin: "", setAlterGst: "No",
+    openingBalance: 645000, drCr: "Dr", status: "Active" },
+  { id: "DPT-003", code: "1380277", name: "Department of Agriculture, HP", alias: "Agri-HP",
+    under: "Sundry Debtors", billByBill: "Yes", creditPeriod: "30",
+    address: "Krishi Bhawan, Boileauganj", district: "Shimla", state: "Himachal Pradesh", pincode: "171005",
+    contactPerson: "Director of Agriculture", phone: "+91 177 2830612", email: "director-agri-hp@nic.in",
+    provideBankDetails: "Yes", bankName: "Punjab National Bank", bankAccountNo: "0421000103550012", ifsc: "PUNB0042100",
+    panNo: "AAAGA1908B", registrationType: "Government", gstin: "02AAAGA1908B1ZP", setAlterGst: "Yes",
+    openingBalance: 2340000, drCr: "Dr", status: "Active" },
+  { id: "DPT-004", code: "1380278", name: "HP Public Works Department", alias: "HPPWD",
+    under: "Sundry Debtors", billByBill: "Yes", creditPeriod: "60",
+    address: "Nirman Bhawan, Chhota Shimla", district: "Shimla", state: "Himachal Pradesh", pincode: "171002",
+    contactPerson: "Executive Engineer (Accts)", phone: "+91 177 2622013", email: "eepwd-hp@nic.in",
+    provideBankDetails: "Yes", bankName: "UCO Bank", bankAccountNo: "12340210004488", ifsc: "UCBA0001234",
+    panNo: "AAAGP4432N", registrationType: "Government", gstin: "02AAAGP4432N1ZK", setAlterGst: "Yes",
+    openingBalance: 4187500, drCr: "Dr", status: "Active" },
+  { id: "DPT-005", code: "1380279", name: "HP Forest Department", alias: "HP-Forest",
+    under: "Sundry Debtors", billByBill: "Yes", creditPeriod: "45",
+    address: "Talland, Bharari Road", district: "Shimla", state: "Himachal Pradesh", pincode: "171002",
+    contactPerson: "PCCF (HoFF)", phone: "+91 177 2626861", email: "pccf-hp@nic.in",
+    provideBankDetails: "No", bankName: "", bankAccountNo: "", ifsc: "",
+    panNo: "AAAGF7712M", registrationType: "Government", gstin: "02AAAGF7712M1ZC", setAlterGst: "No",
+    openingBalance: 985000, drCr: "Dr", status: "Active" },
+  { id: "DPT-006", code: "1380280", name: "HP State Electricity Board Ltd", alias: "HPSEBL",
+    under: "Sundry Debtors", billByBill: "Yes", creditPeriod: "30",
+    address: "Vidyut Bhawan, Kumar House", district: "Shimla", state: "Himachal Pradesh", pincode: "171004",
+    contactPerson: "CFO / Sr. AO", phone: "+91 177 2652003", email: "cfo-hpsebl@nic.in",
+    provideBankDetails: "Yes", bankName: "HDFC Bank", bankAccountNo: "50200012348899", ifsc: "HDFC0000234",
+    panNo: "AABCH1122E", registrationType: "Regular", gstin: "02AABCH1122E1Z6", setAlterGst: "Yes",
+    openingBalance: 3260000, drCr: "Dr", status: "Active" },
+  { id: "DPT-007", code: "1380281", name: "HP Health & Family Welfare Dept", alias: "HP-Health",
+    under: "Sundry Debtors", billByBill: "Yes", creditPeriod: "45",
+    address: "Directorate of Health Services, SDA Complex", district: "Shimla", state: "Himachal Pradesh", pincode: "171009",
+    contactPerson: "Director Health Services", phone: "+91 177 2620221", email: "dhs-hp@nic.in",
+    provideBankDetails: "Yes", bankName: "Canara Bank", bankAccountNo: "1121101002234", ifsc: "CNRB0001121",
+    panNo: "AAAGH5560P", registrationType: "Government", gstin: "", setAlterGst: "No",
+    openingBalance: 512000, drCr: "Dr", status: "Active" },
+  { id: "DPT-008", code: "1380282", name: "HP Rural Development Dept", alias: "HP-RDD",
+    under: "Sundry Debtors", billByBill: "Yes", creditPeriod: "30",
+    address: "Armsdale, HP Secretariat", district: "Shimla", state: "Himachal Pradesh", pincode: "171002",
+    contactPerson: "Director RD", phone: "+91 177 2621309", email: "rd-hp@nic.in",
+    provideBankDetails: "No", bankName: "", bankAccountNo: "", ifsc: "",
+    panNo: "AAAGR9081Q", registrationType: "Government", gstin: "", setAlterGst: "No",
+    openingBalance: 278000, drCr: "Dr", status: "Active" },
+  { id: "DPT-009", code: "1380283", name: "HP Home Guards & Civil Defence", alias: "HP-HomeGuard",
+    under: "Sundry Debtors", billByBill: "Yes", creditPeriod: "30",
+    address: "Chhota Shimla", district: "Shimla", state: "Himachal Pradesh", pincode: "171002",
+    contactPerson: "Commandant General", phone: "+91 177 2624440", email: "hg-hp@nic.in",
+    provideBankDetails: "No", bankName: "", bankAccountNo: "", ifsc: "",
+    panNo: "AAAGH2201F", registrationType: "Government", gstin: "", setAlterGst: "No",
+    openingBalance: 156000, drCr: "Dr", status: "Active" },
+  { id: "DPT-010", code: "1380284", name: "HP Transport Department", alias: "HP-Transport",
+    under: "Sundry Debtors", billByBill: "Yes", creditPeriod: "45",
+    address: "Parivahan Bhawan, Kasumpti", district: "Shimla", state: "Himachal Pradesh", pincode: "171009",
+    contactPerson: "Director Transport", phone: "+91 177 2620033", email: "director-transport-hp@nic.in",
+    provideBankDetails: "Yes", bankName: "Bank of Baroda", bankAccountNo: "12040100019988", ifsc: "BARB0SHIMLA",
+    panNo: "AAAGT7788R", registrationType: "Government", gstin: "02AAAGT7788R1ZH", setAlterGst: "Yes",
+    openingBalance: 820000, drCr: "Dr", status: "Inactive" },
+];
