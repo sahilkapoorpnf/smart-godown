@@ -63,6 +63,7 @@ import {
   TankMasterStatic,
   DepartmentMasterStatic,
   VehicleMasterStatic,
+  NozzleMasterStatic,
 } from "./pages/erp/accountant/StaticTallyPages";
 import BalanceSheetPage from "./pages/erp/accountant/BalanceSheetPage";
 import ProfitLossPage from "./pages/erp/accountant/ProfitLossPage";
