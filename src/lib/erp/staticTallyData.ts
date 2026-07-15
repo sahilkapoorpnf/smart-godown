@@ -109,7 +109,8 @@ export const stockGroupsStatic: MasterRow[] = [
   { id: "SG-007", name: "Consumer Products", under: "Primary", status: "Active" },
   { id: "SG-008", name: "Sugar", under: "Consumer Products", status: "Active" },
   { id: "SG-009", name: "Oil", under: "Consumer Products", status: "Active" },
-  { id: "SG-010", name: "Fuel", under: "Primary", status: "Active" },
+  { id: "SG-010", name: "FUEL", under: "Primary", status: "Active" },
+  { id: "SG-011", name: "Lubricants", under: "Primary", status: "Active" },
 ];
 
 export const stockUnitsStatic: MasterRow[] = [
