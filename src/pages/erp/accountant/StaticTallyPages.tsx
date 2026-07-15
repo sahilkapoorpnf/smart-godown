@@ -14,8 +14,8 @@ import { Switch } from "@/components/ui/switch";
 import {
   areaCompaniesStatic, auditLogsStatic, dashboardStats, documentsStatic, fmtStaticINR,
   godownMastersStatic, groupMasters, ledgerMasters, reportRowsStatic, stockGroupsStatic,
-  stockItemsStatic, stockUnitsStatic, voucherTypeMasters, vouchersStatic,
-  AreaCompanyStatic, MasterRow, VoucherKind, VoucherRow,
+  stockItemsStatic, stockUnitsStatic, voucherTypeMasters, vouchersStatic, tanksStatic,
+  AreaCompanyStatic, MasterRow, VoucherKind, VoucherRow, TankRow,
 } from "@/lib/erp/staticTallyData";
 import {
   ArrowLeftRight, BadgeIndianRupee, Banknote, BookOpen, Building2, Download,
@@ -605,4 +605,187 @@ export function DocumentsStatic() {
 
 export function AuditLogsStatic() {
   return <TallyPage title="Audit Logs" description="Tracks user, role, company, warehouse, action, old value, new value and date-time."><FilteredTable rows={scopedAuditLogs()} exportName="audit-logs" searchKeys={["id", "userName", "role", "company", "warehouse", "action"] as any} columns={["id", "userName", "role", "company", "warehouse", "action", "oldValue", "newValue", "dateTime"].map((k) => ({ key: k, label: k.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()) }))} /></TallyPage>;
+}
+
+// ============ TANK MASTER — linked to HSD / ULP products ============
+const scopedTanks = () => isUnaScoped() ? tanksStatic.filter((t) => UNA_GODOWNS.has(t.godown)) : tanksStatic;
+
+export function TankMasterStatic() {
+  const rows = scopedTanks();
+  const fuelItems = stockItemsStatic.filter((i) => String(i.name) === "HSD" || String(i.name) === "ULP");
+  const godownOptions = scopedGodowns().map((g: any) => String(g.name));
+  const [productFilter, setProductFilter] = useState<"all" | "HSD" | "ULP">("all");
+  const [alterId, setAlterId] = useState<string>(rows[0]?.id ?? "TNK-001");
+  const alterRow = rows.find((r) => r.id === alterId) ?? rows[0];
+
+  const filteredRows = productFilter === "all" ? rows : rows.filter((r) => r.product === productFilter);
+
+  const util = (r: TankRow) => Math.round((r.currentStockLtr / r.capacityLtr) * 100);
+
+  const cols = [
+    { key: "id", label: "Tank ID", sortable: true },
+    { key: "tankCode", label: "Tank Code", render: (r: TankRow) => <span className="font-mono text-xs font-bold">{r.tankCode}</span> },
+    { key: "tankName", label: "Tank Name", sortable: true, render: (r: TankRow) => <span className="font-semibold">{r.tankName}</span> },
+    { key: "product", label: "Product", render: (r: TankRow) => <Badge tone={r.product === "HSD" ? "amber" : "green"}>{r.product}</Badge> },
+    { key: "productId", label: "Linked Item", render: (r: TankRow) => <span className="font-mono text-xs">{r.productId}</span> },
+    { key: "godown", label: "Godown" },
+    { key: "area", label: "Area" },
+    { key: "capacityLtr", label: "Capacity (L)", className: "text-right", render: (r: TankRow) => r.capacityLtr.toLocaleString() },
+    { key: "currentStockLtr", label: "Current Stock (L)", className: "text-right", render: (r: TankRow) => r.currentStockLtr.toLocaleString() },
+    { key: "utilization", label: "Utilization", render: (r: TankRow) => <Badge tone={util(r) > 90 ? "red" : util(r) > 60 ? "amber" : "green"}>{util(r)}%</Badge> },
+    { key: "dipReading", label: "Dip (cm)", className: "text-right" },
+    { key: "status", label: "Status", render: (r: TankRow) => <StatusBadge value={r.status} /> },
+    actionColumn,
+  ];
+
+  const productChip = (p: "HSD" | "ULP") => (
+    <Badge tone={p === "HSD" ? "amber" : "green"}>{p}</Badge>
+  );
+
+  return (
+    <TallyPage
+      title="Tank Master — Petrol Pump"
+      description="Every tank is linked to a fuel product (HSD or ULP) and belongs to a godown. Create tanks under each product for accurate dip / stock tracking."
+      actions={<Button asChild variant="outline"><Link to="/dashboard/erp/acc/inventory/items"><Package className="w-4 h-4 mr-2" />Product Master</Link></Button>}
+    >
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {(["HSD", "ULP"] as const).map((p) => {
+          const list = rows.filter((r) => r.product === p);
+          const totCap = list.reduce((s, r) => s + r.capacityLtr, 0);
+          const totCur = list.reduce((s, r) => s + r.currentStockLtr, 0);
+          return (
+            <Card key={p} className="border-himfed-green/20">
+              <CardContent className="p-4 space-y-1">
+                <div className="flex items-center justify-between"><div className="text-xs text-muted-foreground">Product</div>{productChip(p)}</div>
+                <div className="text-xl font-serif font-bold">{list.length} Tanks</div>
+                <div className="text-xs text-muted-foreground">Capacity {totCap.toLocaleString()} L · Stock {totCur.toLocaleString()} L</div>
+              </CardContent>
+            </Card>
+          );
+        })}
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Total Tanks</div><div className="text-xl font-serif font-bold">{rows.length}</div><div className="text-xs text-muted-foreground">Across {new Set(rows.map((r) => r.godown)).size} godowns</div></CardContent></Card>
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Above 90% Utilization</div><div className="text-xl font-serif font-bold text-destructive">{rows.filter((r) => util(r) > 90).length}</div><div className="text-xs text-muted-foreground">Refill alert</div></CardContent></Card>
+      </div>
+
+      <Tabs defaultValue="create">
+        <TabsList>
+          <TabsTrigger value="create"><Plus className="w-3 h-3 mr-1" />Create Tank</TabsTrigger>
+          <TabsTrigger value="alter">Alter Tank</TabsTrigger>
+          <TabsTrigger value="list">Tank List ({rows.length})</TabsTrigger>
+        </TabsList>
+
+        {/* ============ CREATE TANK ============ */}
+        <TabsContent value="create" className="space-y-4">
+          <div className="rounded border-2 border-himfed-green bg-himfed-green/5 p-2 text-xs font-semibold text-himfed-green">
+            Tank Creation — Petrol Pump Masters → Tank Master → Create Tank
+          </div>
+          <StaticForm title="Tank Identification">
+            <Field label="Tank Name *" value="ULP TANK 03" />
+            <Field label="Tank Code *" value="UNA-ULP-T3" />
+            <SelectField label="Linked Product *" value="ULP" options={["HSD", "ULP"]} />
+            <SelectField label="Linked Item Code" value="ITM-011" options={fuelItems.map((i) => String(i.id))} />
+            <SelectField label="Under (Godown) *" value={godownOptions[0] ?? "UNA Warehouse"} options={godownOptions} />
+            <SelectField label="Under Group" value="Primary" options={["Primary", "Fuel Tanks", "Underground Tanks"]} />
+          </StaticForm>
+
+          <StaticForm title="Capacity & Calibration">
+            <Field label="Total Capacity (Litres) *" value="15000" />
+            <Field label="Opening Stock (Litres)" value="0" />
+            <Field label="Dead Stock (Litres)" value="200" />
+            <Field label="Initial Dip Reading (cm)" value="0" />
+            <Field label="Last Calibrated On" type="date" value="2026-04-01" />
+            <SelectField label="Tank Type" value="Underground" options={["Underground", "Above Ground"]} />
+          </StaticForm>
+
+          <StaticForm title="Operations">
+            <SelectField label="Status" value="Active" options={["Active", "Inactive"]} />
+            <Field label="Assigned Operator" value="Anil Chauhan" />
+            <Field label="Remarks" value="Newly installed ULP tank" />
+          </StaticForm>
+
+          <div className="flex gap-2">
+            <Button><Plus className="w-4 h-4 mr-2" />Accept (Save Tank)</Button>
+            <Button variant="outline">Yes</Button>
+            <Button variant="outline">No</Button>
+            <Button variant="ghost">Quit</Button>
+          </div>
+        </TabsContent>
+
+        {/* ============ ALTER TANK ============ */}
+        <TabsContent value="alter" className="space-y-4">
+          <div className="rounded border-2 border-amber-500 bg-amber-500/5 p-2 text-xs font-semibold text-amber-700">
+            Tank Alteration — Select a tank to modify its configuration
+          </div>
+          <Card>
+            <CardHeader><CardTitle className="text-lg font-serif">Select Tank to Alter</CardTitle></CardHeader>
+            <CardContent className="grid md:grid-cols-4 gap-3">
+              <div className="space-y-1.5 md:col-span-2">
+                <Label className="text-xs text-muted-foreground">Tank Master List</Label>
+                <Select value={alterId} onValueChange={setAlterId}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>{rows.map((r) => <SelectItem key={r.id} value={r.id}>{r.tankCode} · {r.tankName} ({r.product})</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <Field label="Tank ID" value={alterRow?.id ?? ""} />
+              <div className="flex items-end gap-2"><StatusBadge value={alterRow?.status} />{alterRow && productChip(alterRow.product)}</div>
+            </CardContent>
+          </Card>
+
+          {alterRow && (
+            <>
+              <StaticForm title="Tank Identification">
+                <Field label="Tank Name *" value={alterRow.tankName} />
+                <Field label="Tank Code *" value={alterRow.tankCode} />
+                <SelectField label="Linked Product *" value={alterRow.product} options={["HSD", "ULP"]} />
+                <SelectField label="Linked Item Code" value={alterRow.productId} options={fuelItems.map((i) => String(i.id))} />
+                <SelectField label="Under (Godown) *" value={alterRow.godown} options={godownOptions.length ? godownOptions : [alterRow.godown]} />
+                <Field label="Area" value={alterRow.area} />
+              </StaticForm>
+
+              <StaticForm title="Capacity & Calibration">
+                <Field label="Total Capacity (Litres) *" value={String(alterRow.capacityLtr)} />
+                <Field label="Current Stock (Litres)" value={String(alterRow.currentStockLtr)} />
+                <Field label="Current Dip Reading (cm)" value={String(alterRow.dipReading)} />
+                <Field label="Last Calibrated On" type="date" value={alterRow.lastCalibratedOn} />
+                <Field label="Utilization %" value={`${util(alterRow)}%`} />
+                <SelectField label="Status" value={alterRow.status} options={["Active", "Inactive"]} />
+              </StaticForm>
+
+              <div className="flex gap-2">
+                <Button><FileCheck2 className="w-4 h-4 mr-2" />Accept Changes</Button>
+                <Button variant="outline">Yes</Button>
+                <Button variant="outline">No</Button>
+                <Button variant="destructive">Delete Tank</Button>
+              </div>
+            </>
+          )}
+        </TabsContent>
+
+        {/* ============ TANK LIST ============ */}
+        <TabsContent value="list" className="space-y-3">
+          <Card className="border-himfed-green/20">
+            <CardHeader className="pb-3 flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-base font-serif">TANK MASTER LIST</CardTitle>
+              <Select value={productFilter} onValueChange={(v: any) => setProductFilter(v)}>
+                <SelectTrigger className="h-9 w-40"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Products</SelectItem>
+                  <SelectItem value="HSD">HSD Only</SelectItem>
+                  <SelectItem value="ULP">ULP Only</SelectItem>
+                </SelectContent>
+              </Select>
+            </CardHeader>
+            <CardContent>
+              <DataTable
+                rows={filteredRows as any[]}
+                columns={cols as any}
+                exportName="tank-master"
+                searchKeys={["id", "tankCode", "tankName", "product", "godown"] as any}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </TallyPage>
+  );
 }

@@ -60,6 +60,7 @@ import {
   TallyDashboardStatic,
   VoucherStaticPage,
   VoucherTypeMasterStatic,
+  TankMasterStatic,
 } from "./pages/erp/accountant/StaticTallyPages";
 import BalanceSheetPage from "./pages/erp/accountant/BalanceSheetPage";
 import ProfitLossPage from "./pages/erp/accountant/ProfitLossPage";
@@ -130,6 +131,7 @@ const App = () => (
           <Route path="/dashboard/erp/acc/inventory/items" element={<StockItemStatic />} />
           <Route path="/dashboard/erp/acc/inventory/units" element={<StockUnitStatic />} />
           <Route path="/dashboard/erp/acc/inventory/godowns" element={<GodownMasterStatic />} />
+          <Route path="/dashboard/erp/acc/inventory/tanks" element={<TankMasterStatic />} />
           <Route path="/dashboard/erp/acc/purchase" element={<VoucherStaticPage kind="purchase" />} />
           <Route path="/dashboard/erp/acc/sales" element={<VoucherStaticPage kind="sales" />} />
           <Route path="/dashboard/erp/acc/payment" element={<VoucherStaticPage kind="payment" />} />
