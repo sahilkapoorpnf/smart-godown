@@ -324,8 +324,145 @@ function InventoryStaticPage({ type }: { type: "groups" | "items" | "units" | "g
 }
 
 export const StockGroupStatic = () => <InventoryStaticPage type="groups" />;
-export const StockItemStatic = () => <InventoryStaticPage type="items" />;
 export const StockUnitStatic = () => <InventoryStaticPage type="units" />;
+
+export function StockItemStatic() {
+  const rows = stockItemsStatic;
+  const groups = stockGroupsStatic.map((g) => String(g.name));
+  const units = stockUnitsStatic.map((u) => String(u.code));
+  const godownOptions = scopedGodowns().map((g: any) => String(g.name));
+  const [alterId, setAlterId] = useState<string>(String(rows[0].id));
+  const alterRow = rows.find((r) => String(r.id) === alterId) ?? rows[0];
+
+  const cols = [
+    { key: "id", label: "Item ID", sortable: true },
+    { key: "name", label: "Product Name", sortable: true, render: (r: any) => <span className="font-semibold">{r.name}</span> },
+    { key: "group", label: "Stock Group", render: (r: any) => <Badge tone="blue">{r.group}</Badge> },
+    { key: "unit", label: "Unit" },
+    { key: "hsn", label: "HSN/SAC", render: (r: any) => <span className="font-mono text-xs">{r.hsn}</span> },
+    { key: "gstRate", label: "GST %", render: (r: any) => `${r.gstRate}%` },
+    { key: "openingQty", label: "Opening Qty", className: "text-right" },
+    { key: "openingValue", label: "Opening Value", className: "text-right font-mono", render: (r: any) => fmtStaticINR(r.openingValue) },
+    { key: "defaultGodown", label: "Default Godown" },
+    { key: "status", label: "Status", render: (r: any) => <StatusBadge value={r.status} /> },
+    actionColumn,
+  ];
+
+  return (
+    <TallyPage
+      title="Product Master"
+      description="Petrol Pump Masters → Product Master. Create, alter and list stock items (products) — Tally-style."
+      actions={<Button asChild variant="outline"><Link to="/dashboard/erp/acc/inventory/groups"><Package className="w-4 h-4 mr-2" />Stock Groups</Link></Button>}
+    >
+      <Tabs defaultValue="create">
+        <TabsList>
+          <TabsTrigger value="create"><Plus className="w-3 h-3 mr-1" />Create Product</TabsTrigger>
+          <TabsTrigger value="alter">Alter Product</TabsTrigger>
+          <TabsTrigger value="list">Product List ({rows.length})</TabsTrigger>
+        </TabsList>
+
+        {/* ============ CREATE PRODUCT ============ */}
+        <TabsContent value="create" className="space-y-4">
+          <div className="rounded border-2 border-himfed-green bg-himfed-green/5 p-2 text-xs font-semibold text-himfed-green">
+            Stock Item Creation — HIMFED-{scopedCompanies()[0]?.code ?? "UNA"}
+          </div>
+          <StaticForm title="Product Identification">
+            <Field label="Name *" value="HSD" />
+            <Field label="Alias" value="High Speed Diesel" />
+            <SelectField label="Under (Stock Group) *" value="FUEL" options={groups} />
+            <SelectField label="Units *" value="LTR" options={units} />
+          </StaticForm>
+
+          <StaticForm title="Statutory Details">
+            <SelectField label="GST Applicability" value="Applicable" options={["Applicable", "Not Applicable", "Exempt"]} />
+            <SelectField label="HSN/SAC Details" value="As per Company/Stock Group" options={["As per Company/Stock Group", "Specify Details Here"]} />
+            <Field label="HSN/SAC Code" value="27101930" />
+            <Field label="HSN Description" value="High Speed Diesel Oil" />
+            <SelectField label="GST Rate Details" value="As per Company/Stock Group" options={["As per Company/Stock Group", "Specify Details Here"]} />
+            <SelectField label="Taxability Type" value="Taxable" options={["Taxable", "Exempt", "Nil Rated"]} />
+            <Field label="GST Rate %" value="0" />
+            <SelectField label="Type of Supply" value="Goods" options={["Goods", "Services"]} />
+            <Field label="Rate of Duty (eg 5)" value="0" />
+          </StaticForm>
+
+          <StaticForm title="Opening Balance">
+            <Field label="Opening Quantity" value="0" />
+            <Field label="Rate per Unit" value="₹ 92.00" />
+            <Field label="Opening Value" value={fmtStaticINR(0)} />
+            <SelectField label="Default Godown" value={godownOptions[0] ?? "UNA Warehouse"} options={godownOptions} />
+          </StaticForm>
+
+          <div className="flex gap-2">
+            <Button><Plus className="w-4 h-4 mr-2" />Accept (Save Product)</Button>
+            <Button variant="outline">Yes</Button>
+            <Button variant="outline">No</Button>
+            <Button variant="ghost">Quit</Button>
+          </div>
+        </TabsContent>
+
+        {/* ============ ALTER PRODUCT ============ */}
+        <TabsContent value="alter" className="space-y-4">
+          <div className="rounded border-2 border-amber-500 bg-amber-500/5 p-2 text-xs font-semibold text-amber-700">
+            Stock Item Alteration — HIMFED-{scopedCompanies()[0]?.code ?? "UNA"}
+          </div>
+          <Card>
+            <CardHeader><CardTitle className="text-lg font-serif">Select Product to Alter</CardTitle></CardHeader>
+            <CardContent className="grid md:grid-cols-3 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">Product Master List</Label>
+                <Select value={alterId} onValueChange={setAlterId}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>{rows.map((r) => <SelectItem key={String(r.id)} value={String(r.id)}>{String(r.name)}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <Field label="Item Code" value={String(alterRow.id)} />
+              <StatusBadge value={String(alterRow.status)} />
+            </CardContent>
+          </Card>
+
+          <StaticForm title="Product Identification">
+            <Field label="Name *" value={String(alterRow.name)} />
+            <Field label="Alias" value={String(alterRow.name)} />
+            <SelectField label="Under (Stock Group) *" value={String(alterRow.group)} options={groups} />
+            <SelectField label="Units *" value={String(alterRow.unit)} options={units} />
+          </StaticForm>
+
+          <StaticForm title="Statutory Details">
+            <SelectField label="GST Applicability" value="Applicable" options={["Applicable", "Not Applicable", "Exempt"]} />
+            <SelectField label="HSN/SAC Details" value="As per Company/Stock Group" options={["As per Company/Stock Group", "Specify Details Here"]} />
+            <Field label="HSN/SAC Code" value={String(alterRow.hsn)} />
+            <SelectField label="Taxability Type" value={Number(alterRow.gstRate) > 0 ? "Taxable" : "Nil Rated"} options={["Taxable", "Exempt", "Nil Rated"]} />
+            <Field label="GST Rate %" value={String(alterRow.gstRate)} />
+            <SelectField label="Type of Supply" value="Goods" options={["Goods", "Services"]} />
+          </StaticForm>
+
+          <StaticForm title="Opening Balance">
+            <Field label="Opening Quantity" value={String(alterRow.openingQty)} />
+            <Field label="Opening Value" value={fmtStaticINR(Number(alterRow.openingValue))} />
+            <SelectField label="Default Godown" value={String(alterRow.defaultGodown)} options={godownOptions.length ? godownOptions : [String(alterRow.defaultGodown)]} />
+          </StaticForm>
+
+          <div className="flex gap-2">
+            <Button><FileCheck2 className="w-4 h-4 mr-2" />Accept Changes</Button>
+            <Button variant="outline">Yes</Button>
+            <Button variant="outline">No</Button>
+            <Button variant="destructive">Delete Product</Button>
+          </div>
+        </TabsContent>
+
+        {/* ============ PRODUCT LIST ============ */}
+        <TabsContent value="list" className="space-y-3">
+          <Card className="border-himfed-green/20">
+            <CardHeader className="pb-3"><CardTitle className="text-base font-serif">PRODUCT MASTER LIST</CardTitle></CardHeader>
+            <CardContent>
+              <FilteredTable rows={rows} exportName="product-master" searchKeys={["id", "name", "group", "hsn"] as any} columns={cols} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </TallyPage>
+  );
+}
 export function GodownMasterStatic() {
   const rows = scopedGodowns();
   const una = isUnaScoped();

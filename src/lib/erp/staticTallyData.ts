@@ -109,7 +109,8 @@ export const stockGroupsStatic: MasterRow[] = [
   { id: "SG-007", name: "Consumer Products", under: "Primary", status: "Active" },
   { id: "SG-008", name: "Sugar", under: "Consumer Products", status: "Active" },
   { id: "SG-009", name: "Oil", under: "Consumer Products", status: "Active" },
-  { id: "SG-010", name: "Fuel", under: "Primary", status: "Active" },
+  { id: "SG-010", name: "FUEL", under: "Primary", status: "Active" },
+  { id: "SG-011", name: "Lubricants", under: "Primary", status: "Active" },
 ];
 
 export const stockUnitsStatic: MasterRow[] = [
@@ -147,8 +148,11 @@ export const stockItemsStatic: MasterRow[] = [
   { id: "ITM-006", name: "Rice Seed Grade A", group: "Rice", unit: "QTL", hsn: "10061090", gstRate: 0, openingQty: 260, openingValue: 780000, defaultGodown: "AMB Warehouse", status: "Active" },
   { id: "ITM-007", name: "Sugar 50Kg", group: "Sugar", unit: "BAG", hsn: "17019990", gstRate: 5, openingQty: 700, openingValue: 1750000, defaultGodown: "Shimla Central Godown", status: "Active" },
   { id: "ITM-008", name: "Mustard Oil 15L", group: "Oil", unit: "TIN", hsn: "15149120", gstRate: 5, openingQty: 420, openingValue: 840000, defaultGodown: "Solan Main Warehouse", status: "Active" },
-  { id: "ITM-009", name: "Diesel HSD", group: "Fuel", unit: "LTR", hsn: "27101930", gstRate: 0, openingQty: 8500, openingValue: 765000, defaultGodown: "Kangra Depot", status: "Active" },
+  { id: "ITM-009", name: "HSD", group: "FUEL", unit: "LTR", hsn: "27101930", gstRate: 0, openingQty: 8500, openingValue: 765000, defaultGodown: "UNA Warehouse", status: "Active" },
   { id: "ITM-010", name: "Apple Crates Wooden", group: "Consumer Products", unit: "PCS", hsn: "44152000", gstRate: 12, openingQty: 4500, openingValue: 675000, defaultGodown: "Mandi Regional Godown", status: "Active" },
+  { id: "ITM-011", name: "ULP", group: "FUEL", unit: "LTR", hsn: "27101290", gstRate: 0, openingQty: 6200, openingValue: 620000, defaultGodown: "UNA Warehouse", status: "Active" },
+  { id: "ITM-012", name: "Servo Cool Ready", group: "Lubricants", unit: "LTR", hsn: "27101980", gstRate: 18, openingQty: 340, openingValue: 68000, defaultGodown: "UNA Warehouse", status: "Active" },
+  { id: "ITM-013", name: "Nino Urea", group: "Urea", unit: "BAG", hsn: "31021000", gstRate: 5, openingQty: 1200, openingValue: 3600000, defaultGodown: "AMB Warehouse", status: "Active" },
 ];
 
 const parties = ["NFL Panipat", "IFFCO Kandla", "KRIBHCO Hazira", "Kisan Seva Kendra Amb", "Lovely Seed Store UNA", "HIMFED HQ", "IOCL Una Depot", "Transport Union Una", "HP Cooperative Bank", "Cash Account"];
