@@ -374,3 +374,35 @@ export const departmentsStatic: DepartmentRow[] = [
     panNo: "AAAGT7788R", registrationType: "Government", gstin: "02AAAGT7788R1ZH", setAlterGst: "Yes",
     openingBalance: 820000, drCr: "Dr", status: "Inactive" },
 ];
+
+// ===== Vehicle Master — Govt vehicles that refuel at HIMFED Petrol Pumps, mapped to Department =====
+export interface VehicleRow {
+  id: string;
+  vehicleNumber: string;              // e.g. HP-03-A-1234
+  departmentId: string;               // FK -> DepartmentRow.id
+  departmentName: string;             // denormalized for display
+  vehicleType: "Car" | "Jeep" | "SUV" | "Truck" | "Bus" | "Motorcycle" | "Tractor";
+  fuelType: "HSD" | "ULP";
+  driverName: string;
+  driverPhone: string;
+  status: "Active" | "Inactive";
+  [key: string]: string | number;
+}
+
+export const vehiclesStatic: VehicleRow[] = [
+  { id: "VEH-001", vehicleNumber: "HP-03-A-1234", departmentId: "DPT-001", departmentName: "Director General of Police", vehicleType: "SUV",        fuelType: "HSD", driverName: "Constable Ramesh Kumar",  driverPhone: "+91 94180 11223", status: "Active" },
+  { id: "VEH-002", vehicleNumber: "HP-03-B-5678", departmentId: "DPT-001", departmentName: "Director General of Police", vehicleType: "Jeep",       fuelType: "HSD", driverName: "HC Suresh Thakur",         driverPhone: "+91 94180 33445", status: "Active" },
+  { id: "VEH-003", vehicleNumber: "HP-02-C-2211", departmentId: "DPT-002", departmentName: "Under Secretary to GAD",     vehicleType: "Car",        fuelType: "ULP", driverName: "Rajinder Singh",           driverPhone: "+91 98160 55667", status: "Active" },
+  { id: "VEH-004", vehicleNumber: "HP-01-D-9090", departmentId: "DPT-003", departmentName: "Department of Agriculture, HP", vehicleType: "Tractor", fuelType: "HSD", driverName: "Mohan Lal",                driverPhone: "+91 94590 22110", status: "Active" },
+  { id: "VEH-005", vehicleNumber: "HP-11-E-4321", departmentId: "DPT-004", departmentName: "HP Public Works Department",  vehicleType: "Truck",      fuelType: "HSD", driverName: "Devinder Sharma",          driverPhone: "+91 98170 88221", status: "Active" },
+  { id: "VEH-006", vehicleNumber: "HP-11-F-6543", departmentId: "DPT-004", departmentName: "HP Public Works Department",  vehicleType: "Jeep",       fuelType: "HSD", driverName: "Karam Chand",              driverPhone: "+91 94180 77665", status: "Active" },
+  { id: "VEH-007", vehicleNumber: "HP-05-G-1122", departmentId: "DPT-005", departmentName: "HP Forest Department",        vehicleType: "SUV",        fuelType: "HSD", driverName: "Ranger Vijay Kumar",       driverPhone: "+91 94180 44556", status: "Active" },
+  { id: "VEH-008", vehicleNumber: "HP-03-H-7788", departmentId: "DPT-006", departmentName: "HP State Electricity Board Ltd", vehicleType: "Truck",   fuelType: "HSD", driverName: "Lineman Prakash",          driverPhone: "+91 98160 99001", status: "Active" },
+  { id: "VEH-009", vehicleNumber: "HP-03-I-3344", departmentId: "DPT-007", departmentName: "HP Health & Family Welfare Dept", vehicleType: "Bus",    fuelType: "HSD", driverName: "Ambulance Drv. Anil",      driverPhone: "+91 94590 66778", status: "Active" },
+  { id: "VEH-010", vehicleNumber: "HP-08-J-5566", departmentId: "DPT-008", departmentName: "HP Rural Development Dept",   vehicleType: "Jeep",       fuelType: "ULP", driverName: "Sanjay Kumar",             driverPhone: "+91 98170 33221", status: "Active" },
+  { id: "VEH-011", vehicleNumber: "HP-03-K-2200", departmentId: "DPT-009", departmentName: "HP Home Guards & Civil Defence", vehicleType: "Truck",   fuelType: "HSD", driverName: "HG Balbir Singh",          driverPhone: "+91 94180 12345", status: "Active" },
+  { id: "VEH-012", vehicleNumber: "HP-03-L-8899", departmentId: "DPT-010", departmentName: "HP Transport Department",     vehicleType: "Bus",        fuelType: "HSD", driverName: "HRTC Drv. Naresh",         driverPhone: "+91 94590 88112", status: "Inactive" },
+  { id: "VEH-013", vehicleNumber: "HP-03-M-4400", departmentId: "DPT-001", departmentName: "Director General of Police", vehicleType: "Motorcycle", fuelType: "ULP", driverName: "SI Amit Kumar",            driverPhone: "+91 98160 77883", status: "Active" },
+  { id: "VEH-014", vehicleNumber: "HP-11-N-6611", departmentId: "DPT-004", departmentName: "HP Public Works Department",  vehicleType: "Truck",      fuelType: "HSD", driverName: "Om Prakash",               driverPhone: "+91 94180 55443", status: "Active" },
+  { id: "VEH-015", vehicleNumber: "HP-05-O-9922", departmentId: "DPT-005", departmentName: "HP Forest Department",        vehicleType: "Motorcycle", fuelType: "ULP", driverName: "Forest Grd. Mehar",        driverPhone: "+91 98170 11224", status: "Active" },
+];

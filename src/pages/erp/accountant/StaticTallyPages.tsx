@@ -14,8 +14,8 @@ import { Switch } from "@/components/ui/switch";
 import {
   areaCompaniesStatic, auditLogsStatic, dashboardStats, documentsStatic, fmtStaticINR,
   godownMastersStatic, groupMasters, ledgerMasters, reportRowsStatic, stockGroupsStatic,
-  stockItemsStatic, stockUnitsStatic, voucherTypeMasters, vouchersStatic, tanksStatic, departmentsStatic,
-  AreaCompanyStatic, MasterRow, VoucherKind, VoucherRow, TankRow, DepartmentRow,
+  stockItemsStatic, stockUnitsStatic, voucherTypeMasters, vouchersStatic, tanksStatic, departmentsStatic, vehiclesStatic,
+  AreaCompanyStatic, MasterRow, VoucherKind, VoucherRow, TankRow, DepartmentRow, VehicleRow,
 } from "@/lib/erp/staticTallyData";
 import {
   ArrowLeftRight, BadgeIndianRupee, Banknote, BookOpen, Building2, Download,
@@ -790,7 +790,7 @@ export function TankMasterStatic() {
   );
 }
 
-// ============ DEPARTMENT MASTER — HP Government Departments (Ledger Creation style) ============
+// ============ DEPARTMENT MASTER — HP Government Departments (simple: only fields relevant for vehicle refueling) ============
 export function DepartmentMasterStatic() {
   const rows = departmentsStatic;
   const [statusFilter, setStatusFilter] = useState<"all" | "Active" | "Inactive">("all");
@@ -798,19 +798,14 @@ export function DepartmentMasterStatic() {
   const alterRow = rows.find((r) => r.id === alterId) ?? rows[0];
 
   const filtered = statusFilter === "all" ? rows : rows.filter((r) => r.status === statusFilter);
-  const totalOpening = rows.reduce((s, r) => s + r.openingBalance, 0);
+  const vehicleCountByDept = (deptId: string) => vehiclesStatic.filter((v) => v.departmentId === deptId).length;
 
   const cols = [
-    { key: "id", label: "Dept ID", sortable: true },
-    { key: "code", label: "Code", render: (r: DepartmentRow) => <span className="font-mono text-xs font-bold">{r.code}</span> },
+    { key: "code", label: "Dept Code", sortable: true, render: (r: DepartmentRow) => <span className="font-mono text-xs font-bold">{r.code}</span> },
     { key: "name", label: "Department Name", sortable: true, render: (r: DepartmentRow) => <div><div className="font-semibold">{r.name}</div><div className="text-xs text-muted-foreground italic">({r.alias})</div></div> },
-    { key: "under", label: "Under", render: (r: DepartmentRow) => <Badge tone="blue">{r.under}</Badge> },
-    { key: "district", label: "District" },
     { key: "contactPerson", label: "Contact Person" },
     { key: "phone", label: "Phone" },
-    { key: "gstin", label: "GSTIN", render: (r: DepartmentRow) => <span className="font-mono text-xs">{r.gstin || "—"}</span> },
-    { key: "creditPeriod", label: "Credit (days)", className: "text-right" },
-    { key: "openingBalance", label: "Opening Balance", className: "text-right", render: (r: DepartmentRow) => <span className="font-semibold">{fmtStaticINR(r.openingBalance)} <span className="text-xs text-muted-foreground">{r.drCr}</span></span> },
+    { key: "vehicles", label: "Mapped Vehicles", className: "text-right", render: (r: DepartmentRow) => <Badge tone="blue">{vehicleCountByDept(r.id)}</Badge> },
     { key: "status", label: "Status", render: (r: DepartmentRow) => <StatusBadge value={r.status} /> },
     actionColumn,
   ];
@@ -818,14 +813,14 @@ export function DepartmentMasterStatic() {
   return (
     <TallyPage
       title="Department Master — HP Government"
-      description="Create and maintain Himachal Pradesh Government department ledgers (Sundry Debtors). Tally-style Ledger Creation form with mailing, banking and tax registration details."
-      actions={<Button asChild variant="outline"><Link to="/dashboard/erp/acc/masters/ledgers"><BookOpen className="w-4 h-4 mr-2" />Ledger Master</Link></Button>}
+      description="Register Himachal Pradesh Government departments whose vehicles refuel at HIMFED petrol pumps. Kept intentionally minimal — vehicles are mapped under Vehicle Master."
+      actions={<Button asChild variant="outline"><Link to="/dashboard/erp/acc/masters/vehicles"><Truck className="w-4 h-4 mr-2" />Vehicle Master</Link></Button>}
     >
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Total Departments</div><div className="text-xl font-serif font-bold">{rows.length}</div><div className="text-xs text-muted-foreground">HP Govt. Sundry Debtors</div></CardContent></Card>
-        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Active</div><div className="text-xl font-serif font-bold text-himfed-green">{rows.filter((r) => r.status === "Active").length}</div><div className="text-xs text-muted-foreground">Currently billable</div></CardContent></Card>
-        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">GST Registered</div><div className="text-xl font-serif font-bold">{rows.filter((r) => r.gstin).length}</div><div className="text-xs text-muted-foreground">With GSTIN on file</div></CardContent></Card>
-        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Total Opening (Dr)</div><div className="text-xl font-serif font-bold">{fmtStaticINR(totalOpening)}</div><div className="text-xs text-muted-foreground">Receivable balance</div></CardContent></Card>
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Total Departments</div><div className="text-xl font-serif font-bold">{rows.length}</div></CardContent></Card>
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Active</div><div className="text-xl font-serif font-bold text-himfed-green">{rows.filter((r) => r.status === "Active").length}</div></CardContent></Card>
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Inactive</div><div className="text-xl font-serif font-bold text-destructive">{rows.filter((r) => r.status === "Inactive").length}</div></CardContent></Card>
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Total Vehicles Mapped</div><div className="text-xl font-serif font-bold">{vehiclesStatic.length}</div></CardContent></Card>
       </div>
 
       <Tabs defaultValue="create">
@@ -835,71 +830,33 @@ export function DepartmentMasterStatic() {
           <TabsTrigger value="list">Department List ({rows.length})</TabsTrigger>
         </TabsList>
 
-        {/* ============ CREATE ============ */}
+        {/* CREATE */}
         <TabsContent value="create" className="space-y-4">
-          <div className="rounded border-2 border-himfed-green bg-himfed-green/5 p-2 text-xs font-semibold text-himfed-green flex items-center justify-between">
-            <span>Ledger Creation — HIMFED-SHIMLA</span>
-            <span className="text-muted-foreground">Total Opening Balance: {fmtStaticINR(0)}</span>
+          <div className="rounded border-2 border-himfed-green bg-himfed-green/5 p-2 text-xs font-semibold text-himfed-green">
+            Department Creation — HIMFED-SHIMLA
           </div>
-
-          <StaticForm title="Identification">
-            <Field label="Name *" value="DIRECTOR GENERAL POLICE" />
-            <Field label="(alias)" value="" />
+          <StaticForm title="Department Details">
             <Field label="Department Code" value="1380285" />
-            <SelectField label="Under *" value="Sundry Debtors" options={["Sundry Debtors", "Sundry Creditors", "Current Assets", "Loans & Advances (Asset)"]} />
-            <SelectField label="Maintain balances bill-by-bill" value="Yes" options={["Yes", "No"]} />
-            <Field label="Default credit period (days)" value="30" />
-            <SelectField label="Check for credit days during voucher entry" value="No" options={["Yes", "No"]} />
-          </StaticForm>
-
-          <StaticForm title="Mailing Details">
-            <Field label="Name" value="DIRECTOR GENERAL POLICE" />
-            <div className="space-y-1.5 md:col-span-2"><Label className="text-xs text-muted-foreground">Address</Label><Textarea rows={2} defaultValue="Police Headquarters, Chhota Shimla" /></div>
-            <SelectField label="State" value="Himachal Pradesh" options={["Himachal Pradesh", "Punjab", "Haryana", "Delhi", "Uttarakhand"]} />
-            <Field label="Country" value="India" />
-            <Field label="Pincode" value="171002" />
-            <Field label="Contact Person" value="Sr. Accounts Officer" />
-            <Field label="Phone" value="+91 177 2621904" />
-            <Field label="Email" value="dgp-hp@nic.in" />
-          </StaticForm>
-
-          <StaticForm title="Banking Details">
-            <SelectField label="Provide bank details" value="No" options={["Yes", "No"]} />
-            <Field label="Bank Name" value="" />
-            <Field label="Account Number" value="" />
-            <Field label="IFSC Code" value="" />
-          </StaticForm>
-
-          <StaticForm title="Tax Registration Details">
-            <Field label="PAN/IT No." value="" />
-            <SelectField label="Registration type" value="Regular" options={["Regular", "Composition", "Unregistered", "Government"]} />
-            <Field label="GSTIN/UIN" value="" />
-            <SelectField label="Set/Alter additional GST details" value="No" options={["Yes", "No"]} />
-          </StaticForm>
-
-          <StaticForm title="Opening Balance ( on 1-Apr-26 )">
-            <Field label="Opening Balance" value="0" />
-            <SelectField label="Dr / Cr" value="Dr" options={["Dr", "Cr"]} />
+            <Field label="Department Name *" value="" />
+            <Field label="Alias / Short Name" value="" />
+            <Field label="Contact Person" value="" />
+            <Field label="Phone" value="" />
             <SelectField label="Status" value="Active" options={["Active", "Inactive"]} />
           </StaticForm>
-
           <div className="flex gap-2">
             <Button><Plus className="w-4 h-4 mr-2" />Accept (Save Department)</Button>
-            <Button variant="outline">Yes</Button>
-            <Button variant="outline">No</Button>
             <Button variant="ghost">Quit</Button>
           </div>
         </TabsContent>
 
-        {/* ============ ALTER ============ */}
+        {/* ALTER */}
         <TabsContent value="alter" className="space-y-4">
           <div className="rounded border-2 border-amber-500 bg-amber-500/5 p-2 text-xs font-semibold text-amber-700">
-            Ledger Alteration — Select a department to modify its configuration
+            Department Alteration — Select a department to modify
           </div>
-
           <Card>
-            <CardHeader><CardTitle className="text-lg font-serif">Select Department to Alter</CardTitle></CardHeader>
-            <CardContent className="grid md:grid-cols-4 gap-3">
+            <CardHeader><CardTitle className="text-lg font-serif">Select Department</CardTitle></CardHeader>
+            <CardContent className="grid md:grid-cols-3 gap-3">
               <div className="space-y-1.5 md:col-span-2">
                 <Label className="text-xs text-muted-foreground">Department Master List</Label>
                 <Select value={alterId} onValueChange={setAlterId}>
@@ -907,64 +864,28 @@ export function DepartmentMasterStatic() {
                   <SelectContent>{rows.map((r) => <SelectItem key={r.id} value={r.id}>{r.code} · {r.name}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
-              <Field label="Dept ID" value={alterRow?.id ?? ""} />
-              <div className="flex items-end gap-2"><StatusBadge value={alterRow?.status} /><Badge tone="blue">{alterRow?.under}</Badge></div>
+              <div className="flex items-end gap-2"><StatusBadge value={alterRow?.status} /><Badge tone="blue">{vehicleCountByDept(alterRow?.id ?? "")} vehicles</Badge></div>
             </CardContent>
           </Card>
-
           {alterRow && (
             <>
-              <StaticForm title="Identification">
-                <Field label="Name *" value={alterRow.name} />
-                <Field label="(alias)" value={alterRow.alias} />
+              <StaticForm title="Department Details">
                 <Field label="Department Code" value={alterRow.code} />
-                <SelectField label="Under *" value={alterRow.under} options={["Sundry Debtors", "Sundry Creditors", "Current Assets", "Loans & Advances (Asset)"]} />
-                <SelectField label="Maintain balances bill-by-bill" value={alterRow.billByBill} options={["Yes", "No"]} />
-                <Field label="Default credit period (days)" value={alterRow.creditPeriod} />
-              </StaticForm>
-
-              <StaticForm title="Mailing Details">
-                <Field label="Name" value={alterRow.name} />
-                <div className="space-y-1.5 md:col-span-2"><Label className="text-xs text-muted-foreground">Address</Label><Textarea rows={2} readOnly value={alterRow.address} /></div>
-                <Field label="State" value={alterRow.state} />
-                <Field label="Country" value="India" />
-                <Field label="Pincode" value={alterRow.pincode} />
+                <Field label="Department Name *" value={alterRow.name} />
+                <Field label="Alias / Short Name" value={alterRow.alias} />
                 <Field label="Contact Person" value={alterRow.contactPerson} />
                 <Field label="Phone" value={alterRow.phone} />
-                <Field label="Email" value={alterRow.email} />
-              </StaticForm>
-
-              <StaticForm title="Banking Details">
-                <SelectField label="Provide bank details" value={alterRow.provideBankDetails} options={["Yes", "No"]} />
-                <Field label="Bank Name" value={alterRow.bankName || "—"} />
-                <Field label="Account Number" value={alterRow.bankAccountNo || "—"} />
-                <Field label="IFSC Code" value={alterRow.ifsc || "—"} />
-              </StaticForm>
-
-              <StaticForm title="Tax Registration Details">
-                <Field label="PAN/IT No." value={alterRow.panNo} />
-                <SelectField label="Registration type" value={alterRow.registrationType} options={["Regular", "Composition", "Unregistered", "Government"]} />
-                <Field label="GSTIN/UIN" value={alterRow.gstin || "—"} />
-                <SelectField label="Set/Alter additional GST details" value={alterRow.setAlterGst} options={["Yes", "No"]} />
-              </StaticForm>
-
-              <StaticForm title="Opening Balance ( on 1-Apr-26 )">
-                <Field label="Opening Balance" value={fmtStaticINR(alterRow.openingBalance)} />
-                <SelectField label="Dr / Cr" value={alterRow.drCr} options={["Dr", "Cr"]} />
                 <SelectField label="Status" value={alterRow.status} options={["Active", "Inactive"]} />
               </StaticForm>
-
               <div className="flex gap-2">
                 <Button><FileCheck2 className="w-4 h-4 mr-2" />Accept Changes</Button>
-                <Button variant="outline">Yes</Button>
-                <Button variant="outline">No</Button>
                 <Button variant="destructive">Delete Department</Button>
               </div>
             </>
           )}
         </TabsContent>
 
-        {/* ============ LIST ============ */}
+        {/* LIST */}
         <TabsContent value="list" className="space-y-3">
           <Card className="border-himfed-green/20">
             <CardHeader className="pb-3 flex-row items-center justify-between space-y-0">
@@ -983,7 +904,7 @@ export function DepartmentMasterStatic() {
                 rows={filtered as any[]}
                 columns={cols as any}
                 exportName="department-master"
-                searchKeys={["id", "code", "name", "alias", "district", "gstin", "contactPerson"] as any}
+                searchKeys={["code", "name", "alias", "contactPerson"] as any}
               />
             </CardContent>
           </Card>
@@ -992,4 +913,145 @@ export function DepartmentMasterStatic() {
     </TallyPage>
   );
 }
+
+// ============ VEHICLE MASTER — Govt vehicles mapped to Department (Tally PP Vehicle Creation) ============
+export function VehicleMasterStatic() {
+  const rows = vehiclesStatic;
+  const depts = departmentsStatic;
+  const [deptFilter, setDeptFilter] = useState<string>("all");
+  const [fuelFilter, setFuelFilter] = useState<string>("all");
+  const [alterId, setAlterId] = useState<string>(rows[0]?.id ?? "VEH-001");
+  const alterRow = rows.find((r) => r.id === alterId) ?? rows[0];
+
+  const filtered = rows.filter((r) =>
+    (deptFilter === "all" || r.departmentId === deptFilter) &&
+    (fuelFilter === "all" || r.fuelType === fuelFilter)
+  );
+
+  const cols = [
+    { key: "vehicleNumber", label: "Vehicle Number", sortable: true, render: (r: VehicleRow) => <span className="font-mono font-bold text-himfed-green">{r.vehicleNumber}</span> },
+    { key: "departmentName", label: "Department (Mapped)", sortable: true, render: (r: VehicleRow) => <div><div className="font-semibold">{r.departmentName}</div><div className="text-xs text-muted-foreground font-mono">{r.departmentId}</div></div> },
+    { key: "vehicleType", label: "Vehicle Type", render: (r: VehicleRow) => <Badge tone="blue">{r.vehicleType}</Badge> },
+    { key: "fuelType", label: "Fuel", render: (r: VehicleRow) => <Badge tone={r.fuelType === "HSD" ? "amber" : "green"}>{r.fuelType}</Badge> },
+    { key: "driverName", label: "Driver Name" },
+    { key: "driverPhone", label: "Driver Phone" },
+    { key: "status", label: "Status", render: (r: VehicleRow) => <StatusBadge value={r.status} /> },
+    actionColumn,
+  ];
+
+  return (
+    <TallyPage
+      title="Vehicle Master — PP Vehicle Creation"
+      description="Register Govt. vehicles that come to the HIMFED petrol pump for refueling. Every vehicle must be mapped to a Department created in Department Master."
+      actions={<Button asChild variant="outline"><Link to="/dashboard/erp/acc/masters/departments"><Landmark className="w-4 h-4 mr-2" />Department Master</Link></Button>}
+    >
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Total Vehicles</div><div className="text-xl font-serif font-bold">{rows.length}</div></CardContent></Card>
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">HSD Vehicles</div><div className="text-xl font-serif font-bold text-amber-700">{rows.filter((r) => r.fuelType === "HSD").length}</div></CardContent></Card>
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">ULP Vehicles</div><div className="text-xl font-serif font-bold text-himfed-green">{rows.filter((r) => r.fuelType === "ULP").length}</div></CardContent></Card>
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Departments Covered</div><div className="text-xl font-serif font-bold">{new Set(rows.map((r) => r.departmentId)).size}</div></CardContent></Card>
+      </div>
+
+      <Tabs defaultValue="create">
+        <TabsList>
+          <TabsTrigger value="create"><Plus className="w-3 h-3 mr-1" />Vehicle Creation</TabsTrigger>
+          <TabsTrigger value="alter">Vehicle Alteration</TabsTrigger>
+          <TabsTrigger value="list">Vehicle Master List ({rows.length})</TabsTrigger>
+        </TabsList>
+
+        {/* CREATE */}
+        <TabsContent value="create" className="space-y-4">
+          <div className="rounded border-2 border-himfed-green bg-himfed-green/5 p-2 text-xs font-semibold text-himfed-green">
+            PP Vehicle Creation — HIMFED-SHIMLA
+          </div>
+          <StaticForm title="Vehicle Master">
+            <Field label="Vehicle Number *" value="" />
+            <SelectField label="Department Mapping *" value={depts[0]?.name ?? ""} options={depts.map((d) => d.name)} />
+            <SelectField label="Vehicle Type" value="Car" options={["Car", "Jeep", "SUV", "Truck", "Bus", "Motorcycle", "Tractor"]} />
+            <SelectField label="Fuel Type *" value="HSD" options={["HSD", "ULP"]} />
+            <Field label="Driver Name" value="" />
+            <Field label="Driver Phone" value="" />
+            <SelectField label="Status" value="Active" options={["Active", "Inactive"]} />
+          </StaticForm>
+          <div className="flex gap-2">
+            <Button><Plus className="w-4 h-4 mr-2" />Accept (Save Vehicle)</Button>
+            <Button variant="ghost">Quit</Button>
+          </div>
+        </TabsContent>
+
+        {/* ALTER */}
+        <TabsContent value="alter" className="space-y-4">
+          <div className="rounded border-2 border-amber-500 bg-amber-500/5 p-2 text-xs font-semibold text-amber-700">
+            Vehicle Alteration — Select a vehicle to modify
+          </div>
+          <Card>
+            <CardHeader><CardTitle className="text-lg font-serif">Select Vehicle</CardTitle></CardHeader>
+            <CardContent className="grid md:grid-cols-3 gap-3">
+              <div className="space-y-1.5 md:col-span-2">
+                <Label className="text-xs text-muted-foreground">Vehicle Master List</Label>
+                <Select value={alterId} onValueChange={setAlterId}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>{rows.map((r) => <SelectItem key={r.id} value={r.id}>{r.vehicleNumber} — {r.departmentName}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-end gap-2"><StatusBadge value={alterRow?.status} /><Badge tone={alterRow?.fuelType === "HSD" ? "amber" : "green"}>{alterRow?.fuelType}</Badge></div>
+            </CardContent>
+          </Card>
+          {alterRow && (
+            <>
+              <StaticForm title="Vehicle Master">
+                <Field label="Vehicle Number *" value={alterRow.vehicleNumber} />
+                <SelectField label="Department Mapping *" value={alterRow.departmentName} options={depts.map((d) => d.name)} />
+                <SelectField label="Vehicle Type" value={alterRow.vehicleType} options={["Car", "Jeep", "SUV", "Truck", "Bus", "Motorcycle", "Tractor"]} />
+                <SelectField label="Fuel Type *" value={alterRow.fuelType} options={["HSD", "ULP"]} />
+                <Field label="Driver Name" value={alterRow.driverName} />
+                <Field label="Driver Phone" value={alterRow.driverPhone} />
+                <SelectField label="Status" value={alterRow.status} options={["Active", "Inactive"]} />
+              </StaticForm>
+              <div className="flex gap-2">
+                <Button><FileCheck2 className="w-4 h-4 mr-2" />Accept Changes</Button>
+                <Button variant="destructive">Delete Vehicle</Button>
+              </div>
+            </>
+          )}
+        </TabsContent>
+
+        {/* LIST */}
+        <TabsContent value="list" className="space-y-3">
+          <Card className="border-himfed-green/20">
+            <CardHeader className="pb-3 flex-row items-center justify-between space-y-0 gap-2 flex-wrap">
+              <CardTitle className="text-base font-serif">VEHICLE MASTER LIST</CardTitle>
+              <div className="flex gap-2">
+                <Select value={deptFilter} onValueChange={setDeptFilter}>
+                  <SelectTrigger className="h-9 w-64"><SelectValue placeholder="Department" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Departments</SelectItem>
+                    {depts.map((d) => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <Select value={fuelFilter} onValueChange={setFuelFilter}>
+                  <SelectTrigger className="h-9 w-32"><SelectValue placeholder="Fuel" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Fuel</SelectItem>
+                    <SelectItem value="HSD">HSD</SelectItem>
+                    <SelectItem value="ULP">ULP</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <DataTable
+                rows={filtered as any[]}
+                columns={cols as any}
+                exportName="vehicle-master"
+                searchKeys={["vehicleNumber", "departmentName", "driverName", "driverPhone"] as any}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </TallyPage>
+  );
+}
+
 
