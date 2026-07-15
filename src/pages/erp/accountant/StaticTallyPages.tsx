@@ -14,8 +14,8 @@ import { Switch } from "@/components/ui/switch";
 import {
   areaCompaniesStatic, auditLogsStatic, dashboardStats, documentsStatic, fmtStaticINR,
   godownMastersStatic, groupMasters, ledgerMasters, reportRowsStatic, stockGroupsStatic,
-  stockItemsStatic, stockUnitsStatic, voucherTypeMasters, vouchersStatic, tanksStatic,
-  AreaCompanyStatic, MasterRow, VoucherKind, VoucherRow, TankRow,
+  stockItemsStatic, stockUnitsStatic, voucherTypeMasters, vouchersStatic, tanksStatic, departmentsStatic,
+  AreaCompanyStatic, MasterRow, VoucherKind, VoucherRow, TankRow, DepartmentRow,
 } from "@/lib/erp/staticTallyData";
 import {
   ArrowLeftRight, BadgeIndianRupee, Banknote, BookOpen, Building2, Download,
