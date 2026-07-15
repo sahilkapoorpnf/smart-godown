@@ -155,6 +155,38 @@ export const stockItemsStatic: MasterRow[] = [
   { id: "ITM-013", name: "Nino Urea", group: "Urea", unit: "BAG", hsn: "31021000", gstRate: 5, openingQty: 1200, openingValue: 3600000, defaultGodown: "AMB Warehouse", status: "Active" },
 ];
 
+// ===== Tank Master — every tank is linked to a fuel product (HSD / ULP) and a godown =====
+export interface TankRow {
+  id: string;
+  tankCode: string;
+  tankName: string;
+  productId: string;   // -> stockItemsStatic.id (ITM-009 HSD, ITM-011 ULP)
+  product: "HSD" | "ULP";
+  godown: string;      // -> godownMastersStatic.name
+  area: string;
+  capacityLtr: number;
+  currentStockLtr: number;
+  dipReading: number;  // in cm
+  lastCalibratedOn: string;
+  status: "Active" | "Inactive";
+  [key: string]: string | number;
+}
+
+export const tanksStatic: TankRow[] = [
+  { id: "TNK-001", tankCode: "UNA-HSD-T1", tankName: "HSD TANK 01", productId: "ITM-009", product: "HSD", godown: "UNA Warehouse",     area: "UNA Area", capacityLtr: 20000, currentStockLtr: 15400, dipReading: 168, lastCalibratedOn: "2026-01-15", status: "Active" },
+  { id: "TNK-002", tankCode: "UNA-HSD-T2", tankName: "HSD TANK 02", productId: "ITM-009", product: "HSD", godown: "UNA Warehouse",     area: "UNA Area", capacityLtr: 20000, currentStockLtr:  8600, dipReading:  95, lastCalibratedOn: "2026-01-15", status: "Active" },
+  { id: "TNK-003", tankCode: "UNA-ULP-T1", tankName: "ULP TANK 01", productId: "ITM-011", product: "ULP", godown: "UNA Warehouse",     area: "UNA Area", capacityLtr: 15000, currentStockLtr: 11250, dipReading: 172, lastCalibratedOn: "2026-01-15", status: "Active" },
+  { id: "TNK-004", tankCode: "UNA-ULP-T2", tankName: "ULP TANK 02", productId: "ITM-011", product: "ULP", godown: "UNA Warehouse",     area: "UNA Area", capacityLtr: 15000, currentStockLtr:  4800, dipReading:  74, lastCalibratedOn: "2026-01-15", status: "Active" },
+  { id: "TNK-005", tankCode: "AMB-HSD-T1", tankName: "HSD TANK 01", productId: "ITM-009", product: "HSD", godown: "AMB Warehouse",     area: "UNA Area", capacityLtr: 12000, currentStockLtr:  9800, dipReading: 178, lastCalibratedOn: "2026-02-04", status: "Active" },
+  { id: "TNK-006", tankCode: "AMB-ULP-T1", tankName: "ULP TANK 01", productId: "ITM-011", product: "ULP", godown: "AMB Warehouse",     area: "UNA Area", capacityLtr: 10000, currentStockLtr:  6400, dipReading: 132, lastCalibratedOn: "2026-02-04", status: "Active" },
+  { id: "TNK-007", tankCode: "HAR-HSD-T1", tankName: "HSD TANK 01", productId: "ITM-009", product: "HSD", godown: "HAROLI Warehouse",  area: "UNA Area", capacityLtr: 10000, currentStockLtr:  7200, dipReading: 156, lastCalibratedOn: "2025-12-20", status: "Active" },
+  { id: "TNK-008", tankCode: "HAR-ULP-T1", tankName: "ULP TANK 01", productId: "ITM-011", product: "ULP", godown: "HAROLI Warehouse",  area: "UNA Area", capacityLtr:  8000, currentStockLtr:  3100, dipReading:  82, lastCalibratedOn: "2025-12-20", status: "Active" },
+  { id: "TNK-009", tankCode: "BAN-HSD-T1", tankName: "HSD TANK 01", productId: "ITM-009", product: "HSD", godown: "BANGANA Warehouse", area: "UNA Area", capacityLtr:  8000, currentStockLtr:  5200, dipReading: 148, lastCalibratedOn: "2025-11-11", status: "Active" },
+  { id: "TNK-010", tankCode: "BAN-ULP-T1", tankName: "ULP TANK 01", productId: "ITM-011", product: "ULP", godown: "BANGANA Warehouse", area: "UNA Area", capacityLtr:  6000, currentStockLtr:  1800, dipReading:  62, lastCalibratedOn: "2025-11-11", status: "Inactive" },
+  { id: "TNK-011", tankCode: "SHM-HSD-T1", tankName: "HSD TANK 01", productId: "ITM-009", product: "HSD", godown: "Shimla Central Godown", area: "SHIMLA Area", capacityLtr: 15000, currentStockLtr: 12000, dipReading: 184, lastCalibratedOn: "2026-02-18", status: "Active" },
+  { id: "TNK-012", tankCode: "SHM-ULP-T1", tankName: "ULP TANK 01", productId: "ITM-011", product: "ULP", godown: "Shimla Central Godown", area: "SHIMLA Area", capacityLtr: 12000, currentStockLtr:  7500, dipReading: 148, lastCalibratedOn: "2026-02-18", status: "Active" },
+];
+
 const parties = ["NFL Panipat", "IFFCO Kandla", "KRIBHCO Hazira", "Kisan Seva Kendra Amb", "Lovely Seed Store UNA", "HIMFED HQ", "IOCL Una Depot", "Transport Union Una", "HP Cooperative Bank", "Cash Account"];
 const items = stockItemsStatic.map((i) => String(i.name));
 const godowns = godownMastersStatic.map((g) => String(g.name));
