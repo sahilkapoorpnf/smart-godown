@@ -1055,3 +1055,138 @@ export function VehicleMasterStatic() {
 }
 
 
+// ============ NOZZLE MASTER — each nozzle mapped to Tank + Product (PP Nozzle Creation) ============
+export function NozzleMasterStatic() {
+  const rows = nozzlesStatic;
+  const tanks = tanksStatic;
+  const [productFilter, setProductFilter] = useState<string>("all");
+  const [tankFilter, setTankFilter] = useState<string>("all");
+  const [alterId, setAlterId] = useState<string>(rows[0]?.id ?? "NZ-001");
+  const alterRow = rows.find((r) => r.id === alterId) ?? rows[0];
+
+  const filtered = rows.filter((r) =>
+    (productFilter === "all" || r.product === productFilter) &&
+    (tankFilter === "all" || r.tankId === tankFilter)
+  );
+
+  const cols = [
+    { key: "nozzleName", label: "Nozzle", sortable: true, render: (r: NozzleRow) => <span className="font-mono font-bold text-himfed-green">{r.nozzleName}</span> },
+    { key: "product", label: "Product", render: (r: NozzleRow) => <Badge tone={r.product === "HSD" ? "amber" : "green"}>{r.product}</Badge> },
+    { key: "tankName", label: "Tank (Mapped)", sortable: true, render: (r: NozzleRow) => <div><div className="font-semibold">{r.tankName}</div><div className="text-xs text-muted-foreground font-mono">{r.tankId}</div></div> },
+    { key: "godown", label: "Godown / Warehouse" },
+    { key: "lastReading", label: "Last Totalizer (Ltr)", className: "text-right", render: (r: NozzleRow) => <span className="font-mono">{r.lastReading.toLocaleString("en-IN")}</span> },
+    { key: "status", label: "Status", render: (r: NozzleRow) => <StatusBadge value={r.status} /> },
+    actionColumn,
+  ];
+
+  return (
+    <TallyPage
+      title="Nozzle Master — PP Nozzle Creation"
+      description="Register petrol pump nozzles (e.g. ULP-1 / ULP-2 / HSD-1 / HSD-2). Every nozzle is mapped to a Tank and its Product (HSD or ULP)."
+      actions={<Button asChild variant="outline"><Link to="/dashboard/erp/acc/inventory/tanks"><Package className="w-4 h-4 mr-2" />Tank Master</Link></Button>}
+    >
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Total Nozzles</div><div className="text-xl font-serif font-bold">{rows.length}</div></CardContent></Card>
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">HSD Nozzles</div><div className="text-xl font-serif font-bold text-amber-700">{rows.filter((r) => r.product === "HSD").length}</div></CardContent></Card>
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">ULP Nozzles</div><div className="text-xl font-serif font-bold text-himfed-green">{rows.filter((r) => r.product === "ULP").length}</div></CardContent></Card>
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Tanks Covered</div><div className="text-xl font-serif font-bold">{new Set(rows.map((r) => r.tankId)).size}</div></CardContent></Card>
+      </div>
+
+      <Tabs defaultValue="create">
+        <TabsList>
+          <TabsTrigger value="create"><Plus className="w-3 h-3 mr-1" />Nozzle Creation</TabsTrigger>
+          <TabsTrigger value="alter">Nozzle Alteration</TabsTrigger>
+          <TabsTrigger value="list">Nozzle Master List ({rows.length})</TabsTrigger>
+        </TabsList>
+
+        {/* CREATE */}
+        <TabsContent value="create" className="space-y-4">
+          <div className="rounded border-2 border-himfed-green bg-himfed-green/5 p-2 text-xs font-semibold text-himfed-green">
+            PP Nozzle Creation — HIMFED-SHIMLA &nbsp; <span className="text-muted-foreground font-normal">(e.g. ULP-1 / ULP-2 / HSD-1 / HSD-2)</span>
+          </div>
+          <StaticForm title="Nozzle Master">
+            <Field label="Nozzle Name *" value="ULP-1" />
+            <SelectField label="Product *" value="ULP" options={["ULP", "HSD"]} />
+            <SelectField label="Tank *" value={tanks[2]?.tankName ?? ""} options={tanks.map((t) => `${t.tankCode} · ${t.tankName}`)} />
+            <Field label="Opening Totalizer Reading (Ltr)" value="0" />
+            <SelectField label="Status" value="Active" options={["Active", "Inactive"]} />
+          </StaticForm>
+          <div className="flex gap-2">
+            <Button><Plus className="w-4 h-4 mr-2" />Accept (Save Nozzle)</Button>
+            <Button variant="ghost">Quit</Button>
+          </div>
+        </TabsContent>
+
+        {/* ALTER */}
+        <TabsContent value="alter" className="space-y-4">
+          <div className="rounded border-2 border-amber-500 bg-amber-500/5 p-2 text-xs font-semibold text-amber-700">
+            Nozzle Alteration — Select a nozzle to modify
+          </div>
+          <Card>
+            <CardHeader><CardTitle className="text-lg font-serif">Select Nozzle</CardTitle></CardHeader>
+            <CardContent className="grid md:grid-cols-3 gap-3">
+              <div className="space-y-1.5 md:col-span-2">
+                <Label className="text-xs text-muted-foreground">Nozzle Master List</Label>
+                <Select value={alterId} onValueChange={setAlterId}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>{rows.map((r) => <SelectItem key={r.id} value={r.id}>{r.nozzleName} — {r.tankName}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-end gap-2"><StatusBadge value={alterRow?.status} /><Badge tone={alterRow?.product === "HSD" ? "amber" : "green"}>{alterRow?.product}</Badge></div>
+            </CardContent>
+          </Card>
+          {alterRow && (
+            <>
+              <StaticForm title="Nozzle Master">
+                <Field label="Nozzle Name *" value={alterRow.nozzleName} />
+                <SelectField label="Product *" value={alterRow.product} options={["ULP", "HSD"]} />
+                <SelectField label="Tank *" value={alterRow.tankName} options={tanks.map((t) => `${t.tankCode} · ${t.tankName}`)} />
+                <Field label="Last Totalizer Reading (Ltr)" value={String(alterRow.lastReading)} />
+                <SelectField label="Status" value={alterRow.status} options={["Active", "Inactive"]} />
+              </StaticForm>
+              <div className="flex gap-2">
+                <Button><FileCheck2 className="w-4 h-4 mr-2" />Accept Changes</Button>
+                <Button variant="destructive">Delete Nozzle</Button>
+              </div>
+            </>
+          )}
+        </TabsContent>
+
+        {/* LIST */}
+        <TabsContent value="list" className="space-y-3">
+          <Card className="border-himfed-green/20">
+            <CardHeader className="pb-3 flex-row items-center justify-between space-y-0 gap-2 flex-wrap">
+              <CardTitle className="text-base font-serif">NOZZLE MASTER LIST</CardTitle>
+              <div className="flex gap-2">
+                <Select value={productFilter} onValueChange={setProductFilter}>
+                  <SelectTrigger className="h-9 w-32"><SelectValue placeholder="Product" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Products</SelectItem>
+                    <SelectItem value="HSD">HSD</SelectItem>
+                    <SelectItem value="ULP">ULP</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={tankFilter} onValueChange={setTankFilter}>
+                  <SelectTrigger className="h-9 w-64"><SelectValue placeholder="Tank" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Tanks</SelectItem>
+                    {tanks.map((t) => <SelectItem key={t.id} value={t.id}>{t.tankCode} · {t.tankName} ({t.godown})</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <DataTable
+                rows={filtered as any[]}
+                columns={cols as any}
+                exportName="nozzle-master"
+                searchKeys={["nozzleName", "tankName", "godown", "product"] as any}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </TallyPage>
+  );
+}
+
