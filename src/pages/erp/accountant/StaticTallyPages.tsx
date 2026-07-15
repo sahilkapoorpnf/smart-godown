@@ -14,8 +14,8 @@ import { Switch } from "@/components/ui/switch";
 import {
   areaCompaniesStatic, auditLogsStatic, dashboardStats, documentsStatic, fmtStaticINR,
   godownMastersStatic, groupMasters, ledgerMasters, reportRowsStatic, stockGroupsStatic,
-  stockItemsStatic, stockUnitsStatic, voucherTypeMasters, vouchersStatic, tanksStatic,
-  AreaCompanyStatic, MasterRow, VoucherKind, VoucherRow, TankRow,
+  stockItemsStatic, stockUnitsStatic, voucherTypeMasters, vouchersStatic, tanksStatic, departmentsStatic,
+  AreaCompanyStatic, MasterRow, VoucherKind, VoucherRow, TankRow, DepartmentRow,
 } from "@/lib/erp/staticTallyData";
 import {
   ArrowLeftRight, BadgeIndianRupee, Banknote, BookOpen, Building2, Download,
@@ -789,3 +789,207 @@ export function TankMasterStatic() {
     </TallyPage>
   );
 }
+
+// ============ DEPARTMENT MASTER — HP Government Departments (Ledger Creation style) ============
+export function DepartmentMasterStatic() {
+  const rows = departmentsStatic;
+  const [statusFilter, setStatusFilter] = useState<"all" | "Active" | "Inactive">("all");
+  const [alterId, setAlterId] = useState<string>(rows[0]?.id ?? "DPT-001");
+  const alterRow = rows.find((r) => r.id === alterId) ?? rows[0];
+
+  const filtered = statusFilter === "all" ? rows : rows.filter((r) => r.status === statusFilter);
+  const totalOpening = rows.reduce((s, r) => s + r.openingBalance, 0);
+
+  const cols = [
+    { key: "id", label: "Dept ID", sortable: true },
+    { key: "code", label: "Code", render: (r: DepartmentRow) => <span className="font-mono text-xs font-bold">{r.code}</span> },
+    { key: "name", label: "Department Name", sortable: true, render: (r: DepartmentRow) => <div><div className="font-semibold">{r.name}</div><div className="text-xs text-muted-foreground italic">({r.alias})</div></div> },
+    { key: "under", label: "Under", render: (r: DepartmentRow) => <Badge tone="blue">{r.under}</Badge> },
+    { key: "district", label: "District" },
+    { key: "contactPerson", label: "Contact Person" },
+    { key: "phone", label: "Phone" },
+    { key: "gstin", label: "GSTIN", render: (r: DepartmentRow) => <span className="font-mono text-xs">{r.gstin || "—"}</span> },
+    { key: "creditPeriod", label: "Credit (days)", className: "text-right" },
+    { key: "openingBalance", label: "Opening Balance", className: "text-right", render: (r: DepartmentRow) => <span className="font-semibold">{fmtStaticINR(r.openingBalance)} <span className="text-xs text-muted-foreground">{r.drCr}</span></span> },
+    { key: "status", label: "Status", render: (r: DepartmentRow) => <StatusBadge value={r.status} /> },
+    actionColumn,
+  ];
+
+  return (
+    <TallyPage
+      title="Department Master — HP Government"
+      description="Create and maintain Himachal Pradesh Government department ledgers (Sundry Debtors). Tally-style Ledger Creation form with mailing, banking and tax registration details."
+      actions={<Button asChild variant="outline"><Link to="/dashboard/erp/acc/masters/ledgers"><BookOpen className="w-4 h-4 mr-2" />Ledger Master</Link></Button>}
+    >
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Total Departments</div><div className="text-xl font-serif font-bold">{rows.length}</div><div className="text-xs text-muted-foreground">HP Govt. Sundry Debtors</div></CardContent></Card>
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Active</div><div className="text-xl font-serif font-bold text-himfed-green">{rows.filter((r) => r.status === "Active").length}</div><div className="text-xs text-muted-foreground">Currently billable</div></CardContent></Card>
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">GST Registered</div><div className="text-xl font-serif font-bold">{rows.filter((r) => r.gstin).length}</div><div className="text-xs text-muted-foreground">With GSTIN on file</div></CardContent></Card>
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Total Opening (Dr)</div><div className="text-xl font-serif font-bold">{fmtStaticINR(totalOpening)}</div><div className="text-xs text-muted-foreground">Receivable balance</div></CardContent></Card>
+      </div>
+
+      <Tabs defaultValue="create">
+        <TabsList>
+          <TabsTrigger value="create"><Plus className="w-3 h-3 mr-1" />Department Creation</TabsTrigger>
+          <TabsTrigger value="alter">Department Alteration</TabsTrigger>
+          <TabsTrigger value="list">Department List ({rows.length})</TabsTrigger>
+        </TabsList>
+
+        {/* ============ CREATE ============ */}
+        <TabsContent value="create" className="space-y-4">
+          <div className="rounded border-2 border-himfed-green bg-himfed-green/5 p-2 text-xs font-semibold text-himfed-green flex items-center justify-between">
+            <span>Ledger Creation — HIMFED-SHIMLA</span>
+            <span className="text-muted-foreground">Total Opening Balance: {fmtStaticINR(0)}</span>
+          </div>
+
+          <StaticForm title="Identification">
+            <Field label="Name *" value="DIRECTOR GENERAL POLICE" />
+            <Field label="(alias)" value="" />
+            <Field label="Department Code" value="1380285" />
+            <SelectField label="Under *" value="Sundry Debtors" options={["Sundry Debtors", "Sundry Creditors", "Current Assets", "Loans & Advances (Asset)"]} />
+            <SelectField label="Maintain balances bill-by-bill" value="Yes" options={["Yes", "No"]} />
+            <Field label="Default credit period (days)" value="30" />
+            <SelectField label="Check for credit days during voucher entry" value="No" options={["Yes", "No"]} />
+          </StaticForm>
+
+          <StaticForm title="Mailing Details">
+            <Field label="Name" value="DIRECTOR GENERAL POLICE" />
+            <div className="space-y-1.5 md:col-span-2"><Label className="text-xs text-muted-foreground">Address</Label><Textarea rows={2} defaultValue="Police Headquarters, Chhota Shimla" /></div>
+            <SelectField label="State" value="Himachal Pradesh" options={["Himachal Pradesh", "Punjab", "Haryana", "Delhi", "Uttarakhand"]} />
+            <Field label="Country" value="India" />
+            <Field label="Pincode" value="171002" />
+            <Field label="Contact Person" value="Sr. Accounts Officer" />
+            <Field label="Phone" value="+91 177 2621904" />
+            <Field label="Email" value="dgp-hp@nic.in" />
+          </StaticForm>
+
+          <StaticForm title="Banking Details">
+            <SelectField label="Provide bank details" value="No" options={["Yes", "No"]} />
+            <Field label="Bank Name" value="" />
+            <Field label="Account Number" value="" />
+            <Field label="IFSC Code" value="" />
+          </StaticForm>
+
+          <StaticForm title="Tax Registration Details">
+            <Field label="PAN/IT No." value="" />
+            <SelectField label="Registration type" value="Regular" options={["Regular", "Composition", "Unregistered", "Government"]} />
+            <Field label="GSTIN/UIN" value="" />
+            <SelectField label="Set/Alter additional GST details" value="No" options={["Yes", "No"]} />
+          </StaticForm>
+
+          <StaticForm title="Opening Balance ( on 1-Apr-26 )">
+            <Field label="Opening Balance" value="0" />
+            <SelectField label="Dr / Cr" value="Dr" options={["Dr", "Cr"]} />
+            <SelectField label="Status" value="Active" options={["Active", "Inactive"]} />
+          </StaticForm>
+
+          <div className="flex gap-2">
+            <Button><Plus className="w-4 h-4 mr-2" />Accept (Save Department)</Button>
+            <Button variant="outline">Yes</Button>
+            <Button variant="outline">No</Button>
+            <Button variant="ghost">Quit</Button>
+          </div>
+        </TabsContent>
+
+        {/* ============ ALTER ============ */}
+        <TabsContent value="alter" className="space-y-4">
+          <div className="rounded border-2 border-amber-500 bg-amber-500/5 p-2 text-xs font-semibold text-amber-700">
+            Ledger Alteration — Select a department to modify its configuration
+          </div>
+
+          <Card>
+            <CardHeader><CardTitle className="text-lg font-serif">Select Department to Alter</CardTitle></CardHeader>
+            <CardContent className="grid md:grid-cols-4 gap-3">
+              <div className="space-y-1.5 md:col-span-2">
+                <Label className="text-xs text-muted-foreground">Department Master List</Label>
+                <Select value={alterId} onValueChange={setAlterId}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>{rows.map((r) => <SelectItem key={r.id} value={r.id}>{r.code} · {r.name}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <Field label="Dept ID" value={alterRow?.id ?? ""} />
+              <div className="flex items-end gap-2"><StatusBadge value={alterRow?.status} /><Badge tone="blue">{alterRow?.under}</Badge></div>
+            </CardContent>
+          </Card>
+
+          {alterRow && (
+            <>
+              <StaticForm title="Identification">
+                <Field label="Name *" value={alterRow.name} />
+                <Field label="(alias)" value={alterRow.alias} />
+                <Field label="Department Code" value={alterRow.code} />
+                <SelectField label="Under *" value={alterRow.under} options={["Sundry Debtors", "Sundry Creditors", "Current Assets", "Loans & Advances (Asset)"]} />
+                <SelectField label="Maintain balances bill-by-bill" value={alterRow.billByBill} options={["Yes", "No"]} />
+                <Field label="Default credit period (days)" value={alterRow.creditPeriod} />
+              </StaticForm>
+
+              <StaticForm title="Mailing Details">
+                <Field label="Name" value={alterRow.name} />
+                <div className="space-y-1.5 md:col-span-2"><Label className="text-xs text-muted-foreground">Address</Label><Textarea rows={2} readOnly value={alterRow.address} /></div>
+                <Field label="State" value={alterRow.state} />
+                <Field label="Country" value="India" />
+                <Field label="Pincode" value={alterRow.pincode} />
+                <Field label="Contact Person" value={alterRow.contactPerson} />
+                <Field label="Phone" value={alterRow.phone} />
+                <Field label="Email" value={alterRow.email} />
+              </StaticForm>
+
+              <StaticForm title="Banking Details">
+                <SelectField label="Provide bank details" value={alterRow.provideBankDetails} options={["Yes", "No"]} />
+                <Field label="Bank Name" value={alterRow.bankName || "—"} />
+                <Field label="Account Number" value={alterRow.bankAccountNo || "—"} />
+                <Field label="IFSC Code" value={alterRow.ifsc || "—"} />
+              </StaticForm>
+
+              <StaticForm title="Tax Registration Details">
+                <Field label="PAN/IT No." value={alterRow.panNo} />
+                <SelectField label="Registration type" value={alterRow.registrationType} options={["Regular", "Composition", "Unregistered", "Government"]} />
+                <Field label="GSTIN/UIN" value={alterRow.gstin || "—"} />
+                <SelectField label="Set/Alter additional GST details" value={alterRow.setAlterGst} options={["Yes", "No"]} />
+              </StaticForm>
+
+              <StaticForm title="Opening Balance ( on 1-Apr-26 )">
+                <Field label="Opening Balance" value={fmtStaticINR(alterRow.openingBalance)} />
+                <SelectField label="Dr / Cr" value={alterRow.drCr} options={["Dr", "Cr"]} />
+                <SelectField label="Status" value={alterRow.status} options={["Active", "Inactive"]} />
+              </StaticForm>
+
+              <div className="flex gap-2">
+                <Button><FileCheck2 className="w-4 h-4 mr-2" />Accept Changes</Button>
+                <Button variant="outline">Yes</Button>
+                <Button variant="outline">No</Button>
+                <Button variant="destructive">Delete Department</Button>
+              </div>
+            </>
+          )}
+        </TabsContent>
+
+        {/* ============ LIST ============ */}
+        <TabsContent value="list" className="space-y-3">
+          <Card className="border-himfed-green/20">
+            <CardHeader className="pb-3 flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-base font-serif">DEPARTMENT MASTER LIST</CardTitle>
+              <Select value={statusFilter} onValueChange={(v: any) => setStatusFilter(v)}>
+                <SelectTrigger className="h-9 w-40"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="Active">Active Only</SelectItem>
+                  <SelectItem value="Inactive">Inactive Only</SelectItem>
+                </SelectContent>
+              </Select>
+            </CardHeader>
+            <CardContent>
+              <DataTable
+                rows={filtered as any[]}
+                columns={cols as any}
+                exportName="department-master"
+                searchKeys={["id", "code", "name", "alias", "district", "gstin", "contactPerson"] as any}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </TallyPage>
+  );
+}
+

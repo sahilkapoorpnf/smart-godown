@@ -72,6 +72,7 @@ const menuItems: Item[] = [
   { icon: Package,         label: "Inventory: Stock Unit", path: "/dashboard/erp/acc/inventory/units", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   { icon: Warehouse,       label: "Godown/Warehouse Master", path: "/dashboard/erp/acc/inventory/godowns", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   { icon: Package,         label: "Tank Master (HSD / ULP)", path: "/dashboard/erp/acc/inventory/tanks", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
+  { icon: Landmark,        label: "Department Master (HP Govt)", path: "/dashboard/erp/acc/masters/departments", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   { icon: Truck,           label: "Purchase Voucher",     path: "/dashboard/erp/acc/purchase", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   { icon: Receipt,         label: "Sales Voucher",        path: "/dashboard/erp/acc/sales", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   { icon: Wallet,          label: "Payment Voucher",      path: "/dashboard/erp/acc/payment", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
