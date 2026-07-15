@@ -437,3 +437,117 @@ export const nozzlesStatic: NozzleRow[] = [
   { id: "NZ-014", nozzleName: "HSD-2", product: "HSD", tankId: "TNK-011", tankName: "SHM-HSD-T1 · HSD TANK 01", godown: "Shimla Central Godown", lastReading: 109840, status: "Active" },
   { id: "NZ-015", nozzleName: "ULP-1", product: "ULP", tankId: "TNK-012", tankName: "SHM-ULP-T1 · ULP TANK 01", godown: "Shimla Central Godown", lastReading:  84610, status: "Active" },
 ];
+
+// ===== Pump Transactions — Daily Pump Entry (Credit + Cash/Card/UPI sales at the fuel pump) =====
+export type PumpTxnMode = "Credit" | "Cash" | "Card/POS" | "UPI/QR";
+
+export interface PumpTxnRow {
+  id: string;
+  date: string;                       // yyyy-mm-dd
+  billNo: string;                     // e.g. HIM-26-27-0092
+  mode: PumpTxnMode;
+  nozzleId: string;                   // FK NozzleRow
+  nozzleName: string;
+  product: "HSD" | "ULP";
+  tankId: string;                     // FK TankRow
+  tankName: string;
+  godown: string;
+  openingReading: number;             // totalizer Ltr
+  closingReading: number;
+  qty: number;                        // Ltr (closing - opening)
+  rate: number;                       // Rs / Ltr
+  amount: number;                     // qty * rate
+  // Credit-only (linked to Vehicle + Department master)
+  vehicleId: string;
+  vehicleNumber: string;
+  departmentId: string;
+  departmentName: string;
+  customerCode: string;               // department.code
+  // Cash / Card / UPI
+  transRef: string;                   // POS ref / UPI txn id
+  operator: string;
+  shift: "Morning" | "Evening" | "Night";
+  status: "Posted" | "Pending";
+  [key: string]: string | number;
+}
+
+export const pumpTxnsStatic: PumpTxnRow[] = [
+  // === CREDIT sales (govt departments) — matches attached "Credit Sales" screenshot ===
+  { id: "PT-001", date: "2026-07-14", billNo: "HIM-26-27-0092", mode: "Credit",
+    nozzleId: "NZ-004", nozzleName: "HSD-1", product: "HSD", tankId: "TNK-001", tankName: "UNA-HSD-T1 · HSD TANK 01", godown: "UNA Warehouse",
+    openingReading: 268363, closingReading: 268400, qty: 37, rate: 102.65, amount: 3798,
+    vehicleId: "VEH-003", vehicleNumber: "HP-07G-0003", departmentId: "DPT-002", departmentName: "Under Secretary to GAD", customerCode: "1308275",
+    transRef: "", operator: "Anil Chauhan", shift: "Morning", status: "Posted" },
+  { id: "PT-002", date: "2026-07-14", billNo: "HIM-26-27-0093", mode: "Credit",
+    nozzleId: "NZ-001", nozzleName: "ULP-1", product: "ULP", tankId: "TNK-003", tankName: "UNA-ULP-T1 · ULP TANK 01", godown: "UNA Warehouse",
+    openingReading: 184495, closingReading: 184520, qty: 25, rate: 96.72, amount: 2418,
+    vehicleId: "VEH-001", vehicleNumber: "HP-03-A-1234", departmentId: "DPT-001", departmentName: "Director General of Police", customerCode: "1380275",
+    transRef: "", operator: "Anil Chauhan", shift: "Morning", status: "Posted" },
+  { id: "PT-003", date: "2026-07-14", billNo: "HIM-26-27-0094", mode: "Credit",
+    nozzleId: "NZ-005", nozzleName: "HSD-2", product: "HSD", tankId: "TNK-001", tankName: "UNA-HSD-T1 · HSD TANK 01", godown: "UNA Warehouse",
+    openingReading: 254060, closingReading: 254120, qty: 60, rate: 102.65, amount: 6159,
+    vehicleId: "VEH-005", vehicleNumber: "HP-11-E-4321", departmentId: "DPT-004", departmentName: "HP Public Works Department", customerCode: "1380278",
+    transRef: "", operator: "Anil Chauhan", shift: "Morning", status: "Posted" },
+  { id: "PT-004", date: "2026-07-14", billNo: "HIM-26-27-0095", mode: "Credit",
+    nozzleId: "NZ-006", nozzleName: "HSD-3", product: "HSD", tankId: "TNK-002", tankName: "UNA-HSD-T2 · HSD TANK 02", godown: "UNA Warehouse",
+    openingReading: 148855, closingReading: 148900, qty: 45, rate: 102.65, amount: 4619,
+    vehicleId: "VEH-007", vehicleNumber: "HP-05-G-1122", departmentId: "DPT-005", departmentName: "HP Forest Department", customerCode: "1380279",
+    transRef: "", operator: "Pooja Devi", shift: "Evening", status: "Posted" },
+  { id: "PT-005", date: "2026-07-14", billNo: "HIM-26-27-0096", mode: "Credit",
+    nozzleId: "NZ-004", nozzleName: "HSD-1", product: "HSD", tankId: "TNK-001", tankName: "UNA-HSD-T1 · HSD TANK 01", godown: "UNA Warehouse",
+    openingReading: 268320, closingReading: 268363, qty: 43, rate: 102.65, amount: 4414,
+    vehicleId: "VEH-008", vehicleNumber: "HP-03-H-7788", departmentId: "DPT-006", departmentName: "HP State Electricity Board Ltd", customerCode: "1380280",
+    transRef: "", operator: "Anil Chauhan", shift: "Morning", status: "Posted" },
+  { id: "PT-006", date: "2026-07-14", billNo: "HIM-26-27-0097", mode: "Credit",
+    nozzleId: "NZ-002", nozzleName: "ULP-2", product: "ULP", tankId: "TNK-003", tankName: "UNA-ULP-T1 · ULP TANK 01", godown: "UNA Warehouse",
+    openingReading: 172310, closingReading: 172340, qty: 30, rate: 96.72, amount: 2902,
+    vehicleId: "VEH-013", vehicleNumber: "HP-03-M-4400", departmentId: "DPT-001", departmentName: "Director General of Police", customerCode: "1380275",
+    transRef: "", operator: "Pooja Devi", shift: "Evening", status: "Posted" },
+  { id: "PT-007", date: "2026-07-14", billNo: "HIM-26-27-0098", mode: "Credit",
+    nozzleId: "NZ-005", nozzleName: "HSD-2", product: "HSD", tankId: "TNK-001", tankName: "UNA-HSD-T1 · HSD TANK 01", godown: "UNA Warehouse",
+    openingReading: 254000, closingReading: 254060, qty: 60, rate: 102.65, amount: 6159,
+    vehicleId: "VEH-011", vehicleNumber: "HP-03-K-2200", departmentId: "DPT-009", departmentName: "HP Home Guards & Civil Defence", customerCode: "1380283",
+    transRef: "", operator: "Anil Chauhan", shift: "Morning", status: "Posted" },
+  { id: "PT-008", date: "2026-07-14", billNo: "HIM-26-27-0099", mode: "Credit",
+    nozzleId: "NZ-004", nozzleName: "HSD-1", product: "HSD", tankId: "TNK-001", tankName: "UNA-HSD-T1 · HSD TANK 01", godown: "UNA Warehouse",
+    openingReading: 268285, closingReading: 268320, qty: 35, rate: 102.65, amount: 3593,
+    vehicleId: "VEH-004", vehicleNumber: "HP-01-D-9090", departmentId: "DPT-003", departmentName: "Department of Agriculture, HP", customerCode: "1380277",
+    transRef: "", operator: "Anil Chauhan", shift: "Morning", status: "Pending" },
+
+  // === CASH / CARD / UPI sales — matches attached "Cash Sales" screenshot ===
+  { id: "PT-009", date: "2026-07-14", billNo: "HIM-26-27-0100", mode: "Cash",
+    nozzleId: "NZ-004", nozzleName: "HSD-1", product: "HSD", tankId: "TNK-001", tankName: "UNA-HSD-T1 · HSD TANK 01", godown: "UNA Warehouse",
+    openingReading: 268248, closingReading: 268285, qty: 37, rate: 102.65, amount: 3798,
+    vehicleId: "", vehicleNumber: "", departmentId: "", departmentName: "", customerCode: "",
+    transRef: "CASH-DRAWER", operator: "Anil Chauhan", shift: "Morning", status: "Posted" },
+  { id: "PT-010", date: "2026-07-14", billNo: "HIM-26-27-0101", mode: "Card/POS",
+    nozzleId: "NZ-001", nozzleName: "ULP-1", product: "ULP", tankId: "TNK-003", tankName: "UNA-ULP-T1 · ULP TANK 01", godown: "UNA Warehouse",
+    openingReading: 184470, closingReading: 184495, qty: 25, rate: 96.72, amount: 2418,
+    vehicleId: "", vehicleNumber: "", departmentId: "", departmentName: "", customerCode: "",
+    transRef: "POS-HDFC-88451209", operator: "Anil Chauhan", shift: "Morning", status: "Posted" },
+  { id: "PT-011", date: "2026-07-14", billNo: "HIM-26-27-0102", mode: "UPI/QR",
+    nozzleId: "NZ-006", nozzleName: "HSD-3", product: "HSD", tankId: "TNK-002", tankName: "UNA-HSD-T2 · HSD TANK 02", godown: "UNA Warehouse",
+    openingReading: 148845, closingReading: 148855, qty: 10, rate: 102.65, amount: 1027,
+    vehicleId: "", vehicleNumber: "", departmentId: "", departmentName: "", customerCode: "",
+    transRef: "UPI-PPBL-6640123098", operator: "Pooja Devi", shift: "Evening", status: "Posted" },
+  { id: "PT-012", date: "2026-07-14", billNo: "HIM-26-27-0103", mode: "Cash",
+    nozzleId: "NZ-002", nozzleName: "ULP-2", product: "ULP", tankId: "TNK-003", tankName: "UNA-ULP-T1 · ULP TANK 01", godown: "UNA Warehouse",
+    openingReading: 172290, closingReading: 172310, qty: 20, rate: 96.72, amount: 1934,
+    vehicleId: "", vehicleNumber: "", departmentId: "", departmentName: "", customerCode: "",
+    transRef: "CASH-DRAWER", operator: "Anil Chauhan", shift: "Morning", status: "Posted" },
+  { id: "PT-013", date: "2026-07-14", billNo: "HIM-26-27-0104", mode: "Card/POS",
+    nozzleId: "NZ-005", nozzleName: "HSD-2", product: "HSD", tankId: "TNK-001", tankName: "UNA-HSD-T1 · HSD TANK 01", godown: "UNA Warehouse",
+    openingReading: 253972, closingReading: 254000, qty: 28, rate: 102.65, amount: 2874,
+    vehicleId: "", vehicleNumber: "", departmentId: "", departmentName: "", customerCode: "",
+    transRef: "POS-ICICI-77209332", operator: "Anil Chauhan", shift: "Morning", status: "Posted" },
+  { id: "PT-014", date: "2026-07-14", billNo: "HIM-26-27-0105", mode: "UPI/QR",
+    nozzleId: "NZ-001", nozzleName: "ULP-1", product: "ULP", tankId: "TNK-003", tankName: "UNA-ULP-T1 · ULP TANK 01", godown: "UNA Warehouse",
+    openingReading: 184455, closingReading: 184470, qty: 15, rate: 96.72, amount: 1451,
+    vehicleId: "", vehicleNumber: "", departmentId: "", departmentName: "", customerCode: "",
+    transRef: "UPI-GPAY-1122336655", operator: "Pooja Devi", shift: "Evening", status: "Pending" },
+  { id: "PT-015", date: "2026-07-13", billNo: "HIM-26-27-0091", mode: "Credit",
+    nozzleId: "NZ-007", nozzleName: "HSD-1", product: "HSD", tankId: "TNK-005", tankName: "AMB-HSD-T1 · HSD TANK 01", godown: "AMB Warehouse",
+    openingReading:  91180, closingReading:  91240, qty: 60, rate: 102.65, amount: 6159,
+    vehicleId: "VEH-006", vehicleNumber: "HP-11-F-6543", departmentId: "DPT-004", departmentName: "HP Public Works Department", customerCode: "1380278",
+    transRef: "", operator: "Rohit Kashyap", shift: "Morning", status: "Posted" },
+];
