@@ -1190,3 +1190,291 @@ export function NozzleMasterStatic() {
   );
 }
 
+// ============ PUMP TRANSACTIONS — Petrol Pump Daily Entry (Credit / Cash / Card / UPI) ============
+export function PumpTransactionsStatic() {
+  const rows = pumpTxnsStatic;
+  const nozzles = nozzlesStatic;
+  const tanks = tanksStatic;
+  const vehicles = vehiclesStatic;
+  const departments = departmentsStatic;
+
+  const [dateFilter, setDateFilter] = useState<string>("2026-07-14");
+  const [modeFilter, setModeFilter] = useState<string>("all");
+  const [productFilter, setProductFilter] = useState<string>("all");
+  const [nozzleFilter, setNozzleFilter] = useState<string>("all");
+
+  const scoped = rows.filter((r) =>
+    r.date === dateFilter &&
+    (modeFilter === "all" || r.mode === modeFilter) &&
+    (productFilter === "all" || r.product === productFilter) &&
+    (nozzleFilter === "all" || r.nozzleId === nozzleFilter)
+  );
+
+  const credit = scoped.filter((r) => r.mode === "Credit");
+  const cashish = scoped.filter((r) => r.mode !== "Credit");
+  const totalQty = scoped.reduce((s, r) => s + r.qty, 0);
+  const totalAmt = scoped.reduce((s, r) => s + r.amount, 0);
+  const creditAmt = credit.reduce((s, r) => s + r.amount, 0);
+  const cashAmt = cashish.filter((r) => r.mode === "Cash").reduce((s, r) => s + r.amount, 0);
+  const cardAmt = cashish.filter((r) => r.mode === "Card/POS").reduce((s, r) => s + r.amount, 0);
+  const upiAmt = cashish.filter((r) => r.mode === "UPI/QR").reduce((s, r) => s + r.amount, 0);
+
+  // === MAIN LIST columns (Daily Pump Entry — Tally-look) ===
+  const modeTone = (m: string) => m === "Credit" ? "amber" : m === "Cash" ? "green" : m === "Card/POS" ? "blue" : "red";
+  const mainCols = [
+    { key: "date", label: "Date", sortable: true, render: (r: PumpTxnRow) => <span className="font-mono">{r.date}</span> },
+    { key: "billNo", label: "Bill No.", sortable: true, render: (r: PumpTxnRow) => <span className="font-mono font-bold text-himfed-green">{r.billNo}</span> },
+    { key: "mode", label: "Mode", render: (r: PumpTxnRow) => <Badge tone={modeTone(r.mode) as any}>{r.mode}</Badge> },
+    { key: "nozzleName", label: "Nozzle", render: (r: PumpTxnRow) => <div><div className="font-mono font-semibold">{r.nozzleName}</div><div className="text-[10px] text-muted-foreground">{r.nozzleId}</div></div> },
+    { key: "product", label: "Product", render: (r: PumpTxnRow) => <Badge tone={r.product === "HSD" ? "amber" : "green"}>{r.product}</Badge> },
+    { key: "tankName", label: "Tank (Godown)", render: (r: PumpTxnRow) => <div className="text-xs"><div className="font-semibold">{r.tankName}</div><div className="text-muted-foreground">{r.godown}</div></div> },
+    { key: "openingReading", label: "Opening", className: "text-right", render: (r: PumpTxnRow) => <span className="font-mono">{r.openingReading.toLocaleString("en-IN")}</span> },
+    { key: "closingReading", label: "Closing", className: "text-right", render: (r: PumpTxnRow) => <span className="font-mono">{r.closingReading.toLocaleString("en-IN")}</span> },
+    { key: "qty", label: "Qty (Ltr)", className: "text-right", sortable: true, render: (r: PumpTxnRow) => <span className="font-mono font-bold">{r.qty.toFixed(2)}</span> },
+    { key: "rate", label: "Rate", className: "text-right", render: (r: PumpTxnRow) => <span className="font-mono">₹{r.rate.toFixed(2)}</span> },
+    { key: "amount", label: "Amount", className: "text-right", sortable: true, render: (r: PumpTxnRow) => <span className="font-mono font-bold text-himfed-green">{fmtStaticINR(r.amount)}</span> },
+    { key: "party", label: "Party / Ref", render: (r: PumpTxnRow) => r.mode === "Credit"
+        ? <div className="text-xs"><div className="font-semibold">{r.departmentName}</div><div className="text-muted-foreground font-mono">{r.customerCode} · {r.vehicleNumber}</div></div>
+        : <div className="text-xs"><div className="font-semibold">{r.mode}</div><div className="text-muted-foreground font-mono">{r.transRef || "—"}</div></div> },
+    { key: "operator", label: "Operator / Shift", render: (r: PumpTxnRow) => <div className="text-xs"><div>{r.operator}</div><div className="text-muted-foreground">{r.shift}</div></div> },
+    { key: "status", label: "Status", render: (r: PumpTxnRow) => <StatusBadge value={r.status === "Posted" ? "Approved" : "Pending"} /> },
+    actionColumn,
+  ];
+
+  // === CREDIT SALES columns (matches screenshot 2 exactly) ===
+  const creditCols = [
+    { key: "sr", label: "SR", className: "w-12", render: (_r: PumpTxnRow, i: number) => <span className="font-mono">{i + 1}</span> },
+    { key: "departmentName", label: "Name of Customer", sortable: true, render: (r: PumpTxnRow) => <span className="font-semibold">{r.departmentName}</span> },
+    { key: "customerCode", label: "Customer Code", render: (r: PumpTxnRow) => <span className="font-mono">{r.customerCode}</span> },
+    { key: "vehicleNumber", label: "Vehicle No", render: (r: PumpTxnRow) => <span className="font-mono">{r.vehicleNumber}</span> },
+    { key: "billNo", label: "Bill No", render: (r: PumpTxnRow) => <span className="font-mono text-himfed-green font-bold">{r.billNo}</span> },
+    { key: "product", label: "Product", render: (r: PumpTxnRow) => <Badge tone={r.product === "HSD" ? "amber" : "green"}>{r.product}</Badge> },
+    { key: "qty", label: "Qty", className: "text-right", render: (r: PumpTxnRow) => <span className="font-mono font-bold">{r.qty.toFixed(2)}</span> },
+    { key: "amount", label: "Amount", className: "text-right", render: (r: PumpTxnRow) => <span className="font-mono font-bold">{fmtStaticINR(r.amount)}</span> },
+    { key: "date", label: "Date", render: (r: PumpTxnRow) => <span className="font-mono">{new Date(r.date).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "2-digit" })}</span> },
+  ];
+
+  // === CASH SALES rollup (matches screenshot 3 exactly) ===
+  const cashRollup = [
+    { id: "CS-1", sr: 1, transId: "cash", modeKey: "Cash",     qty: cashish.filter(r => r.mode === "Cash").reduce((s, r) => s + r.qty, 0), amount: cashAmt },
+    { id: "CS-2", sr: 2, transId: "card/pos", modeKey: "Card/POS", qty: cashish.filter(r => r.mode === "Card/POS").reduce((s, r) => s + r.qty, 0), amount: cardAmt },
+    { id: "CS-3", sr: 3, transId: "upi/qr", modeKey: "UPI/QR",   qty: cashish.filter(r => r.mode === "UPI/QR").reduce((s, r) => s + r.qty, 0), amount: upiAmt },
+  ];
+  const cashCols = [
+    { key: "sr", label: "SR", className: "w-12", render: (r: any) => <span className="font-mono">{r.sr}</span> },
+    { key: "transId", label: "Trans Id", render: (r: any) => <span className="font-mono">{r.transId}</span> },
+    { key: "qty", label: "Qty", className: "text-right", render: (r: any) => <span className="font-mono font-bold">{Number(r.qty).toFixed(2)}</span> },
+    { key: "amount", label: "Amount", className: "text-right", render: (r: any) => <span className="font-mono font-bold">{fmtStaticINR(r.amount)}</span> },
+    { key: "date", label: "Date", render: () => <span className="font-mono">{new Date(dateFilter).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "2-digit" })}</span> },
+  ];
+
+  // Collection Summary (per mode)
+  const collectionRows = [
+    { id: "CL-1", mode: "Cash",     qty: cashish.filter(r => r.mode === "Cash").reduce((s, r) => s + r.qty, 0), amount: cashAmt, count: cashish.filter(r => r.mode === "Cash").length },
+    { id: "CL-2", mode: "Card/POS", qty: cashish.filter(r => r.mode === "Card/POS").reduce((s, r) => s + r.qty, 0), amount: cardAmt, count: cashish.filter(r => r.mode === "Card/POS").length },
+    { id: "CL-3", mode: "UPI/QR",   qty: cashish.filter(r => r.mode === "UPI/QR").reduce((s, r) => s + r.qty, 0), amount: upiAmt, count: cashish.filter(r => r.mode === "UPI/QR").length },
+    { id: "CL-4", mode: "Credit",   qty: credit.reduce((s, r) => s + r.qty, 0), amount: creditAmt, count: credit.length },
+  ];
+  const collectionCols = [
+    { key: "mode", label: "Collection Mode", render: (r: any) => <Badge tone={modeTone(r.mode) as any}>{r.mode}</Badge> },
+    { key: "count", label: "Txn Count", className: "text-right", render: (r: any) => <span className="font-mono">{r.count}</span> },
+    { key: "qty", label: "Qty (Ltr)", className: "text-right", render: (r: any) => <span className="font-mono font-bold">{Number(r.qty).toFixed(2)}</span> },
+    { key: "amount", label: "Amount", className: "text-right", render: (r: any) => <span className="font-mono font-bold text-himfed-green">{fmtStaticINR(r.amount)}</span> },
+  ];
+
+  // Credit Allocation (department-wise)
+  const allocMap = new Map<string, { dept: string; code: string; count: number; qty: number; amount: number }>();
+  credit.forEach((r) => {
+    const k = r.departmentId;
+    const cur = allocMap.get(k) ?? { dept: r.departmentName, code: r.customerCode, count: 0, qty: 0, amount: 0 };
+    cur.count += 1; cur.qty += r.qty; cur.amount += r.amount;
+    allocMap.set(k, cur);
+  });
+  const allocRows = Array.from(allocMap.entries()).map(([id, v]) => ({ id, ...v }));
+  const allocCols = [
+    { key: "dept", label: "Department (Customer)", sortable: true, render: (r: any) => <span className="font-semibold">{r.dept}</span> },
+    { key: "code", label: "Customer Code", render: (r: any) => <span className="font-mono">{r.code}</span> },
+    { key: "count", label: "Bills", className: "text-right", render: (r: any) => <span className="font-mono">{r.count}</span> },
+    { key: "qty", label: "Qty (Ltr)", className: "text-right", render: (r: any) => <span className="font-mono">{r.qty.toFixed(2)}</span> },
+    { key: "amount", label: "Credit Amount", className: "text-right", render: (r: any) => <span className="font-mono font-bold text-himfed-green">{fmtStaticINR(r.amount)}</span> },
+  ];
+
+  return (
+    <TallyPage
+      title="Pump Transactions — Petrol Pump Daily Entry"
+      description="Tally-style daily fuel pump transactions. Every entry is linked to Nozzle → Tank → Product (HSD/ULP), and for Credit sales to Vehicle → Department (Customer)."
+      actions={
+        <div className="flex gap-2">
+          <Button asChild variant="outline"><Link to="/dashboard/erp/acc/masters/nozzles"><Package className="w-4 h-4 mr-2" />Nozzles</Link></Button>
+          <Button asChild variant="outline"><Link to="/dashboard/erp/acc/masters/vehicles"><Truck className="w-4 h-4 mr-2" />Vehicles</Link></Button>
+          <Button asChild variant="outline"><Link to="/dashboard/erp/acc/masters/departments"><Landmark className="w-4 h-4 mr-2" />Departments</Link></Button>
+        </div>
+      }
+    >
+      {/* Tally-style top bar */}
+      <div className="rounded border-2 border-himfed-green bg-himfed-green/5 p-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="font-bold text-himfed-green tracking-wider">GATEWAY OF TALLY › PETROL PUMP TRANSACTIONS</div>
+        <div className="flex gap-2 items-center">
+          <Label className="text-[11px] text-muted-foreground">Date</Label>
+          <Input type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} className="h-8 w-40" />
+          <Select value={modeFilter} onValueChange={setModeFilter}>
+            <SelectTrigger className="h-8 w-36"><SelectValue placeholder="Mode" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Modes</SelectItem>
+              <SelectItem value="Credit">Credit</SelectItem>
+              <SelectItem value="Cash">Cash</SelectItem>
+              <SelectItem value="Card/POS">Card/POS</SelectItem>
+              <SelectItem value="UPI/QR">UPI/QR</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={productFilter} onValueChange={setProductFilter}>
+            <SelectTrigger className="h-8 w-32"><SelectValue placeholder="Product" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Products</SelectItem>
+              <SelectItem value="HSD">HSD</SelectItem>
+              <SelectItem value="ULP">ULP</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={nozzleFilter} onValueChange={setNozzleFilter}>
+            <SelectTrigger className="h-8 w-48"><SelectValue placeholder="Nozzle" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Nozzles</SelectItem>
+              {nozzles.map((n) => <SelectItem key={n.id} value={n.id}>{n.nozzleName} · {n.tankName}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* KPI tiles */}
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Total Txns</div><div className="text-xl font-serif font-bold">{scoped.length}</div></CardContent></Card>
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Total Qty (Ltr)</div><div className="text-xl font-serif font-bold">{totalQty.toFixed(2)}</div></CardContent></Card>
+        <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Total Amount</div><div className="text-xl font-serif font-bold text-himfed-green">{fmtStaticINR(totalAmt)}</div></CardContent></Card>
+        <Card className="border-amber-500/30"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Credit</div><div className="text-xl font-serif font-bold text-amber-700">{fmtStaticINR(creditAmt)}</div></CardContent></Card>
+        <Card className="border-emerald-500/30"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Cash</div><div className="text-xl font-serif font-bold text-emerald-700">{fmtStaticINR(cashAmt)}</div></CardContent></Card>
+        <Card className="border-sky-500/30"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Card + UPI</div><div className="text-xl font-serif font-bold text-sky-700">{fmtStaticINR(cardAmt + upiAmt)}</div></CardContent></Card>
+      </div>
+
+      <Tabs defaultValue="entry">
+        <TabsList>
+          <TabsTrigger value="entry"><Plus className="w-3 h-3 mr-1" />Daily Pump Entry</TabsTrigger>
+          <TabsTrigger value="sales">Daily Sales Summary</TabsTrigger>
+          <TabsTrigger value="collection">Collection Summary</TabsTrigger>
+          <TabsTrigger value="credit">Credit Allocation</TabsTrigger>
+          <TabsTrigger value="list">All Transactions ({rows.length})</TabsTrigger>
+        </TabsList>
+
+        {/* DAILY PUMP ENTRY — create form + today's list */}
+        <TabsContent value="entry" className="space-y-4">
+          <div className="rounded border-2 border-himfed-green bg-himfed-green/5 p-2 text-xs font-semibold text-himfed-green">
+            Daily Pump Entry — HIMFED-SHIMLA &nbsp; <span className="text-muted-foreground font-normal">Enter each nozzle-wise fuel sale (Credit or Cash/Card/UPI)</span>
+          </div>
+          <StaticForm title="New Pump Transaction">
+            <Field label="Date *" type="date" value={dateFilter} />
+            <Field label="Bill No. *" value="HIM-26-27-0106" />
+            <SelectField label="Mode *" value="Credit" options={["Credit", "Cash", "Card/POS", "UPI/QR"]} />
+            <SelectField label="Nozzle *" value={nozzles[3]?.nozzleName ?? ""} options={nozzles.map((n) => `${n.nozzleName} · ${n.tankName}`)} />
+            <SelectField label="Product (auto)" value="HSD" options={["HSD", "ULP"]} />
+            <SelectField label="Tank (auto from Nozzle)" value={tanks[0]?.tankName ?? ""} options={tanks.map((t) => `${t.tankCode} · ${t.tankName}`)} />
+            <Field label="Opening Reading (Ltr)" value="268400" />
+            <Field label="Closing Reading (Ltr)" value="268437" />
+            <Field label="Qty (Ltr)" value="37.00" />
+            <Field label="Rate (₹/Ltr)" value="102.65" />
+            <Field label="Amount (₹)" value="3798" />
+            <SelectField label="Department (Credit only)" value={departments[0]?.name ?? ""} options={departments.map((d) => `${d.code} · ${d.name}`)} />
+            <SelectField label="Vehicle (Credit only)" value={vehicles[0]?.vehicleNumber ?? ""} options={vehicles.map((v) => `${v.vehicleNumber} · ${v.departmentName}`)} />
+            <Field label="Trans Ref (POS / UPI id)" value="" />
+            <SelectField label="Operator" value="Anil Chauhan" options={["Anil Chauhan", "Pooja Devi", "Rohit Kashyap"]} />
+            <SelectField label="Shift" value="Morning" options={["Morning", "Evening", "Night"]} />
+          </StaticForm>
+          <div className="flex gap-2">
+            <Button><Plus className="w-4 h-4 mr-2" />Accept (Post Entry)</Button>
+            <Button variant="outline">Reset</Button>
+            <Button variant="ghost">Quit</Button>
+          </div>
+
+          <Card className="border-himfed-green/20">
+            <CardHeader className="pb-3"><CardTitle className="text-base font-serif">TODAY'S POSTED ENTRIES — {dateFilter}</CardTitle></CardHeader>
+            <CardContent>
+              <DataTable rows={scoped as any[]} columns={mainCols as any} exportName="pump-daily-entry" searchKeys={["billNo", "nozzleName", "departmentName", "vehicleNumber", "transRef"] as any} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* DAILY SALES SUMMARY — Credit + Cash sheets (Tally excel look) */}
+        <TabsContent value="sales" className="space-y-6">
+          <Card className="border-himfed-green/20">
+            <CardHeader className="pb-2 text-center border-b">
+              <CardTitle className="text-lg font-serif tracking-wider">CREDIT SALES</CardTitle>
+              <div className="text-xs text-muted-foreground">Detailed credit-billed entries for {dateFilter} — linked to Vehicle Master & Department Master</div>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <DataTable
+                rows={credit.map((r, i) => ({ ...r, sr: i + 1 })) as any[]}
+                columns={creditCols as any}
+                exportName={`credit-sales-${dateFilter}`}
+                searchKeys={["billNo", "departmentName", "customerCode", "vehicleNumber"] as any}
+              />
+              <div className="mt-2 flex justify-end gap-6 text-sm font-mono border-t pt-2">
+                <span className="text-muted-foreground">Total Qty: <span className="font-bold text-foreground">{credit.reduce((s, r) => s + r.qty, 0).toFixed(2)}</span></span>
+                <span className="text-muted-foreground">Total Amount: <span className="font-bold text-himfed-green">{fmtStaticINR(creditAmt)}</span></span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-himfed-green/20">
+            <CardHeader className="pb-2 text-center border-b">
+              <CardTitle className="text-lg font-serif tracking-wider">CASH SALES</CardTitle>
+              <div className="text-xs text-muted-foreground">Aggregated cash / card / UPI collections for {dateFilter}</div>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <DataTable rows={cashRollup as any[]} columns={cashCols as any} exportName={`cash-sales-${dateFilter}`} />
+              <div className="mt-2 flex justify-end gap-6 text-sm font-mono border-t pt-2">
+                <span className="text-muted-foreground">Total Qty: <span className="font-bold text-foreground">{cashRollup.reduce((s, r) => s + r.qty, 0).toFixed(2)}</span></span>
+                <span className="text-muted-foreground">Total Amount: <span className="font-bold text-himfed-green">{fmtStaticINR(cashAmt + cardAmt + upiAmt)}</span></span>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* COLLECTION SUMMARY */}
+        <TabsContent value="collection" className="space-y-3">
+          <Card className="border-himfed-green/20">
+            <CardHeader className="pb-3"><CardTitle className="text-base font-serif">COLLECTION SUMMARY — {dateFilter}</CardTitle></CardHeader>
+            <CardContent>
+              <DataTable rows={collectionRows as any[]} columns={collectionCols as any} exportName="collection-summary" />
+              <div className="mt-2 flex justify-end gap-6 text-sm font-mono border-t pt-2">
+                <span className="text-muted-foreground">Grand Total: <span className="font-bold text-himfed-green">{fmtStaticINR(totalAmt)}</span></span>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* CREDIT ALLOCATION — dept-wise */}
+        <TabsContent value="credit" className="space-y-3">
+          <Card className="border-amber-500/30">
+            <CardHeader className="pb-3"><CardTitle className="text-base font-serif">CREDIT ALLOCATION — Department-wise Outstanding</CardTitle></CardHeader>
+            <CardContent>
+              <DataTable rows={allocRows as any[]} columns={allocCols as any} exportName="credit-allocation" searchKeys={["dept", "code"] as any} />
+              <div className="mt-2 flex justify-end gap-6 text-sm font-mono border-t pt-2">
+                <span className="text-muted-foreground">Total Credit Extended: <span className="font-bold text-amber-700">{fmtStaticINR(creditAmt)}</span></span>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* ALL TRANSACTIONS */}
+        <TabsContent value="list" className="space-y-3">
+          <Card className="border-himfed-green/20">
+            <CardHeader className="pb-3"><CardTitle className="text-base font-serif">PUMP TRANSACTIONS — MASTER LIST</CardTitle></CardHeader>
+            <CardContent>
+              <DataTable rows={rows as any[]} columns={mainCols as any} exportName="pump-transactions" searchKeys={["billNo", "nozzleName", "departmentName", "vehicleNumber", "transRef", "operator"] as any} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </TallyPage>
+  );
+}
+
+
