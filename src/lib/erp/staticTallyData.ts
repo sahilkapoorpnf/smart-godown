@@ -406,3 +406,34 @@ export const vehiclesStatic: VehicleRow[] = [
   { id: "VEH-014", vehicleNumber: "HP-11-N-6611", departmentId: "DPT-004", departmentName: "HP Public Works Department",  vehicleType: "Truck",      fuelType: "HSD", driverName: "Om Prakash",               driverPhone: "+91 94180 55443", status: "Active" },
   { id: "VEH-015", vehicleNumber: "HP-05-O-9922", departmentId: "DPT-005", departmentName: "HP Forest Department",        vehicleType: "Motorcycle", fuelType: "ULP", driverName: "Forest Grd. Mehar",        driverPhone: "+91 98170 11224", status: "Active" },
 ];
+
+// ===== Nozzle Master — each nozzle mapped to a Tank + Product (HSD / ULP) =====
+export interface NozzleRow {
+  id: string;
+  nozzleName: string;                 // e.g. ULP-1, HSD-2
+  product: "HSD" | "ULP";
+  tankId: string;                     // FK -> TankRow.id
+  tankName: string;                   // denormalized (tankCode · tankName)
+  godown: string;
+  lastReading: number;                // totalizer reading in Ltr
+  status: "Active" | "Inactive";
+  [key: string]: string | number;
+}
+
+export const nozzlesStatic: NozzleRow[] = [
+  { id: "NZ-001", nozzleName: "ULP-1", product: "ULP", tankId: "TNK-003", tankName: "UNA-ULP-T1 · ULP TANK 01", godown: "UNA Warehouse",     lastReading: 184520, status: "Active" },
+  { id: "NZ-002", nozzleName: "ULP-2", product: "ULP", tankId: "TNK-003", tankName: "UNA-ULP-T1 · ULP TANK 01", godown: "UNA Warehouse",     lastReading: 172340, status: "Active" },
+  { id: "NZ-003", nozzleName: "ULP-3", product: "ULP", tankId: "TNK-004", tankName: "UNA-ULP-T2 · ULP TANK 02", godown: "UNA Warehouse",     lastReading:  96210, status: "Active" },
+  { id: "NZ-004", nozzleName: "HSD-1", product: "HSD", tankId: "TNK-001", tankName: "UNA-HSD-T1 · HSD TANK 01", godown: "UNA Warehouse",     lastReading: 268400, status: "Active" },
+  { id: "NZ-005", nozzleName: "HSD-2", product: "HSD", tankId: "TNK-001", tankName: "UNA-HSD-T1 · HSD TANK 01", godown: "UNA Warehouse",     lastReading: 254120, status: "Active" },
+  { id: "NZ-006", nozzleName: "HSD-3", product: "HSD", tankId: "TNK-002", tankName: "UNA-HSD-T2 · HSD TANK 02", godown: "UNA Warehouse",     lastReading: 148900, status: "Active" },
+  { id: "NZ-007", nozzleName: "HSD-1", product: "HSD", tankId: "TNK-005", tankName: "AMB-HSD-T1 · HSD TANK 01", godown: "AMB Warehouse",     lastReading:  91240, status: "Active" },
+  { id: "NZ-008", nozzleName: "ULP-1", product: "ULP", tankId: "TNK-006", tankName: "AMB-ULP-T1 · ULP TANK 01", godown: "AMB Warehouse",     lastReading:  76310, status: "Active" },
+  { id: "NZ-009", nozzleName: "HSD-1", product: "HSD", tankId: "TNK-007", tankName: "HAR-HSD-T1 · HSD TANK 01", godown: "HAROLI Warehouse",  lastReading:  58420, status: "Active" },
+  { id: "NZ-010", nozzleName: "ULP-1", product: "ULP", tankId: "TNK-008", tankName: "HAR-ULP-T1 · ULP TANK 01", godown: "HAROLI Warehouse",  lastReading:  41220, status: "Active" },
+  { id: "NZ-011", nozzleName: "HSD-1", product: "HSD", tankId: "TNK-009", tankName: "BAN-HSD-T1 · HSD TANK 01", godown: "BANGANA Warehouse", lastReading:  36510, status: "Active" },
+  { id: "NZ-012", nozzleName: "ULP-1", product: "ULP", tankId: "TNK-010", tankName: "BAN-ULP-T1 · ULP TANK 01", godown: "BANGANA Warehouse", lastReading:  22140, status: "Inactive" },
+  { id: "NZ-013", nozzleName: "HSD-1", product: "HSD", tankId: "TNK-011", tankName: "SHM-HSD-T1 · HSD TANK 01", godown: "Shimla Central Godown", lastReading: 118220, status: "Active" },
+  { id: "NZ-014", nozzleName: "HSD-2", product: "HSD", tankId: "TNK-011", tankName: "SHM-HSD-T1 · HSD TANK 01", godown: "Shimla Central Godown", lastReading: 109840, status: "Active" },
+  { id: "NZ-015", nozzleName: "ULP-1", product: "ULP", tankId: "TNK-012", tankName: "SHM-ULP-T1 · ULP TANK 01", godown: "Shimla Central Godown", lastReading:  84610, status: "Active" },
+];
