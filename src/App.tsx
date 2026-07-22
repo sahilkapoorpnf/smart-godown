@@ -67,6 +67,7 @@ import {
   PumpTransactionsStatic,
 } from "./pages/erp/accountant/StaticTallyPages";
 import BalanceSheetPage from "./pages/erp/accountant/BalanceSheetPage";
+import DepartmentOutstandingPage from "./pages/erp/accountant/DepartmentOutstandingPage";
 import ProfitLossPage from "./pages/erp/accountant/ProfitLossPage";
 
 const queryClient = new QueryClient();
