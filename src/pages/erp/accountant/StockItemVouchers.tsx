@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import * as XLSX from "xlsx";
 import AppShell from "@/components/warehouse/AppShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -85,18 +84,26 @@ export default function StockItemVouchers() {
   const lastIdx = withClosing.length - 1;
 
   const exportCsv = () => {
+    const escape = (v: string | number) => {
+      const s = String(v ?? "");
+      if (s.includes(",") || s.includes('"') || s.includes("\n")) return `"${s.replace(/"/g, '""')}"`;
+      return s;
+    };
+
     const title = `Stock Item Vouchers — ${item}  |  HIMFED-SHIMLA  |  1-Jul-26 to 31-Jul-26`;
-    const aoa: (string | number)[][] = [];
-    aoa.push([title]);
-    aoa.push([]);
-    aoa.push(["Date", "Particulars", "Vch Type", "Vch No", "Inwards", "", "Outwards - Sales", "", "Outwards - Shrinkage", "", "Outwards - Shortage", "", "Closing", ""]);
-    aoa.push(["", "", "", "", "Qty (L)", "Value (INR)", "Qty (L)", "Value (INR)", "Qty (L)", "Value (INR)", "Qty (L)", "Value (INR)", "Qty (L)", "Value (INR)"]);
+    const rows: (string | number)[][] = [];
+    rows.push([title]);
+    rows.push([]);
+    // Tiered header rows matching the displayed table (CSV has no merged cells, so labels are placed in the first column of each group)
+    rows.push(["Date", "Particulars", "Vch Type", "Vch No", "Inwards", "", "Outwards", "", "", "", "", "", "Closing", ""]);
+    rows.push(["", "", "", "", "", "", "Sales", "", "Shrinkage", "", "Shortage", "", "", ""]);
+    rows.push(["", "", "", "", "Qty (L)", "Value (INR)", "Qty (L)", "Value (INR)", "Qty (L)", "Value (INR)", "Qty (L)", "Value (INR)", "Qty (L)", "Value (INR)"]);
 
     withClosing.forEach((r, i) => {
       const isSales = r.outKind === "sales";
       const isShr = r.outKind === "shrinkage";
       const isSho = r.outKind === "shortage";
-      aoa.push([
+      rows.push([
         r.date,
         r.particulars || "—",
         r.vchType,
@@ -114,7 +121,7 @@ export default function StockItemVouchers() {
       ]);
     });
 
-    aoa.push([
+    rows.push([
       "Totals as per 'Default' valuation :", "", "", "",
       Number(totals.inQ.toFixed(2)), Number(totals.inV.toFixed(2)),
       Number(totals.salesQ.toFixed(2)), Number(totals.salesV.toFixed(2)),
@@ -123,30 +130,16 @@ export default function StockItemVouchers() {
       Number(totals.closeQ.toFixed(2)), Number(totals.closeV.toFixed(2)),
     ]);
 
-    const ws = XLSX.utils.aoa_to_sheet(aoa);
-    ws["!merges"] = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: 13 } },
-      { s: { r: 2, c: 0 }, e: { r: 3, c: 0 } },
-      { s: { r: 2, c: 1 }, e: { r: 3, c: 1 } },
-      { s: { r: 2, c: 2 }, e: { r: 3, c: 2 } },
-      { s: { r: 2, c: 3 }, e: { r: 3, c: 3 } },
-      { s: { r: 2, c: 4 }, e: { r: 2, c: 5 } },
-      { s: { r: 2, c: 6 }, e: { r: 2, c: 7 } },
-      { s: { r: 2, c: 8 }, e: { r: 2, c: 9 } },
-      { s: { r: 2, c: 10 }, e: { r: 2, c: 11 } },
-      { s: { r: 2, c: 12 }, e: { r: 2, c: 13 } },
-      { s: { r: aoa.length - 1, c: 0 }, e: { r: aoa.length - 1, c: 3 } },
-    ];
-    ws["!cols"] = [
-      { wch: 12 }, { wch: 30 }, { wch: 10 }, { wch: 8 },
-      { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 14 },
-      { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 14 },
-      { wch: 12 }, { wch: 14 },
-    ];
-
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, `${item} Vouchers`);
-    XLSX.writeFile(wb, `stock-item-vouchers-${item}-${Date.now()}.xlsx`);
+    const csv = rows.map(row => row.map(escape).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `stock-item-vouchers-${item}-${Date.now()}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   return (
