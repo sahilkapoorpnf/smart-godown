@@ -1198,11 +1198,17 @@ export function PumpTransactionsStatic() {
   const tanks = tanksStatic;
   const vehicles = vehiclesStatic;
   const departments = departmentsStatic;
+  const navigate = useNavigate();
+  const [sp] = useSearchParams();
+  const initialDept = sp.get("dept") ?? departments[0]?.id ?? "";
 
   const [dateFilter, setDateFilter] = useState<string>("2026-07-14");
   const [modeFilter, setModeFilter] = useState<string>("all");
   const [productFilter, setProductFilter] = useState<string>("all");
   const [nozzleFilter, setNozzleFilter] = useState<string>("all");
+  const [formDeptId, setFormDeptId] = useState<string>(initialDept);
+  const deptSummary = useMemo(() => formDeptId ? getDeptSummary(formDeptId) : null, [formDeptId]);
+  const healthCounts = useMemo(() => getDeptHealthCounts(), []);
 
   const scoped = rows.filter((r) =>
     r.date === dateFilter &&
