@@ -138,6 +138,7 @@ const App = () => (
           <Route path="/dashboard/erp/acc/inventory/units" element={<StockUnitStatic />} />
           <Route path="/dashboard/erp/acc/inventory/godowns" element={<GodownMasterStatic />} />
           <Route path="/dashboard/erp/acc/inventory/tanks" element={<TankMasterStatic />} />
+          <Route path="/dashboard/erp/acc/inventory/item-vouchers" element={<StockItemVouchers />} />
           <Route path="/dashboard/erp/acc/masters/departments" element={<DepartmentMasterStatic />} />
           <Route path="/dashboard/erp/acc/masters/vehicles" element={<VehicleMasterStatic />} />
           <Route path="/dashboard/erp/acc/masters/nozzles" element={<NozzleMasterStatic />} />
