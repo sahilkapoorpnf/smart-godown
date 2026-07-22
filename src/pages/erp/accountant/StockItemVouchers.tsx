@@ -94,10 +94,15 @@ export default function StockItemVouchers() {
     const rows: (string | number)[][] = [];
     rows.push([title]);
     rows.push([]);
-    // Tiered header rows matching the displayed table (CSV has no merged cells, so labels are placed in the first column of each group)
-    rows.push(["Date", "Particulars", "Vch Type", "Vch No", "Inwards", "", "Outwards", "", "", "", "", "", "Closing", ""]);
-    rows.push(["", "", "", "", "", "", "Sales", "", "Shrinkage", "", "Shortage", "", "", ""]);
-    rows.push(["", "", "", "", "Qty (L)", "Value (INR)", "Qty (L)", "Value (INR)", "Qty (L)", "Value (INR)", "Qty (L)", "Value (INR)", "Qty (L)", "Value (INR)"]);
+    // Single flat header row that mirrors the displayed grouped columns (Date, Particulars, Vch Type, Vch No, Inwards, Outwards Sales, Outwards Shrinkage, Outwards Shortage, Closing)
+    rows.push([
+      "Date", "Particulars", "Vch Type", "Vch No",
+      "Inwards Qty (L)", "Inwards Value (INR)",
+      "Outwards Sales Qty (L)", "Outwards Sales Value (INR)",
+      "Outwards Shrinkage Qty (L)", "Outwards Shrinkage Value (INR)",
+      "Outwards Shortage Qty (L)", "Outwards Shortage Value (INR)",
+      "Closing Qty (L)", "Closing Value (INR)",
+    ]);
 
     withClosing.forEach((r, i) => {
       const isSales = r.outKind === "sales";
