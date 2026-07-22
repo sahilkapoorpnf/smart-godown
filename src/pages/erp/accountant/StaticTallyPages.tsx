@@ -1462,7 +1462,17 @@ export function PumpTransactionsStatic() {
             <Field label="Qty (Ltr)" value="37.00" />
             <Field label="Rate (₹/Ltr)" value="102.65" />
             <Field label="Amount (₹)" value="3798" />
-            <SelectField label="Department (Credit only)" value={departments[0]?.name ?? ""} options={departments.map((d) => `${d.code} · ${d.name}`)} />
+            <div className="space-y-1">
+              <Label className="text-xs">Department (Credit only)</Label>
+              <Select value={formDeptId} onValueChange={setFormDeptId}>
+                <SelectTrigger className="h-9"><SelectValue placeholder="Select department" /></SelectTrigger>
+                <SelectContent className="max-h-72">
+                  {departments.map((d) => (
+                    <SelectItem key={d.id} value={d.id}>{d.code} · {d.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <SelectField label="Vehicle (Credit only)" value={vehicles[0]?.vehicleNumber ?? ""} options={vehicles.map((v) => `${v.vehicleNumber} · ${v.departmentName}`)} />
             <Field label="Trans Ref (POS / UPI id)" value="" />
             <SelectField label="Operator" value="Anil Chauhan" options={["Anil Chauhan", "Pooja Devi", "Rohit Kashyap"]} />
