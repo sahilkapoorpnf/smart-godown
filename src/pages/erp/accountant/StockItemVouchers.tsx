@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import * as XLSX from "xlsx";
 import AppShell from "@/components/warehouse/AppShell";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -84,84 +85,68 @@ export default function StockItemVouchers() {
   const lastIdx = withClosing.length - 1;
 
   const exportCsv = () => {
-    const num = (n?: number) => (n == null || n === 0 ? "" : n);
-    const cell = (v: string | number, opts: { bold?: boolean; bg?: string; color?: string; align?: string; colspan?: number; rowspan?: number } = {}) => {
-      const style = [
-        "border:1px solid #999;padding:4px 8px;",
-        opts.bold ? "font-weight:bold;" : "",
-        opts.bg ? `background:${opts.bg};` : "",
-        opts.color ? `color:${opts.color};` : "",
-        opts.align ? `text-align:${opts.align};` : "",
-      ].join("");
-      const attrs = `${opts.colspan ? ` colspan="${opts.colspan}"` : ""}${opts.rowspan ? ` rowspan="${opts.rowspan}"` : ""}`;
-      return `<td style="${style}"${attrs}>${v}</td>`;
-    };
+    const title = `Stock Item Vouchers — ${item}  |  HIMFED-SHIMLA  |  1-Jul-26 to 31-Jul-26`;
+    const aoa: (string | number)[][] = [];
+    aoa.push([title]);
+    aoa.push([]);
+    aoa.push(["Date", "Particulars", "Vch Type", "Vch No", "Inwards", "", "Outwards - Sales", "", "Outwards - Shrinkage", "", "Outwards - Shortage", "", "Closing", ""]);
+    aoa.push(["", "", "", "", "Qty (L)", "Value (INR)", "Qty (L)", "Value (INR)", "Qty (L)", "Value (INR)", "Qty (L)", "Value (INR)", "Qty (L)", "Value (INR)"]);
 
-    const bodyRows = withClosing.map((r, i) => {
+    withClosing.forEach((r, i) => {
       const isSales = r.outKind === "sales";
       const isShr = r.outKind === "shrinkage";
       const isSho = r.outKind === "shortage";
-      return "<tr>" + [
-        cell(r.date),
-        cell(r.particulars || "—"),
-        cell(r.vchType, { bold: true, color: r.vchType === "Purchase" ? "#047857" : r.vchType === "Sales" ? "#1d4ed8" : "#b45309" }),
-        cell(r.vchNo, { align: "right" }),
-        cell(num(r.inQty), { align: "right", color: "#047857" }),
-        cell(num(r.inVal), { align: "right", color: "#047857" }),
-        cell(isSales ? num(r.outQty) : "", { align: "right", color: "#1d4ed8" }),
-        cell(isSales ? num(r.outVal) : "", { align: "right", color: "#1d4ed8" }),
-        cell(isShr ? num(r.outQty) : "", { align: "right", color: "#b45309", bg: "#fef3c7" }),
-        cell(isShr ? num(r.outVal) : "", { align: "right", color: "#b45309", bg: "#fef3c7" }),
-        cell(isSho ? num(r.outQty) : "", { align: "right", color: "#be123c", bg: "#ffe4e6" }),
-        cell(isSho ? num(r.outVal) : "", { align: "right", color: "#be123c", bg: "#ffe4e6" }),
-        cell(i === lastIdx ? r.closeQ.toFixed(2) : "", { align: "right", bold: true, color: "#0f5132" }),
-        cell(i === lastIdx ? r.closeV.toFixed(2) : "", { align: "right", bold: true, color: "#0f5132" }),
-      ].join("") + "</tr>";
-    }).join("");
+      aoa.push([
+        r.date,
+        r.particulars || "—",
+        r.vchType,
+        r.vchNo,
+        r.inQty ?? "",
+        r.inVal ?? "",
+        isSales ? (r.outQty ?? "") : "",
+        isSales ? (r.outVal ?? "") : "",
+        isShr ? (r.outQty ?? "") : "",
+        isShr ? (r.outVal ?? "") : "",
+        isSho ? (r.outQty ?? "") : "",
+        isSho ? (r.outVal ?? "") : "",
+        i === lastIdx ? Number(r.closeQ.toFixed(2)) : "",
+        i === lastIdx ? Number(r.closeV.toFixed(2)) : "",
+      ]);
+    });
 
-    const header =
-      `<tr>` +
-        cell("Date", { bold: true, rowspan: 2, bg: "#e5e7eb" }) +
-        cell("Particulars", { bold: true, rowspan: 2, bg: "#e5e7eb" }) +
-        cell("Vch Type", { bold: true, rowspan: 2, bg: "#e5e7eb" }) +
-        cell("Vch No", { bold: true, rowspan: 2, bg: "#e5e7eb", align: "right" }) +
-        cell("Inwards", { bold: true, colspan: 2, bg: "#d1fae5", color: "#047857", align: "center" }) +
-        cell("Outwards - Sales", { bold: true, colspan: 2, bg: "#dbeafe", color: "#1d4ed8", align: "center" }) +
-        cell("Outwards - Shrinkage", { bold: true, colspan: 2, bg: "#fef3c7", color: "#b45309", align: "center" }) +
-        cell("Outwards - Shortage", { bold: true, colspan: 2, bg: "#ffe4e6", color: "#be123c", align: "center" }) +
-        cell("Closing", { bold: true, colspan: 2, bg: "#dcfce7", color: "#0f5132", align: "center" }) +
-      `</tr>` +
-      `<tr>` +
-        cell("Qty (L)", { bold: true, bg: "#d1fae5", align: "right" }) + cell("Value (₹)", { bold: true, bg: "#d1fae5", align: "right" }) +
-        cell("Qty (L)", { bold: true, bg: "#dbeafe", align: "right" }) + cell("Value (₹)", { bold: true, bg: "#dbeafe", align: "right" }) +
-        cell("Qty (L)", { bold: true, bg: "#fef3c7", align: "right" }) + cell("Value (₹)", { bold: true, bg: "#fef3c7", align: "right" }) +
-        cell("Qty (L)", { bold: true, bg: "#ffe4e6", align: "right" }) + cell("Value (₹)", { bold: true, bg: "#ffe4e6", align: "right" }) +
-        cell("Qty (L)", { bold: true, bg: "#dcfce7", align: "right" }) + cell("Value (₹)", { bold: true, bg: "#dcfce7", align: "right" }) +
-      `</tr>`;
+    aoa.push([
+      "Totals as per 'Default' valuation :", "", "", "",
+      Number(totals.inQ.toFixed(2)), Number(totals.inV.toFixed(2)),
+      Number(totals.salesQ.toFixed(2)), Number(totals.salesV.toFixed(2)),
+      Number(totals.shrQ.toFixed(2)), Number(totals.shrV.toFixed(2)),
+      Number(totals.shoQ.toFixed(2)), Number(totals.shoV.toFixed(2)),
+      Number(totals.closeQ.toFixed(2)), Number(totals.closeV.toFixed(2)),
+    ]);
 
-    const footer = `<tr>` +
-      cell("Totals as per 'Default' valuation :", { bold: true, colspan: 4, align: "right", bg: "#f3f4f6" }) +
-      cell(totals.inQ.toFixed(2), { bold: true, align: "right", bg: "#f3f4f6", color: "#047857" }) +
-      cell(totals.inV.toFixed(2), { bold: true, align: "right", bg: "#f3f4f6", color: "#047857" }) +
-      cell(totals.salesQ.toFixed(2), { bold: true, align: "right", bg: "#f3f4f6", color: "#1d4ed8" }) +
-      cell(totals.salesV.toFixed(2), { bold: true, align: "right", bg: "#f3f4f6", color: "#1d4ed8" }) +
-      cell(totals.shrQ.toFixed(2), { bold: true, align: "right", bg: "#f3f4f6", color: "#b45309" }) +
-      cell(totals.shrV.toFixed(2), { bold: true, align: "right", bg: "#f3f4f6", color: "#b45309" }) +
-      cell(totals.shoQ.toFixed(2), { bold: true, align: "right", bg: "#f3f4f6", color: "#be123c" }) +
-      cell(totals.shoV.toFixed(2), { bold: true, align: "right", bg: "#f3f4f6", color: "#be123c" }) +
-      cell(totals.closeQ.toFixed(2), { bold: true, align: "right", bg: "#f3f4f6", color: "#0f5132" }) +
-      cell(totals.closeV.toFixed(2), { bold: true, align: "right", bg: "#f3f4f6", color: "#0f5132" }) +
-    `</tr>`;
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 13 } },
+      { s: { r: 2, c: 0 }, e: { r: 3, c: 0 } },
+      { s: { r: 2, c: 1 }, e: { r: 3, c: 1 } },
+      { s: { r: 2, c: 2 }, e: { r: 3, c: 2 } },
+      { s: { r: 2, c: 3 }, e: { r: 3, c: 3 } },
+      { s: { r: 2, c: 4 }, e: { r: 2, c: 5 } },
+      { s: { r: 2, c: 6 }, e: { r: 2, c: 7 } },
+      { s: { r: 2, c: 8 }, e: { r: 2, c: 9 } },
+      { s: { r: 2, c: 10 }, e: { r: 2, c: 11 } },
+      { s: { r: 2, c: 12 }, e: { r: 2, c: 13 } },
+      { s: { r: aoa.length - 1, c: 0 }, e: { r: aoa.length - 1, c: 3 } },
+    ];
+    ws["!cols"] = [
+      { wch: 12 }, { wch: 30 }, { wch: 10 }, { wch: 8 },
+      { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 14 },
+      { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 14 },
+      { wch: 12 }, { wch: 14 },
+    ];
 
-    const title = `<tr><td colspan="14" style="text-align:center;font-weight:bold;font-size:14px;padding:8px;background:#0f5132;color:#fff;">Stock Item Vouchers — ${item} &nbsp; | &nbsp; HIMFED-SHIMLA &nbsp; | &nbsp; 1-Jul-26 to 31-Jul-26</td></tr>`;
-
-    const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"/><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>${item} Vouchers</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table style="border-collapse:collapse;font-family:Arial,sans-serif;font-size:11px;">${title}${header}${bodyRows}${footer}</table></body></html>`;
-
-    const blob = new Blob(["\ufeff", html], { type: "application/vnd.ms-excel" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `stock-item-vouchers-${item}-${Date.now()}.xls`;
-    a.click();
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, `${item} Vouchers`);
+    XLSX.writeFile(wb, `stock-item-vouchers-${item}-${Date.now()}.xlsx`);
   };
 
   return (
