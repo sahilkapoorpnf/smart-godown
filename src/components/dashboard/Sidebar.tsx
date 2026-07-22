@@ -76,6 +76,7 @@ const menuItems: Item[] = [
   { icon: Truck,           label: "Vehicle Master (PP)",  path: "/dashboard/erp/acc/masters/vehicles", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   { icon: Package,         label: "Nozzle Master (PP)",   path: "/dashboard/erp/acc/masters/nozzles", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   { icon: Receipt,         label: "Pump Transactions (PP)", path: "/dashboard/erp/acc/pump-transactions", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
+  { icon: AlertTriangle,   label: "Dept Outstanding & Credit", path: "/dashboard/erp/acc/outstanding", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   { icon: Truck,           label: "Purchase Voucher",     path: "/dashboard/erp/acc/purchase", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   { icon: Receipt,         label: "Sales Voucher",        path: "/dashboard/erp/acc/sales", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   { icon: Wallet,          label: "Payment Voucher",      path: "/dashboard/erp/acc/payment", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },

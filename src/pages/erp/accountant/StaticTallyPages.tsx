@@ -1,5 +1,5 @@
 import { ReactNode, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import ErpPage, { Badge, StatTile } from "@/components/erp/ErpPage";
 import { DataTable } from "@/components/erp/DataTable";
 import { Button } from "@/components/ui/button";
@@ -20,8 +20,9 @@ import {
 import {
   ArrowLeftRight, BadgeIndianRupee, Banknote, BookOpen, Building2, Download,
   FileCheck2, FileText, Landmark, Package, Plus, Printer, Receipt, Search,
-  ShieldCheck, Truck, Upload, Wallet,
+  ShieldCheck, Truck, Upload, Wallet, ShieldAlert, Clock, CheckCircle2, AlertTriangle,
 } from "lucide-react";
+import { getDeptSummary, getDeptHealthCounts, healthLabel, HealthStatus, CREDIT_PERIOD_DAYS } from "@/lib/erp/creditData";
 import { getCurrentUser } from "@/lib/warehouse/store";
 
 const allowed = ["wh_accountant", "admin_accountant", "accountant", "superadmin"] as any;
@@ -1197,11 +1198,17 @@ export function PumpTransactionsStatic() {
   const tanks = tanksStatic;
   const vehicles = vehiclesStatic;
   const departments = departmentsStatic;
+  const navigate = useNavigate();
+  const [sp] = useSearchParams();
+  const initialDept = sp.get("dept") ?? departments[0]?.id ?? "";
 
   const [dateFilter, setDateFilter] = useState<string>("2026-07-14");
   const [modeFilter, setModeFilter] = useState<string>("all");
   const [productFilter, setProductFilter] = useState<string>("all");
   const [nozzleFilter, setNozzleFilter] = useState<string>("all");
+  const [formDeptId, setFormDeptId] = useState<string>(initialDept);
+  const deptSummary = useMemo(() => formDeptId ? getDeptSummary(formDeptId) : null, [formDeptId]);
+  const healthCounts = useMemo(() => getDeptHealthCounts(), []);
 
   const scoped = rows.filter((r) =>
     r.date === dateFilter &&
@@ -1345,6 +1352,44 @@ export function PumpTransactionsStatic() {
         </div>
       </div>
 
+      {/* Department Credit Health — clickable status cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <button onClick={() => navigate("/dashboard/erp/acc/outstanding?status=red")}
+          className="text-left rounded-xl border-2 border-rose-300 bg-gradient-to-br from-rose-50 to-rose-100 p-4 hover:scale-[1.01] transition">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-rose-500 text-white"><ShieldAlert className="w-5 h-5" /></div>
+            <div className="flex-1">
+              <div className="text-[11px] uppercase tracking-wider font-bold text-rose-700">🔴 Red — Overdue Depts</div>
+              <div className="text-2xl font-serif font-bold text-rose-900">{healthCounts.red}</div>
+              <div className="text-[11px] text-rose-700">Overdue amount: <b>{fmtStaticINR(healthCounts.overdueAmount)}</b></div>
+            </div>
+          </div>
+        </button>
+        <button onClick={() => navigate("/dashboard/erp/acc/outstanding?status=yellow")}
+          className="text-left rounded-xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-amber-100 p-4 hover:scale-[1.01] transition">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-amber-500 text-white"><Clock className="w-5 h-5" /></div>
+            <div className="flex-1">
+              <div className="text-[11px] uppercase tracking-wider font-bold text-amber-700">🟡 Yellow — Within Period</div>
+              <div className="text-2xl font-serif font-bold text-amber-900">{healthCounts.yellow}</div>
+              <div className="text-[11px] text-amber-700">Outstanding within {CREDIT_PERIOD_DAYS}-day credit window</div>
+            </div>
+          </div>
+        </button>
+        <button onClick={() => navigate("/dashboard/erp/acc/outstanding?status=green")}
+          className="text-left rounded-xl border-2 border-emerald-300 bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 hover:scale-[1.01] transition">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-emerald-500 text-white"><CheckCircle2 className="w-5 h-5" /></div>
+            <div className="flex-1">
+              <div className="text-[11px] uppercase tracking-wider font-bold text-emerald-700">🟢 Green — Healthy Depts</div>
+              <div className="text-2xl font-serif font-bold text-emerald-900">{healthCounts.green}</div>
+              <div className="text-[11px] text-emerald-700">No outstanding · safe to extend credit</div>
+            </div>
+          </div>
+        </button>
+      </div>
+
+
       {/* KPI tiles */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
         <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Total Txns</div><div className="text-xl font-serif font-bold">{scoped.length}</div></CardContent></Card>
@@ -1369,7 +1414,43 @@ export function PumpTransactionsStatic() {
           <div className="rounded border-2 border-himfed-green bg-himfed-green/5 p-2 text-xs font-semibold text-himfed-green">
             Daily Pump Entry — HIMFED-SHIMLA &nbsp; <span className="text-muted-foreground font-normal">Enter each nozzle-wise fuel sale (Credit or Cash/Card/UPI)</span>
           </div>
+
+          {/* Live department credit-health banner (clickable) */}
+          {deptSummary && (() => {
+            const h = deptSummary.health as HealthStatus;
+            const styles = h === "red"
+              ? "border-rose-400 bg-rose-50 text-rose-900"
+              : h === "yellow"
+              ? "border-amber-400 bg-amber-50 text-amber-900"
+              : "border-emerald-400 bg-emerald-50 text-emerald-900";
+            const Icon = h === "red" ? ShieldAlert : h === "yellow" ? Clock : CheckCircle2;
+            const dot = h === "red" ? "bg-rose-500" : h === "yellow" ? "bg-amber-500" : "bg-emerald-500";
+            return (
+              <button type="button" onClick={() => navigate(`/dashboard/erp/acc/outstanding?dept=${deptSummary.deptId}&view=ledger`)}
+                className={`w-full text-left rounded-xl border-2 p-3 ${styles} hover:brightness-95 transition`}>
+                <div className="flex items-center gap-3">
+                  <span className={`w-3 h-3 rounded-full ${dot} flex-shrink-0`} />
+                  <Icon className="w-5 h-5 flex-shrink-0" />
+                  <div className="flex-1 text-xs">
+                    <div className="font-bold uppercase tracking-wider">{healthLabel(h)} — {deptSummary.name}</div>
+                    <div className="mt-0.5">
+                      {h === "red" && <><b>⚠ CREDIT PERIOD EXCEEDED.</b> Oldest bill pending <b>{deptSummary.oldestPendingDays} days</b> · Collect payment before further fuel transactions.</>}
+                      {h === "yellow" && <>Outstanding <b>{fmtStaticINR(deptSummary.totalOutstanding)}</b>. Oldest {deptSummary.oldestPendingDays} d · <b>{Math.max(0, CREDIT_PERIOD_DAYS - deptSummary.oldestPendingDays)} d</b> remaining.</>}
+                      {h === "green" && <>Payment health OK. Outstanding <b>{fmtStaticINR(deptSummary.totalOutstanding)}</b>. Last payment {deptSummary.lastPaymentDate ?? "—"}.</>}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[10px] opacity-75">Total O/S</div>
+                    <div className="font-serif font-bold text-lg">{fmtStaticINR(deptSummary.totalOutstanding)}</div>
+                    <div className="text-[10px] opacity-75 underline">View ledger →</div>
+                  </div>
+                </div>
+              </button>
+            );
+          })()}
+
           <StaticForm title="New Pump Transaction">
+
             <Field label="Date *" type="date" value={dateFilter} />
             <Field label="Bill No. *" value="HIM-26-27-0106" />
             <SelectField label="Mode *" value="Credit" options={["Credit", "Cash", "Card/POS", "UPI/QR"]} />
@@ -1381,7 +1462,17 @@ export function PumpTransactionsStatic() {
             <Field label="Qty (Ltr)" value="37.00" />
             <Field label="Rate (₹/Ltr)" value="102.65" />
             <Field label="Amount (₹)" value="3798" />
-            <SelectField label="Department (Credit only)" value={departments[0]?.name ?? ""} options={departments.map((d) => `${d.code} · ${d.name}`)} />
+            <div className="space-y-1">
+              <Label className="text-xs">Department (Credit only)</Label>
+              <Select value={formDeptId} onValueChange={setFormDeptId}>
+                <SelectTrigger className="h-9"><SelectValue placeholder="Select department" /></SelectTrigger>
+                <SelectContent className="max-h-72">
+                  {departments.map((d) => (
+                    <SelectItem key={d.id} value={d.id}>{d.code} · {d.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <SelectField label="Vehicle (Credit only)" value={vehicles[0]?.vehicleNumber ?? ""} options={vehicles.map((v) => `${v.vehicleNumber} · ${v.departmentName}`)} />
             <Field label="Trans Ref (POS / UPI id)" value="" />
             <SelectField label="Operator" value="Anil Chauhan" options={["Anil Chauhan", "Pooja Devi", "Rohit Kashyap"]} />
