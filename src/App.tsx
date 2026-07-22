@@ -69,6 +69,7 @@ import {
 import BalanceSheetPage from "./pages/erp/accountant/BalanceSheetPage";
 import DepartmentOutstandingPage from "./pages/erp/accountant/DepartmentOutstandingPage";
 import ProfitLossPage from "./pages/erp/accountant/ProfitLossPage";
+import StockItemVouchers from "./pages/erp/accountant/StockItemVouchers";
 
 const queryClient = new QueryClient();
 
