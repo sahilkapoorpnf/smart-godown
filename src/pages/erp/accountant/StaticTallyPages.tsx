@@ -1414,7 +1414,43 @@ export function PumpTransactionsStatic() {
           <div className="rounded border-2 border-himfed-green bg-himfed-green/5 p-2 text-xs font-semibold text-himfed-green">
             Daily Pump Entry — HIMFED-SHIMLA &nbsp; <span className="text-muted-foreground font-normal">Enter each nozzle-wise fuel sale (Credit or Cash/Card/UPI)</span>
           </div>
+
+          {/* Live department credit-health banner (clickable) */}
+          {deptSummary && (() => {
+            const h = deptSummary.health as HealthStatus;
+            const styles = h === "red"
+              ? "border-rose-400 bg-rose-50 text-rose-900"
+              : h === "yellow"
+              ? "border-amber-400 bg-amber-50 text-amber-900"
+              : "border-emerald-400 bg-emerald-50 text-emerald-900";
+            const Icon = h === "red" ? ShieldAlert : h === "yellow" ? Clock : CheckCircle2;
+            const dot = h === "red" ? "bg-rose-500" : h === "yellow" ? "bg-amber-500" : "bg-emerald-500";
+            return (
+              <button type="button" onClick={() => navigate(`/dashboard/erp/acc/outstanding?dept=${deptSummary.deptId}&view=ledger`)}
+                className={`w-full text-left rounded-xl border-2 p-3 ${styles} hover:brightness-95 transition`}>
+                <div className="flex items-center gap-3">
+                  <span className={`w-3 h-3 rounded-full ${dot} flex-shrink-0`} />
+                  <Icon className="w-5 h-5 flex-shrink-0" />
+                  <div className="flex-1 text-xs">
+                    <div className="font-bold uppercase tracking-wider">{healthLabel(h)} — {deptSummary.name}</div>
+                    <div className="mt-0.5">
+                      {h === "red" && <><b>⚠ CREDIT PERIOD EXCEEDED.</b> Oldest bill pending <b>{deptSummary.oldestPendingDays} days</b> · Collect payment before further fuel transactions.</>}
+                      {h === "yellow" && <>Outstanding <b>{fmtStaticINR(deptSummary.totalOutstanding)}</b>. Oldest {deptSummary.oldestPendingDays} d · <b>{Math.max(0, CREDIT_PERIOD_DAYS - deptSummary.oldestPendingDays)} d</b> remaining.</>}
+                      {h === "green" && <>Payment health OK. Outstanding <b>{fmtStaticINR(deptSummary.totalOutstanding)}</b>. Last payment {deptSummary.lastPaymentDate ?? "—"}.</>}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[10px] opacity-75">Total O/S</div>
+                    <div className="font-serif font-bold text-lg">{fmtStaticINR(deptSummary.totalOutstanding)}</div>
+                    <div className="text-[10px] opacity-75 underline">View ledger →</div>
+                  </div>
+                </div>
+              </button>
+            );
+          })()}
+
           <StaticForm title="New Pump Transaction">
+
             <Field label="Date *" type="date" value={dateFilter} />
             <Field label="Bill No. *" value="HIM-26-27-0106" />
             <SelectField label="Mode *" value="Credit" options={["Credit", "Cash", "Card/POS", "UPI/QR"]} />
