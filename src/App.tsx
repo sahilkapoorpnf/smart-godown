@@ -69,6 +69,7 @@ import {
 import BalanceSheetPage from "./pages/erp/accountant/BalanceSheetPage";
 import DepartmentOutstandingPage from "./pages/erp/accountant/DepartmentOutstandingPage";
 import ProfitLossPage from "./pages/erp/accountant/ProfitLossPage";
+import StockItemVouchers from "./pages/erp/accountant/StockItemVouchers";
 
 const queryClient = new QueryClient();
 
@@ -137,6 +138,7 @@ const App = () => (
           <Route path="/dashboard/erp/acc/inventory/units" element={<StockUnitStatic />} />
           <Route path="/dashboard/erp/acc/inventory/godowns" element={<GodownMasterStatic />} />
           <Route path="/dashboard/erp/acc/inventory/tanks" element={<TankMasterStatic />} />
+          <Route path="/dashboard/erp/acc/inventory/item-vouchers" element={<StockItemVouchers />} />
           <Route path="/dashboard/erp/acc/masters/departments" element={<DepartmentMasterStatic />} />
           <Route path="/dashboard/erp/acc/masters/vehicles" element={<VehicleMasterStatic />} />
           <Route path="/dashboard/erp/acc/masters/nozzles" element={<NozzleMasterStatic />} />
