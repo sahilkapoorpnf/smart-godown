@@ -1352,6 +1352,44 @@ export function PumpTransactionsStatic() {
         </div>
       </div>
 
+      {/* Department Credit Health — clickable status cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <button onClick={() => navigate("/dashboard/erp/acc/outstanding?status=red")}
+          className="text-left rounded-xl border-2 border-rose-300 bg-gradient-to-br from-rose-50 to-rose-100 p-4 hover:scale-[1.01] transition">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-rose-500 text-white"><ShieldAlert className="w-5 h-5" /></div>
+            <div className="flex-1">
+              <div className="text-[11px] uppercase tracking-wider font-bold text-rose-700">🔴 Red — Overdue Depts</div>
+              <div className="text-2xl font-serif font-bold text-rose-900">{healthCounts.red}</div>
+              <div className="text-[11px] text-rose-700">Overdue amount: <b>{fmtStaticINR(healthCounts.overdueAmount)}</b></div>
+            </div>
+          </div>
+        </button>
+        <button onClick={() => navigate("/dashboard/erp/acc/outstanding?status=yellow")}
+          className="text-left rounded-xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-amber-100 p-4 hover:scale-[1.01] transition">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-amber-500 text-white"><Clock className="w-5 h-5" /></div>
+            <div className="flex-1">
+              <div className="text-[11px] uppercase tracking-wider font-bold text-amber-700">🟡 Yellow — Within Period</div>
+              <div className="text-2xl font-serif font-bold text-amber-900">{healthCounts.yellow}</div>
+              <div className="text-[11px] text-amber-700">Outstanding within {CREDIT_PERIOD_DAYS}-day credit window</div>
+            </div>
+          </div>
+        </button>
+        <button onClick={() => navigate("/dashboard/erp/acc/outstanding?status=green")}
+          className="text-left rounded-xl border-2 border-emerald-300 bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 hover:scale-[1.01] transition">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-emerald-500 text-white"><CheckCircle2 className="w-5 h-5" /></div>
+            <div className="flex-1">
+              <div className="text-[11px] uppercase tracking-wider font-bold text-emerald-700">🟢 Green — Healthy Depts</div>
+              <div className="text-2xl font-serif font-bold text-emerald-900">{healthCounts.green}</div>
+              <div className="text-[11px] text-emerald-700">No outstanding · safe to extend credit</div>
+            </div>
+          </div>
+        </button>
+      </div>
+
+
       {/* KPI tiles */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
         <Card className="border-himfed-green/20"><CardContent className="p-4 space-y-1"><div className="text-xs text-muted-foreground">Total Txns</div><div className="text-xl font-serif font-bold">{scoped.length}</div></CardContent></Card>
