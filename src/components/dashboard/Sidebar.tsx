@@ -72,6 +72,7 @@ const menuItems: Item[] = [
   { icon: Package,         label: "Inventory: Stock Unit", path: "/dashboard/erp/acc/inventory/units", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   { icon: Warehouse,       label: "Godown/Warehouse Master", path: "/dashboard/erp/acc/inventory/godowns", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   { icon: Package,         label: "Tank Master (HSD / ULP)", path: "/dashboard/erp/acc/inventory/tanks", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
+  { icon: Package,         label: "Stock Item Vouchers",  path: "/dashboard/erp/acc/inventory/item-vouchers", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   { icon: Landmark,        label: "Department Master (HP Govt)", path: "/dashboard/erp/acc/masters/departments", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   { icon: Truck,           label: "Vehicle Master (PP)",  path: "/dashboard/erp/acc/masters/vehicles", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
   { icon: Package,         label: "Nozzle Master (PP)",   path: "/dashboard/erp/acc/masters/nozzles", roles: ["wh_accountant", "admin_accountant", "accountant", "superadmin"] },
