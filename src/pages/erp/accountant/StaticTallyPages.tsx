@@ -20,8 +20,9 @@ import {
 import {
   ArrowLeftRight, BadgeIndianRupee, Banknote, BookOpen, Building2, Download,
   FileCheck2, FileText, Landmark, Package, Plus, Printer, Receipt, Search,
-  ShieldCheck, Truck, Upload, Wallet,
+  ShieldCheck, Truck, Upload, Wallet, ShieldAlert, Clock, CheckCircle2, AlertTriangle,
 } from "lucide-react";
+import { getDeptSummary, getDeptHealthCounts, healthLabel, HealthStatus, CREDIT_PERIOD_DAYS } from "@/lib/erp/creditData";
 import { getCurrentUser } from "@/lib/warehouse/store";
 
 const allowed = ["wh_accountant", "admin_accountant", "accountant", "superadmin"] as any;
