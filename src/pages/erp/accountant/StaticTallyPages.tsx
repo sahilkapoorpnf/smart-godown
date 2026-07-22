@@ -1,5 +1,5 @@
 import { ReactNode, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import ErpPage, { Badge, StatTile } from "@/components/erp/ErpPage";
 import { DataTable } from "@/components/erp/DataTable";
 import { Button } from "@/components/ui/button";
