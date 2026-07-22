@@ -84,18 +84,83 @@ export default function StockItemVouchers() {
   const lastIdx = withClosing.length - 1;
 
   const exportCsv = () => {
-    const head = "Date,Particulars,Vch Type,Vch No,Inwards Qty,Inwards Value,Sales Qty,Sales Value,Shrinkage Qty,Shrinkage Value,Shortage Qty,Shortage Value";
-    const body = withClosing.map(r => [
-      r.date, r.particulars, r.vchType, r.vchNo,
-      r.inQty ?? "", r.inVal ?? "",
-      r.outKind === "sales" ? r.outQty : "", r.outKind === "sales" ? r.outVal : "",
-      r.outKind === "shrinkage" ? r.outQty : "", r.outKind === "shrinkage" ? r.outVal : "",
-      r.outKind === "shortage" ? r.outQty : "", r.outKind === "shortage" ? r.outVal : "",
-    ].join(",")).join("\n");
-    const blob = new Blob([head + "\n" + body], { type: "text/csv" });
+    const num = (n?: number) => (n == null || n === 0 ? "" : n);
+    const cell = (v: string | number, opts: { bold?: boolean; bg?: string; color?: string; align?: string; colspan?: number; rowspan?: number } = {}) => {
+      const style = [
+        "border:1px solid #999;padding:4px 8px;",
+        opts.bold ? "font-weight:bold;" : "",
+        opts.bg ? `background:${opts.bg};` : "",
+        opts.color ? `color:${opts.color};` : "",
+        opts.align ? `text-align:${opts.align};` : "",
+      ].join("");
+      const attrs = `${opts.colspan ? ` colspan="${opts.colspan}"` : ""}${opts.rowspan ? ` rowspan="${opts.rowspan}"` : ""}`;
+      return `<td style="${style}"${attrs}>${v}</td>`;
+    };
+
+    const bodyRows = withClosing.map((r, i) => {
+      const isSales = r.outKind === "sales";
+      const isShr = r.outKind === "shrinkage";
+      const isSho = r.outKind === "shortage";
+      return "<tr>" + [
+        cell(r.date),
+        cell(r.particulars || "—"),
+        cell(r.vchType, { bold: true, color: r.vchType === "Purchase" ? "#047857" : r.vchType === "Sales" ? "#1d4ed8" : "#b45309" }),
+        cell(r.vchNo, { align: "right" }),
+        cell(num(r.inQty), { align: "right", color: "#047857" }),
+        cell(num(r.inVal), { align: "right", color: "#047857" }),
+        cell(isSales ? num(r.outQty) : "", { align: "right", color: "#1d4ed8" }),
+        cell(isSales ? num(r.outVal) : "", { align: "right", color: "#1d4ed8" }),
+        cell(isShr ? num(r.outQty) : "", { align: "right", color: "#b45309", bg: "#fef3c7" }),
+        cell(isShr ? num(r.outVal) : "", { align: "right", color: "#b45309", bg: "#fef3c7" }),
+        cell(isSho ? num(r.outQty) : "", { align: "right", color: "#be123c", bg: "#ffe4e6" }),
+        cell(isSho ? num(r.outVal) : "", { align: "right", color: "#be123c", bg: "#ffe4e6" }),
+        cell(i === lastIdx ? r.closeQ.toFixed(2) : "", { align: "right", bold: true, color: "#0f5132" }),
+        cell(i === lastIdx ? r.closeV.toFixed(2) : "", { align: "right", bold: true, color: "#0f5132" }),
+      ].join("") + "</tr>";
+    }).join("");
+
+    const header =
+      `<tr>` +
+        cell("Date", { bold: true, rowspan: 2, bg: "#e5e7eb" }) +
+        cell("Particulars", { bold: true, rowspan: 2, bg: "#e5e7eb" }) +
+        cell("Vch Type", { bold: true, rowspan: 2, bg: "#e5e7eb" }) +
+        cell("Vch No", { bold: true, rowspan: 2, bg: "#e5e7eb", align: "right" }) +
+        cell("Inwards", { bold: true, colspan: 2, bg: "#d1fae5", color: "#047857", align: "center" }) +
+        cell("Outwards - Sales", { bold: true, colspan: 2, bg: "#dbeafe", color: "#1d4ed8", align: "center" }) +
+        cell("Outwards - Shrinkage", { bold: true, colspan: 2, bg: "#fef3c7", color: "#b45309", align: "center" }) +
+        cell("Outwards - Shortage", { bold: true, colspan: 2, bg: "#ffe4e6", color: "#be123c", align: "center" }) +
+        cell("Closing", { bold: true, colspan: 2, bg: "#dcfce7", color: "#0f5132", align: "center" }) +
+      `</tr>` +
+      `<tr>` +
+        cell("Qty (L)", { bold: true, bg: "#d1fae5", align: "right" }) + cell("Value (₹)", { bold: true, bg: "#d1fae5", align: "right" }) +
+        cell("Qty (L)", { bold: true, bg: "#dbeafe", align: "right" }) + cell("Value (₹)", { bold: true, bg: "#dbeafe", align: "right" }) +
+        cell("Qty (L)", { bold: true, bg: "#fef3c7", align: "right" }) + cell("Value (₹)", { bold: true, bg: "#fef3c7", align: "right" }) +
+        cell("Qty (L)", { bold: true, bg: "#ffe4e6", align: "right" }) + cell("Value (₹)", { bold: true, bg: "#ffe4e6", align: "right" }) +
+        cell("Qty (L)", { bold: true, bg: "#dcfce7", align: "right" }) + cell("Value (₹)", { bold: true, bg: "#dcfce7", align: "right" }) +
+      `</tr>`;
+
+    const footer = `<tr>` +
+      cell("Totals as per 'Default' valuation :", { bold: true, colspan: 4, align: "right", bg: "#f3f4f6" }) +
+      cell(totals.inQ.toFixed(2), { bold: true, align: "right", bg: "#f3f4f6", color: "#047857" }) +
+      cell(totals.inV.toFixed(2), { bold: true, align: "right", bg: "#f3f4f6", color: "#047857" }) +
+      cell(totals.salesQ.toFixed(2), { bold: true, align: "right", bg: "#f3f4f6", color: "#1d4ed8" }) +
+      cell(totals.salesV.toFixed(2), { bold: true, align: "right", bg: "#f3f4f6", color: "#1d4ed8" }) +
+      cell(totals.shrQ.toFixed(2), { bold: true, align: "right", bg: "#f3f4f6", color: "#b45309" }) +
+      cell(totals.shrV.toFixed(2), { bold: true, align: "right", bg: "#f3f4f6", color: "#b45309" }) +
+      cell(totals.shoQ.toFixed(2), { bold: true, align: "right", bg: "#f3f4f6", color: "#be123c" }) +
+      cell(totals.shoV.toFixed(2), { bold: true, align: "right", bg: "#f3f4f6", color: "#be123c" }) +
+      cell(totals.closeQ.toFixed(2), { bold: true, align: "right", bg: "#f3f4f6", color: "#0f5132" }) +
+      cell(totals.closeV.toFixed(2), { bold: true, align: "right", bg: "#f3f4f6", color: "#0f5132" }) +
+    `</tr>`;
+
+    const title = `<tr><td colspan="14" style="text-align:center;font-weight:bold;font-size:14px;padding:8px;background:#0f5132;color:#fff;">Stock Item Vouchers — ${item} &nbsp; | &nbsp; HIMFED-SHIMLA &nbsp; | &nbsp; 1-Jul-26 to 31-Jul-26</td></tr>`;
+
+    const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"/><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>${item} Vouchers</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table style="border-collapse:collapse;font-family:Arial,sans-serif;font-size:11px;">${title}${header}${bodyRows}${footer}</table></body></html>`;
+
+    const blob = new Blob(["\ufeff", html], { type: "application/vnd.ms-excel" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `stock-item-vouchers-${item}-${Date.now()}.csv`;
+    a.download = `stock-item-vouchers-${item}-${Date.now()}.xls`;
     a.click();
   };
 
